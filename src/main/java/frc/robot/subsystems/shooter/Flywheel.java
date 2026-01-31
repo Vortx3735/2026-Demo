@@ -14,7 +14,6 @@ public class Flywheel extends SubsystemBase {
 
   public void setFlywheelSpeed(double speed) {
     motorSpeed = speed;
-    
   }
 
   public double getFlywheelSpeed() {
@@ -35,5 +34,15 @@ public class Flywheel extends SubsystemBase {
 
   public Command shootCommand() {
     return run(() -> shoot()).withName("shoot flywheel");
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // This method will be called once per scheduler run during simulation
   }
 }
