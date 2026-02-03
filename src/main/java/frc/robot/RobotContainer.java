@@ -179,10 +179,10 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // do not move the defaultcommands
     intake.setDefaultCommand(intake.stopCommand());
-    climber.setDefaultCommand(climber.stopCommand());
-    indexer.setDefaultCommand(indexer.stopCommand());
-    flywheel.setDefaultCommand(flywheel.stopCommand());
-    turret.setDefaultCommand(TurretCommands.AimToHub(turret, () -> drive.getPose()));
+    climber.setDefaultCommand(climber.stopCommand().withName("Stop Climber"));
+    indexer.setDefaultCommand(indexer.stopCommand().withName("Stop Indexer"));
+    flywheel.setDefaultCommand(flywheel.stopCommand().withName("Stop Flywheel"));
+    turret.setDefaultCommand(TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("Aim To Hub"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
