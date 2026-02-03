@@ -77,6 +77,7 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -197,7 +198,8 @@ public class RobotContainer {
     indexer.setDefaultCommand(indexer.stopCommand().withName("stop indexer"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
     turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
-    turret.setDefaultCommand(TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to hub"));
+    turret.setDefaultCommand(
+        TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to hub"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(

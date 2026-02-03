@@ -17,6 +17,7 @@ public class Hood extends SubsystemBase {
    */
   private final TalonFX motor;
   private final CANcoder canCoder;
+
   /*initialize subsystem objects in constructor
    *for good practice, pass in any constants through the constructor
    */
