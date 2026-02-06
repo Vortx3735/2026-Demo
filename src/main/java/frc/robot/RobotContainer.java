@@ -182,8 +182,9 @@ public class RobotContainer {
     climber.setDefaultCommand(climber.stopCommand().withName("Stop Climber"));
     indexer.setDefaultCommand(indexer.stopCommand().withName("Stop Indexer"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("Stop Flywheel"));
-    turret.setDefaultCommand(TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("Aim To Hub"));
-
+    turret.setDefaultCommand(
+        TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("Aim To Hub"));
+    // turret.stopCommand());
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
