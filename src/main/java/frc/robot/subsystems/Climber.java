@@ -49,7 +49,7 @@ public class Climber extends SubsystemBase {
 
   public Command stopCommand() {
 
-    return this.runOnce(() -> this.stop());
+    return this.runOnce(() -> this.stop()).withName("stop climber");
   }
 
   @Override
