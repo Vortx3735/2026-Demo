@@ -192,7 +192,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // do not move the defaultcommands
-    intake.setDefaultCommand(intake.stopCommand()).withName("Stop Intake");
+    intake.setDefaultCommand(intake.stopCommand().withName("Stop Intake"));
     climber.setDefaultCommand(climber.stopCommand().withName("Stop Climber"));
     indexer.setDefaultCommand(indexer.stopCommand().withName("Stop Indexer"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("Stop Flywheel"));
