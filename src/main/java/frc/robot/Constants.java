@@ -63,6 +63,11 @@ public class Constants {
     public static final int TURRET_MOTOR_ID = 1;
   }
 
+  public static class HoodConstants {
+    public static final int HOOD_MOTOR_ID = 2;
+    public static final int HOOD_CANCODER_ID = 3;
+  }
+
   public static class IndexerConstants {
     public static final int INDEXER_MOTOR_ID = 17;
   }
