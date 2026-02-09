@@ -228,7 +228,7 @@ public class RobotContainer {
     controller.povDown.whileTrue(flywheel.setVelocityPIDCommand(0));
     controller.povRight.whileTrue(turret.moveCommand(0.5));
     controller.povLeft.whileTrue(turret.moveCommand(-0.5));
-    controller.yButton.whileTrue(hood.setPositionPIDCommand(45));
+    controller.yButton.whileTrue(hood.setPositionPIDCommand(-45));
     controller.bButton.whileTrue(hood.setPositionPIDCommand(0));
     controller.rt.whileTrue(indexer.runCommand(0.6));
     controller.aButton.whileTrue(indexer.runCommand(-0.6));
@@ -271,6 +271,16 @@ public class RobotContainer {
                         new Transform2d(
                             0.13, -0.2, new Rotation2d(turret.turretPosition * 2 * Math.PI))))
             .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
+    Logger.recordOutput(
+        "Hood/simulatedPose",
+        new Pose3d(
+                driveSimulation
+                    .getSimulatedDriveTrainPose()
+                    .plus(
+                        new Transform2d(
+                            0.13, -0.2, new Rotation2d(turret.turretPosition * 2 * Math.PI))))
+            .plus(
+                new Transform3d(0, 0, 0.3, new Rotation3d(0, hood.hoodAngle * Math.PI / 180, 0))));
     Logger.recordOutput(
         "Turret/targetPose",
         new Pose3d(
