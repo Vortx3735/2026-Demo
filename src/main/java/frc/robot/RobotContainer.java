@@ -202,7 +202,8 @@ public class RobotContainer {
     intake.setDefaultCommand(intake.stopCommand().withName("stop intake"));
     climber.setDefaultCommand(climber.stopCommand().withName("stop climber"));
     indexer.setDefaultCommand(indexer.stopCommand().withName("stop indexer"));
-    flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
+    hood.setDefaultCommand(hood.hold().withName("hold hood"));
+    flywheel.setDefaultCommand(flywheel.stopCommand().withName("hold flywheel velocity"));
     turret.setDefaultCommand(
         TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to hub"));
 
@@ -223,10 +224,10 @@ public class RobotContainer {
     controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
     // Set bindings
-    controller.rt.whileTrue(flywheel.setVelocityPIDCommand(300));
-    controller.lt.whileTrue(flywheel.setVelocityPIDCommand(0));
-    controller.povRight.whileTrue(turret.moveCommand(1));
-    controller.povLeft.whileTrue(turret.moveCommand(-1));
+    controller.povUp.whileTrue(flywheel.setVelocityPIDCommand(300));
+    controller.povDown.whileTrue(flywheel.setVelocityPIDCommand(0));
+    controller.povRight.whileTrue(turret.moveCommand(0.5));
+    controller.povLeft.whileTrue(turret.moveCommand(-0.5));
     controller.yButton.whileTrue(hood.setPositionPIDCommand(45));
     controller.bButton.whileTrue(hood.setPositionPIDCommand(0));
     controller.rt.whileTrue(indexer.runCommand(0.6));

@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -12,6 +12,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
@@ -50,14 +51,14 @@ public class Flywheel extends SubsystemBase {
                     * DCMotor.getKrakenX60(1).rOhms
                     * kMOI))
             * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kP = 0.11; // An error of 1 rps results in 0.11 V output
+    slot0Configs.kP = 11; // An error of 1 rps results in 0.11 V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0; // no output for error derivative
 
     // set Motion Magic Velocity settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration =
-        400; // Target acceleration of 400 rps/s (0.25 seconds to max)
+        1000; // Target acceleration of 400 rps/s (0.25 seconds to max)
     motionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0.1 seconds)
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
@@ -87,23 +88,29 @@ public class Flywheel extends SubsystemBase {
   public void setVelocityPID(double rps) {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
-    final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps * kGearRatio);
-    // final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
+    // final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps *
+    // kGearRatio);
+    final VelocityVoltage m_request = new VelocityVoltage(rps * kGearRatio);
     flywheelMotor.setControl(m_request);
     // }
     targetVelocity = rps;
   }
 
   public Command setVelocityPIDCommand(double rps) {
-    return runOnce(() -> setVelocityPID(rps)).withName("Set flywheel velocity PID");
+    return Commands.run(() -> setVelocityPID(rps), this).withName("Set flywheel velocity PID");
+  }
+
+  public Command holdSpeed() {
+    return Commands.run(() -> setVelocityPID(targetVelocity), this)
+        .withName("hold flywheel velocity");
   }
 
   public Command stopCommand() {
-    return run(() -> stop()).withName("stop flywheel");
+    return Commands.run(() -> stop(), this).withName("stop flywheel");
   }
 
   public Command shootCommand() {
-    return run(() -> shoot()).withName("shoot flywheel");
+    return Commands.run(() -> shoot(), this).withName("shoot flywheel");
   }
 
   @Override
