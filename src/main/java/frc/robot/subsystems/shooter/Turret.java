@@ -20,8 +20,8 @@ import org.littletonrobotics.junction.Logger;
 public class Turret extends SubsystemBase {
   public static TalonFX turretMotor;
   public double turretPosition;
-  private static final double kGearRatio = 10.0;
-  private static final double kMOI = 0.001; // kg*m^2
+  private static final double kGearRatio = 45.45; // Thanks Landon!
+  private static final double kMOI = 0.0117; // kg*m^2, thanks Landon!
   public double targetRotations = 0;
   private final double error = 0.005;
   private final DCMotorSim m_motorSimModel =
@@ -53,16 +53,16 @@ public class Turret extends SubsystemBase {
                     * DCMotor.getKrakenX60(1).rOhms
                     * kMOI))
             * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kP = 2.075; // A position error of 2.5 rotations results in 12 V output
+    slot0Configs.kP = 4.6; // A position error of 2.5 rotations results in 12 V output
     slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.065; // A velocity error of 1 rps results in 0.1 V output
+    slot0Configs.kD = 0.048; // A velocity error of 1 rps results in 0.1 V output
 
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
-        3 * kGearRatio; // target cruise velocity of 3 rps after gearing
+        1 * kGearRatio; // target cruise velocity of 3 rps after gearing
     motionMagicConfigs.MotionMagicAcceleration =
-        200; // Target acceleration of 160 rps/s (0.5 seconds)
-    motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        2; // Target acceleration of 160 rps/s (0.5 seconds)
+    motionMagicConfigs.MotionMagicJerk = 3; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
     turretMotor.getConfigurator().apply(talonFXConfigs);
 
@@ -100,8 +100,8 @@ public class Turret extends SubsystemBase {
   public void setPositionPID(double rotations) {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
-    final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
-    // final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
+    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
+    final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
     turretMotor.setControl(m_request);
     // }
     targetRotations = rotations;
@@ -120,7 +120,7 @@ public class Turret extends SubsystemBase {
   }
 
   public Command stopCommand() {
-    return run(() -> stop()).withName("stop turret");
+    return run(() -> stop()).withName("Stop Turret");
   }
 
   @Override

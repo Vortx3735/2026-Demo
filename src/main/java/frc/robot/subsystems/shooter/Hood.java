@@ -89,7 +89,7 @@ public class Hood extends SubsystemBase {
     motor.set(speed);
   }
 
-  public void stop() {
+  private void stop() {
     motor.set(0);
   }
 
