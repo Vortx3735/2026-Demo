@@ -39,6 +39,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.shooter.Flywheel;
+import frc.robot.subsystems.shooter.Hood;
 import frc.robot.subsystems.shooter.Turret;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.*;
@@ -61,7 +62,13 @@ public class RobotContainer {
   public final Climber climber = new Climber(Constants.ClimberConstants.CLIMBER_MOTOR_ID);
   public final Turret turret =
       new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Constants.currentMode);
-  public final Flywheel flywheel = new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID);
+  public final Hood hood =
+      new Hood(
+          Constants.HoodConstants.HOOD_MOTOR_ID,
+          Constants.HoodConstants.HOOD_CANCODER_ID,
+          Constants.currentMode);
+  public final Flywheel flywheel =
+      new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID, Constants.currentMode);
   public final Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
   public final Indexer indexer = new Indexer(Constants.IndexerConstants.INDEXER_MOTOR_ID);
 
@@ -192,13 +199,14 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // do not move the defaultcommands
-    intake.setDefaultCommand(intake.stopCommand().withName("Stop Intake"));
-    climber.setDefaultCommand(climber.stopCommand().withName("Stop Climber"));
-    indexer.setDefaultCommand(indexer.stopCommand().withName("Stop Indexer"));
-    flywheel.setDefaultCommand(flywheel.stopCommand().withName("Stop Flywheel"));
+    intake.setDefaultCommand(intake.stopCommand().withName("stop intake"));
+    climber.setDefaultCommand(climber.stopCommand().withName("stop climber"));
+    indexer.setDefaultCommand(indexer.stopCommand().withName("stop indexer"));
+    hood.setDefaultCommand(hood.hold().withName("hold hood"));
+    flywheel.setDefaultCommand(flywheel.stopCommand().withName("hold flywheel velocity"));
     turret.setDefaultCommand(
-        TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("Aim To Hub"));
-    // turret.stopCommand());
+        TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to hub"));
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -216,12 +224,12 @@ public class RobotContainer {
     controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
     // Set bindings
-    controller.rt.whileTrue(flywheel.shootCommand());
-    controller.povRight.whileTrue(turret.moveCommand(1));
-    controller.povLeft.whileTrue(turret.moveCommand(-1));
-    controller.lt.whileTrue(intake.intakeCommand());
-    controller.yButton.whileTrue(climber.upCommand());
-    controller.bButton.whileTrue(climber.downCommand());
+    controller.povUp.whileTrue(flywheel.setVelocityPIDCommand(100));
+    controller.povDown.whileTrue(flywheel.setVelocityPIDCommand(0));
+    controller.povRight.whileTrue(turret.moveCommand(0.5));
+    controller.povLeft.whileTrue(turret.moveCommand(-0.5));
+    controller.yButton.whileTrue(hood.setPositionPIDCommand(-45));
+    controller.bButton.whileTrue(hood.setPositionPIDCommand(0));
     controller.rt.whileTrue(indexer.runCommand(0.6));
     controller.aButton.whileTrue(indexer.runCommand(-0.6));
     controller.xButton.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
@@ -263,6 +271,16 @@ public class RobotContainer {
                         new Transform2d(
                             0.13, -0.2, new Rotation2d(turret.turretPosition * 2 * Math.PI))))
             .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
+    Logger.recordOutput(
+        "Hood/simulatedPose",
+        new Pose3d(
+                driveSimulation
+                    .getSimulatedDriveTrainPose()
+                    .plus(
+                        new Transform2d(
+                            0.13, -0.2, new Rotation2d(turret.turretPosition * 2 * Math.PI))))
+            .plus(
+                new Transform3d(0, 0, 0.3, new Rotation3d(0, hood.hoodAngle * Math.PI / 180, 0))));
     Logger.recordOutput(
         "Turret/targetPose",
         new Pose3d(
