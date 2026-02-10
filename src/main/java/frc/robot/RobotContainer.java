@@ -224,7 +224,7 @@ public class RobotContainer {
     controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
     // Set bindings
-    controller.povUp.whileTrue(flywheel.setVelocityPIDCommand(300));
+    controller.povUp.whileTrue(flywheel.setVelocityPIDCommand(100));
     controller.povDown.whileTrue(flywheel.setVelocityPIDCommand(0));
     controller.povRight.whileTrue(turret.moveCommand(0.5));
     controller.povLeft.whileTrue(turret.moveCommand(-0.5));
