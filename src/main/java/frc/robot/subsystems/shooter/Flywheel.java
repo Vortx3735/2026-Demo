@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.ChassisReference;
@@ -36,13 +37,6 @@ public class Flywheel extends SubsystemBase {
 
     // set slot 0 gains
     var slot0Configs = talonFXConfigs.Slot0;
-    slot0Configs.kS = 0.25; // Add 0.25 V output to overcome static friction
-    slot0Configs.kA =
-        1
-            / (kGearRatio
-                * DCMotor.getKrakenX60(1).KtNMPerAmp
-                / (DCMotor.getKrakenX60(1).rOhms
-                    * kMOI)); // An acceleration of 1 rps/s requires 0.01 V output
     slot0Configs.kV = 0.12;
     slot0Configs.kP = 1; // An error of 1 rps results in 0.11 V output
     slot0Configs.kI = 0; // no output for integrated error
@@ -51,8 +45,8 @@ public class Flywheel extends SubsystemBase {
     // set Motion Magic Velocity settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration =
-        1000; // Target acceleration of 400 rps/s (0.25 seconds to max)
-    motionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0.1 seconds)
+        500; // Target acceleration of 100 rps/s 
+    motionMagicConfigs.MotionMagicJerk = 6000; // Target jerk of 6000 rps/s/s (0.1 seconds)
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
     if (state == Mode.SIM) {
@@ -82,8 +76,7 @@ public class Flywheel extends SubsystemBase {
   public void setVelocityPID(double rps) {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
-    // final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps *
-    // kGearRatio);
+    //final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps * kGearRatio);
     final VelocityVoltage m_request = new VelocityVoltage(rps * kGearRatio);
     flywheelMotor.setControl(m_request);
     // }
