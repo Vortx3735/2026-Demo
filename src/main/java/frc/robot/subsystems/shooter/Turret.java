@@ -26,8 +26,8 @@ public class Turret extends SubsystemBase {
   private final double error = 0.005;
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), kMOI, kGearRatio),
-          DCMotor.getKrakenX60(1));
+          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
+          DCMotor.getKrakenX44(1));
 
   public Turret(int turretMotorID, Mode state) {
     turretMotor = new TalonFX(turretMotorID);
@@ -42,15 +42,15 @@ public class Turret extends SubsystemBase {
     slot0Configs.kA =
         1
             / (kGearRatio
-                * DCMotor.getKrakenX60(1).KtNMPerAmp
-                / (DCMotor.getKrakenX60(1).rOhms
+                * DCMotor.getKrakenX44(1).KtNMPerAmp
+                / (DCMotor.getKrakenX44(1).rOhms
                     * kMOI)); // An acceleration of 1 rps/s requires 0.01 V output
     slot0Configs.kV =
         (kGearRatio
                 * kGearRatio
-                * DCMotor.getKrakenX60(1).KtNMPerAmp
-                / (DCMotor.getKrakenX60(1).KvRadPerSecPerVolt
-                    * DCMotor.getKrakenX60(1).rOhms
+                * DCMotor.getKrakenX44(1).KtNMPerAmp
+                / (DCMotor.getKrakenX44(1).KvRadPerSecPerVolt
+                    * DCMotor.getKrakenX44(1).rOhms
                     * kMOI))
             * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
     slot0Configs.kP = 4.6; // A position error of 2.5 rotations results in 12 V output
@@ -70,7 +70,7 @@ public class Turret extends SubsystemBase {
     if (state == Mode.SIM) {
       var talonFXSim = turretMotor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
-      talonFXSim.setMotorType(TalonFXSimState.MotorType.KrakenX60);
+      talonFXSim.setMotorType(TalonFXSimState.MotorType.KrakenX44);
     }
   }
 
