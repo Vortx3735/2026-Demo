@@ -27,6 +27,7 @@ public class Intake extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Intake");
     intakeMotorSpeedEntry = intakeTable.getDoubleTopic("intakeMotorSpeed").getEntry(0);
+    intakeMotorSpeedEntry.set(1);
   }
 
   public double getSpeed() {
@@ -47,7 +48,7 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return this.run(() -> this.intake()).withName("run intake");
+    return this.run(() -> {setSpeed(intakeMotorSpeedEntry.getAsDouble());this.intake();}).withName("run intake");
   }
 
   public Command stopCommand() {

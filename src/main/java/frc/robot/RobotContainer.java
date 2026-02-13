@@ -70,7 +70,7 @@ public class RobotContainer {
   public final Flywheel flywheel =
       new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID, Constants.currentMode);
   public final Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-  public final Indexer indexer = new Indexer(Constants.IndexerConstants.INDEXER_MOTOR_ID);
+  public final Indexer indexer = new Indexer(Constants.IndexerConstants.INDEXER_MOTOR_ID,Constants.IndexerConstants.INDEXER_ROLLER_MOTOR_ID);
 
   private SwerveDriveSimulation driveSimulation = null;
 
@@ -230,8 +230,9 @@ public class RobotContainer {
     controller.povLeft.whileTrue(turret.moveCommand(-0.5));
     controller.yButton.whileTrue(hood.setPositionPIDCommand(-45));
     controller.bButton.whileTrue(hood.setPositionPIDCommand(0));
-    controller.rt.whileTrue(indexer.runCommand(0.6));
-    controller.aButton.whileTrue(indexer.runCommand(-0.6));
+    controller.rt.whileTrue(indexer.runIndexerCommand(true));
+    controller.lt.whileTrue(intake.intakeCommand());
+    controller.aButton.whileTrue(indexer.runIndexerCommand(true));
     controller.xButton.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
   }
 
