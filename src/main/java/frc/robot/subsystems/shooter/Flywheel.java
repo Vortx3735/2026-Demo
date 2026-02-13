@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.ChassisReference;
@@ -44,8 +43,7 @@ public class Flywheel extends SubsystemBase {
 
     // set Motion Magic Velocity settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicAcceleration =
-        500; // Target acceleration of 100 rps/s 
+    motionMagicConfigs.MotionMagicAcceleration = 500; // Target acceleration of 100 rps/s
     motionMagicConfigs.MotionMagicJerk = 6000; // Target jerk of 6000 rps/s/s (0.1 seconds)
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
@@ -76,7 +74,8 @@ public class Flywheel extends SubsystemBase {
   public void setVelocityPID(double rps) {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
-    //final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps * kGearRatio);
+    // final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps *
+    // kGearRatio);
     final VelocityVoltage m_request = new VelocityVoltage(rps * kGearRatio);
     flywheelMotor.setControl(m_request);
     // }
