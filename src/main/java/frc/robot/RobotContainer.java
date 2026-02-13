@@ -70,7 +70,10 @@ public class RobotContainer {
   public final Flywheel flywheel =
       new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID, Constants.currentMode);
   public final Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-  public final Indexer indexer = new Indexer(Constants.IndexerConstants.INDEXER_MOTOR_ID,Constants.IndexerConstants.INDEXER_ROLLER_MOTOR_ID);
+  public final Indexer indexer =
+      new Indexer(
+          Constants.IndexerConstants.INDEXER_MOTOR_ID,
+          Constants.IndexerConstants.INDEXER_ROLLER_MOTOR_ID);
 
   private SwerveDriveSimulation driveSimulation = null;
 

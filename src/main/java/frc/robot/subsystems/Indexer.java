@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
-
 import edu.wpi.first.networktables.DoubleEntry;
 // NetworkTable imports
 import edu.wpi.first.networktables.NetworkTable;
@@ -24,7 +23,9 @@ public class Indexer extends SubsystemBase {
   public Indexer(int indexerID, int rollerID) {
     indexerMotor = new TalonFX(indexerID);
     rollerMotor = new TalonFX(rollerID);
-    rollerMotor.setControl(new Follower(indexerID, MotorAlignmentValue.Opposed)); //TODO: change direction based on real robot
+    rollerMotor.setControl(
+        new Follower(
+            indexerID, MotorAlignmentValue.Opposed)); // TODO: change direction based on real robot
     // Indexer Network Table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable indexerTable = inst.getTable("Indexer");

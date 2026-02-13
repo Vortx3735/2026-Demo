@@ -48,7 +48,12 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return this.run(() -> {setSpeed(intakeMotorSpeedEntry.getAsDouble());this.intake();}).withName("run intake");
+    return this.run(
+            () -> {
+              setSpeed(intakeMotorSpeedEntry.getAsDouble());
+              this.intake();
+            })
+        .withName("run intake");
   }
 
   public Command stopCommand() {
