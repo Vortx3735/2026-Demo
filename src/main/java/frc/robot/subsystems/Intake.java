@@ -5,6 +5,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.networktables.DoubleEntry;
+// NetworkTable imports
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -13,8 +17,17 @@ public class Intake extends SubsystemBase {
   private final TalonFX motor;
   private double speed = 0.25;
 
+  // Network Table Entry
+  final DoubleEntry intakeMotorSpeedEntry;
+
   public Intake(int motorId) {
     motor = new TalonFX(motorId);
+
+    // Intake Network Table
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable intakeTable = inst.getTable("Intake");
+    intakeMotorSpeedEntry = intakeTable.getDoubleTopic("intakeMotorSpeed").getEntry(0);
+    intakeMotorSpeedEntry.set(1);
   }
 
   public double getSpeed() {
@@ -35,7 +48,12 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return this.run(() -> this.intake()).withName("run intake");
+    return this.run(
+            () -> {
+              setSpeed(intakeMotorSpeedEntry.getAsDouble());
+              this.intake();
+            })
+        .withName("run intake");
   }
 
   public Command stopCommand() {
@@ -44,11 +62,16 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    publishTelemetry();
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+  // Publish motor speed to dashboard
+  private void publishTelemetry() {
+    intakeMotorSpeedEntry.set(motor.getDutyCycle().getValueAsDouble());
   }
 }

@@ -40,7 +40,8 @@ public class AutoRoutines {
                 m_container.drive.stopCommand(),
                 Commands.parallel(
                     // Run intake and indexer
-                    m_container.intake.intakeCommand(), m_container.indexer.runCommand(1)),
+                    m_container.intake.intakeCommand(),
+                    m_container.indexer.runIndexerCommand(false)),
                 // Stop intake and indexer
                 m_container.intake.stopCommand(),
                 m_container.indexer.stopCommand(),

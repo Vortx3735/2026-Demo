@@ -1,42 +1,65 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import edu.wpi.first.networktables.DoubleEntry;
+// NetworkTable imports
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-// import stuff up here
-// for example:
-// import com.aaronsFavWebsite.motorLibrary.Motor;
+import org.littletonrobotics.junction.Logger;
 
 public class Indexer extends SubsystemBase {
-  /*define objects and variables here (e.g. motors, sensors, variables)
-   *for example:
-  public final Motor motor1;
-   */
-  private final TalonFX motor;
+  private final TalonFX indexerMotor;
+  private final TalonFX rollerMotor;
+  private double motorSpeed;
 
-  /*initialize subsystem objects in constructor
-   *for good practice, pass in any constants through the constructor
-   */
-  public Indexer(int motorId) {
-    motor = new TalonFX(motorId);
+  // Network Table Entry
+  final DoubleEntry indexerMotorSpeedEntry;
+
+  public Indexer(int indexerID, int rollerID) {
+    indexerMotor = new TalonFX(indexerID);
+    rollerMotor = new TalonFX(rollerID);
+    rollerMotor.setControl(
+        new Follower(
+            indexerID, MotorAlignmentValue.Opposed)); // TODO: change direction based on real robot
+    // Indexer Network Table
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable indexerTable = inst.getTable("Indexer");
+    indexerMotorSpeedEntry = indexerTable.getDoubleTopic("indexerMotorSpeed").getEntry(0);
+    indexerMotorSpeedEntry.set(1);
   }
 
-  public void run(double speed) {
-    motor.set(speed);
+  public void setIndexerSpeed(double speed) {
+    motorSpeed = speed;
+  }
+
+  public double getIndexerSpeed() {
+    return motorSpeed;
+  }
+
+  public void run(Boolean inverted) {
+    if (inverted) {
+      indexerMotor.set(-motorSpeed);
+    } else {
+      indexerMotor.set(motorSpeed);
+    }
   }
 
   public void stop() {
-    motor.set(0);
+    indexerMotor.set(0);
   }
 
-  public Command runCommand(double speed) {
-    return new RunCommand(() -> run(speed), this).withName("run indexer");
+  public Command runIndexerCommand(Boolean inverted) {
+    // Execute setIndexerSpeed AND set the motor every loop
+    return run(() -> {
+          setIndexerSpeed(indexerMotorSpeedEntry.getAsDouble());
+          run(inverted); // Ensure the motor is actually updated
+        })
+        .withName("run indexer");
   }
 
   public Command stopCommand() {
@@ -45,11 +68,12 @@ public class Indexer extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    Logger.recordOutput("Indexer/motorSpeed", motorSpeed);
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+    Logger.recordOutput("Indexer/simulatedVoltage", indexerMotor.getSimState().getMotorVoltage());
   }
 }
