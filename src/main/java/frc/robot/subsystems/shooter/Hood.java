@@ -65,10 +65,15 @@ public class Hood extends SubsystemBase {
                     * DCMotor.getKrakenX44(1).rOhms
                     * kMOI))
             * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
-    // slot0Configs.kP = 0.6; // A position error of 2.5 rotations results in 12 V output
-    slot0Configs.kP = 0.15; // A position error of 2.5 rotations results in 12 V output
-    slot0Configs.kI = 0.015; // no output for integrated error
-    slot0Configs.kD = 0.07; // Add 0.1 V output for a velocity error of 1 rps
+    slot0Configs.kP = 4; // A position error of 4 rotations results in 12 V output
+    slot0Configs.kI = 0; // no output for integrated error
+    slot0Configs.kD = 0.4; // Add 0.4 V output for a velocity error of 1 rps
+
+    // Slow values for testing
+    //slot0Configs.kP = 0.59;
+    //slot0Configs.kD = 0.07;
+
+    // set Motion Magic settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
         3 * kGearRatio; // target cruise velocity of 3 rps after gearing
