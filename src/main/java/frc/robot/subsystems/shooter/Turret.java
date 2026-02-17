@@ -21,6 +21,7 @@ public class Turret extends SubsystemBase {
   public double turretPosition;
   private static final double kGearRatio = 45.45;
   private static final double kMOI = 0.0117; // kg*m^2
+  private static final double approachLimitRange = (150.0 / 360) * (2.0 / 3); // Range to slow motor down as its close to its limit (to prevent overshoot)
   public double targetRotations = 0;
   private final double error = 0.005;
   private final DCMotorSim m_motorSimModel =
@@ -59,6 +60,12 @@ public class Turret extends SubsystemBase {
     // Slow values for testing
     slot0Configs.kP = 1.15;
 
+    // Limit turret rotations
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 150.0 / 360 * kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -(150.0 / 360) * kGearRatio;
+
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
         3 * kGearRatio; // target cruise velocity of 3 rps after gearing
@@ -77,7 +84,15 @@ public class Turret extends SubsystemBase {
   }
 
   public void setTurretSpeed(double speed) {
-    turretMotor.set(speed);
+    double motorPos = turretMotor.getRotorPosition().getValueAsDouble() / kGearRatio;
+
+    if (motorPos >= approachLimitRange || motorPos <= -(approachLimitRange)) {
+      turretMotor.set(speed * 0.6);
+    }
+    else {
+      turretMotor.set(speed);
+    }
+    
   }
 
   public void setVoltage(double voltage) {

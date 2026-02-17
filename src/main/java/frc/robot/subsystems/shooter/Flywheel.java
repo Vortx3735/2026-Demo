@@ -36,14 +36,14 @@ public class Flywheel extends SubsystemBase {
 
     // set slot 0 gains
     var slot0Configs = talonFXConfigs.Slot0;
-    slot0Configs.kS = 0.25;
+    //slot0Configs.kS = 0.25;
     slot0Configs.kV = 0.12;
-    slot0Configs.kA =
+    /*slot0Configs.kA =
         1
             / (kGearRatio
                 * DCMotor.getKrakenX60(1).KtNMPerAmp
                 / (DCMotor.getKrakenX60(1).rOhms
-                    * kMOI)); // An acceleration of 1 rps/s requires 0.01 V output
+                    * kMOI)); // An acceleration of 1 rps/s requires 0.01 V output */
     slot0Configs.kP = 1; // An error of 1 rps results in 0.11 V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0; // no output for error derivative

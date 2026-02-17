@@ -70,8 +70,8 @@ public class Hood extends SubsystemBase {
     slot0Configs.kD = 0.4; // Add 0.4 V output for a velocity error of 1 rps
 
     // Slow values for testing
-    //slot0Configs.kP = 0.59;
-    //slot0Configs.kD = 0.07;
+    // slot0Configs.kP = 0.59;
+    // slot0Configs.kD = 0.07;
 
     // set Motion Magic settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
