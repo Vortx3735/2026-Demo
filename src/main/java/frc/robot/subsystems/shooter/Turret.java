@@ -21,7 +21,9 @@ public class Turret extends SubsystemBase {
   public double turretPosition;
   private static final double kGearRatio = 45.45;
   private static final double kMOI = 0.0117; // kg*m^2
-  private static final double approachLimitRange = (150.0 / 360) * (2.0 / 3); // Range to slow motor down as its close to its limit (to prevent overshoot)
+  private static final double approachLimitRange =
+      (150.0 / 360)
+          * (13.0 / 15); // Range to slow motor down as its close to its limit (to prevent overshoot)
   public double targetRotations = 0;
   private final double error = 0.005;
   private final DCMotorSim m_motorSimModel =
@@ -88,11 +90,9 @@ public class Turret extends SubsystemBase {
 
     if (motorPos >= approachLimitRange || motorPos <= -(approachLimitRange)) {
       turretMotor.set(speed * 0.6);
-    }
-    else {
+    } else {
       turretMotor.set(speed);
     }
-    
   }
 
   public void setVoltage(double voltage) {
@@ -117,7 +117,7 @@ public class Turret extends SubsystemBase {
   public void setPositionPID(double rotations) {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
-    //final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
+    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
     final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
     turretMotor.setControl(m_request);
     // }
