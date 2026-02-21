@@ -18,17 +18,21 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "usbcLeft";
-  public static String camera1Name = "usbcRight";
-  public static String camera2Name = "usb2.0top";
-  public static String camera3Name = "usb3.0bottom";
+  public static String frontCamera = "usbcLeft";
+  public static String backCamera = "usbcRight";
+  public static String rightCamera = "usb2.0top";
+  public static String leftCamera = "usb3.0bottom";
   
   //note: zero z component is 0.5 meters above the ground
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
-  public static Transform3d robotToCamera0 =
+  public static Transform3d frontCameraTransform =
       new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
-  public static Transform3d robotToCamera1 =
+  public static Transform3d backCameraTransform =
+      new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
+  public static Transform3d rightCameraTransform =
+      new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
+  public static Transform3d leftCameraTransform =
       new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
 
   // Basic filtering thresholds
