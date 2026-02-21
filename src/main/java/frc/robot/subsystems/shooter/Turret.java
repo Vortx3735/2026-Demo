@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -17,7 +18,8 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
-  public static TalonFX turretMotor;
+  private final TalonFX turretMotor;
+//private final CANcoder canCoder; // unsure if will be added yet
   public double turretPosition;
   private static final double kGearRatio = 45.45;
   private static final double kMOI = 0.0117; // kg*m^2
@@ -28,8 +30,9 @@ public class Turret extends SubsystemBase {
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
           DCMotor.getKrakenX44(1));
 
-  public Turret(int turretMotorID, Mode state) {
+  public Turret(int turretMotorID, /*int canCoderId,*/ Mode state) {
     turretMotor = new TalonFX(turretMotorID);
+    //canCoder = new CANcoder(canCoderId); // unsure if will be added yet
 
     var talonFXConfigs = new TalonFXConfiguration();
 
@@ -133,6 +136,7 @@ public class Turret extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     var talonFXSim = turretMotor.getSimState();
+    //var canCoderSim = canCoder.getSimState();
 
     // set the supply voltage of the TalonFX
     talonFXSim.setSupplyVoltage(12);
@@ -149,6 +153,10 @@ public class Turret extends SubsystemBase {
     // DCMotorSim returns mechanism position/velocity (after gear ratio)
     talonFXSim.setRawRotorPosition(m_motorSimModel.getAngularPosition().times(kGearRatio));
     talonFXSim.setRotorVelocity(m_motorSimModel.getAngularVelocity().times(kGearRatio));
+
+    // apply stuff to CANCoder
+    /*canCoderSim.setRawPosition(m_motorSimModel.getAngularPosition());
+    canCoderSim.setVelocity(m_motorSimModel.getAngularVelocity());*/
 
     turretPosition = m_motorSimModel.getAngularPosition().in(Units.Rotations);
     Logger.recordOutput("Turret/TargetPosition", targetRotations);

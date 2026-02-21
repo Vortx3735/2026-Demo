@@ -138,6 +138,7 @@ public class Hood extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     var talonFXSim = motor.getSimState();
+    var canCoderSim = canCoder.getSimState();
 
     // set the supply voltage of the TalonFX
     talonFXSim.setSupplyVoltage(12);
@@ -154,6 +155,10 @@ public class Hood extends SubsystemBase {
     // DCMotorSim returns mechanism position/velocity (after gear ratio)
     talonFXSim.setRawRotorPosition(m_motorSimModel.getAngularPosition().times(kGearRatio));
     talonFXSim.setRotorVelocity(m_motorSimModel.getAngularVelocity().times(kGearRatio));
+
+    // apply stuff to CANCoder
+    canCoderSim.setRawPosition(m_motorSimModel.getAngularPosition());
+    canCoderSim.setVelocity(m_motorSimModel.getAngularVelocity());
 
     hoodAngle = m_motorSimModel.getAngularPosition().in(Units.Degrees);
     Logger.recordOutput("Hood/TargetPosition", targetAngle);
