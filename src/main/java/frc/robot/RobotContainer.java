@@ -107,7 +107,13 @@ public class RobotContainer {
             new Vision(
                 drive,
                 new VisionIOPhotonVision(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0));
+                    VisionConstants.frontCameraName, VisionConstants.frontCameraTransform),
+                    new VisionIOPhotonVision(
+                    VisionConstants.backCameraName, VisionConstants.backCameraTransform),
+                    new VisionIOPhotonVision(
+                    VisionConstants.leftCameraName, VisionConstants.leftCameraTransform),
+                    new VisionIOPhotonVision(
+                    VisionConstants.rightCameraName, VisionConstants.rightCameraTransform));
         break;
 
       case SIM:
@@ -128,7 +134,13 @@ public class RobotContainer {
             new Vision(
                 drive,
                 new VisionIOPhotonVisionSim(
-                    camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
+                    VisionConstants.frontCameraName, VisionConstants.frontCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
+                    new VisionIOPhotonVisionSim(
+                    VisionConstants.backCameraName, VisionConstants.backCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
+                    new VisionIOPhotonVisionSim(
+                    VisionConstants.leftCameraName, VisionConstants.leftCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
+                    new VisionIOPhotonVisionSim(
+                    VisionConstants.rightCameraName, VisionConstants.rightCameraTransform, driveSimulation::getSimulatedDriveTrainPose));
         break;
 
       default:
