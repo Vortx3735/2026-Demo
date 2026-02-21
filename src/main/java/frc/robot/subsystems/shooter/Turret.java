@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -20,14 +19,14 @@ import org.littletonrobotics.junction.Logger;
 public class Turret extends SubsystemBase {
   public static TalonFX turretMotor;
   public double turretPosition;
-  private static final double kGearRatio = 10.0;
-  private static final double kMOI = 0.001; // kg*m^2
+  private static final double kGearRatio = 45.45;
+  private static final double kMOI = 0.0117; // kg*m^2
   public double targetRotations = 0;
   private final double error = 0.005;
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), kMOI, kGearRatio),
-          DCMotor.getKrakenX60(1));
+          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
+          DCMotor.getKrakenX44(1));
 
   public Turret(int turretMotorID, Mode state) {
     turretMotor = new TalonFX(turretMotorID);
@@ -35,27 +34,30 @@ public class Turret extends SubsystemBase {
     var talonFXConfigs = new TalonFXConfiguration();
 
     var slot0Configs = talonFXConfigs.Slot0;
-    // slot0Configs.kS = 0.1; // Add 0.25 V output to overcome static friction
-    // slot0Configs.kV = 0.1178; // A velocity target of 1 rps results in 0.12 V output
-    // slot0Configs.kA = 0.02; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0Configs.kS = 0; // Add 0.25 V output to overcome static friction
-    slot0Configs.kA =
-        1
-            / (kGearRatio
-                * DCMotor.getKrakenX60(1).KtNMPerAmp
-                / (DCMotor.getKrakenX60(1).rOhms
-                    * kMOI)); // An acceleration of 1 rps/s requires 0.01 V output
-    slot0Configs.kV =
-        (kGearRatio
-                * kGearRatio
-                * DCMotor.getKrakenX60(1).KtNMPerAmp
-                / (DCMotor.getKrakenX60(1).KvRadPerSecPerVolt
-                    * DCMotor.getKrakenX60(1).rOhms
-                    * kMOI))
-            * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kP = 2.075; // A position error of 2.5 rotations results in 12 V output
+    slot0Configs.kS = 0.0060924;
+    slot0Configs.kV = 0.11931;
+    slot0Configs.kA = 0.0017373;
+    // slot0Configs.kS = 0.0060924;
+    // slot0Configs.kA =
+    //     1
+    //         / (kGearRatio
+    //             * DCMotor.getKrakenX44(1).KtNMPerAmp
+    //             / (DCMotor.getKrakenX44(1).rOhms
+    //                 * kMOI)); // An acceleration of 1 rps/s requires 0.01 V output
+    // slot0Configs.kV =
+    //     (kGearRatio
+    //             * kGearRatio
+    //             * DCMotor.getKrakenX44(1).KtNMPerAmp
+    //             / (DCMotor.getKrakenX44(1).KvRadPerSecPerVolt
+    //                 * DCMotor.getKrakenX44(1).rOhms
+    //                 * kMOI))
+    //         * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
+    slot0Configs.kP = 4.4; // A position error of 2.5 rotations results in 12 V output
     slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.065; // A velocity error of 1 rps results in 0.1 V output
+    slot0Configs.kD = 0.025; // A velocity error of 1 rps results in 0.1 V output
+
+    // Slow values for testing
+    slot0Configs.kP = 1.15;
 
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
@@ -70,7 +72,7 @@ public class Turret extends SubsystemBase {
     if (state == Mode.SIM) {
       var talonFXSim = turretMotor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
-      talonFXSim.setMotorType(TalonFXSimState.MotorType.KrakenX60);
+      talonFXSim.setMotorType(TalonFXSimState.MotorType.KrakenX44);
     }
   }
 
@@ -100,8 +102,8 @@ public class Turret extends SubsystemBase {
   public void setPositionPID(double rotations) {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
-    final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
-    // final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
+    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
+    final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
     turretMotor.setControl(m_request);
     // }
     targetRotations = rotations;
@@ -120,7 +122,7 @@ public class Turret extends SubsystemBase {
   }
 
   public Command stopCommand() {
-    return run(() -> stop()).withName("stop turret");
+    return run(() -> stop()).withName("Stop Turret");
   }
 
   @Override
