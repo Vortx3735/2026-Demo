@@ -8,6 +8,8 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
@@ -24,6 +26,7 @@ public class Flywheel extends SubsystemBase {
   private static final double kGearRatio = 1.0;
   private static final double kMOI = 0.001; // kg*m^2
   public double targetVelocity = 0;
+  BangBangController bangBangController = new BangBangController(); // comment out PID but not feedforward to use
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), kMOI, kGearRatio),
@@ -71,6 +74,7 @@ public class Flywheel extends SubsystemBase {
 
   public void shoot() {
     flywheelMotor.set(motorSpeed);
+    //flywheelMotor.set(bangBangController.calculate(motorSpeed, targetVelocity));
   }
 
   public void stop() {
@@ -87,6 +91,7 @@ public class Flywheel extends SubsystemBase {
     flywheelMotor.setControl(m_request);
     // }
     targetVelocity = rps;
+    //flywheelMotor.set(bangBangController.calculate(motorSpeed, targetVelocity));
   }
 
   public Command setVelocityPIDCommand(double rps) {
