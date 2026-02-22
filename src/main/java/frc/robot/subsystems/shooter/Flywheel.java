@@ -10,6 +10,9 @@ import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -24,6 +27,7 @@ public class Flywheel extends SubsystemBase {
   private static final double kGearRatio = 1.0;
   private static final double kMOI = 0.001; // kg*m^2
   public double targetVelocity = 0;
+  final DoubleEntry flywheelMotorSpeedEntry;
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), kMOI, kGearRatio),
@@ -54,6 +58,10 @@ public class Flywheel extends SubsystemBase {
     motionMagicConfigs.MotionMagicJerk = 6000; // Target jerk of 6000 rps/s/s (0.1 seconds)
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable intakeTable = inst.getTable("Flywheel");
+    flywheelMotorSpeedEntry = intakeTable.getDoubleTopic("flywheelMotorSpeed").getEntry(0);
+    flywheelMotorSpeedEntry.set(1);
     if (state == Mode.SIM) {
       var talonFXSim = flywheelMotor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -103,7 +111,12 @@ public class Flywheel extends SubsystemBase {
   }
 
   public Command shootCommand() {
-    return Commands.run(() -> shoot(), this).withName("shoot flywheel");
+    return this.run(
+            () -> {
+              setFlywheelSpeed(flywheelMotorSpeedEntry.getAsDouble());
+              this.shoot();
+            })
+        .withName("shoot flywheel");
   }
 
   @Override

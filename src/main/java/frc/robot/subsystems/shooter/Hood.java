@@ -14,6 +14,9 @@ import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,6 +37,8 @@ public class Hood extends SubsystemBase {
   public double targetAngle = 0;
   public double hoodAngle = 0;
   private final double error = 0.005;
+  final DoubleEntry hoodMotorSpeedEntry;
+  double speed;
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
@@ -82,7 +87,10 @@ public class Hood extends SubsystemBase {
     motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
     motor.getConfigurator().apply(talonFXConfigs);
-
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable intakeTable = inst.getTable("Hood");
+    hoodMotorSpeedEntry = intakeTable.getDoubleTopic("hoodMotorSpeed").getEntry(0);
+    hoodMotorSpeedEntry.set(0.1);
     // configure talonfx sim state if the mode is sim
     if (state == Mode.SIM) {
       var talonFXSim = motor.getSimState();
@@ -92,15 +100,28 @@ public class Hood extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
-    motor.set(speed);
+    this.speed = speed;
+  }
+
+  public void set(boolean reversed) {
+    if (reversed) {
+      motor.set(-speed);
+    } else {
+      motor.set(speed);
+    }
   }
 
   private void stop() {
     motor.set(0);
   }
 
-  public Command moveCommand(double speed) {
-    return new RunCommand(() -> setSpeed(speed), this).withName("run hood");
+  public Command moveCommand(boolean reversed) {
+    return this.run(
+            () -> {
+              setSpeed(hoodMotorSpeedEntry.getAsDouble());
+              this.set(reversed);
+            })
+        .withName("move hood");
   }
 
   public Command stopCommand() {
@@ -108,7 +129,9 @@ public class Hood extends SubsystemBase {
   }
 
   public double getHoodAngleDegrees() {
-    return canCoder.getAbsolutePosition().getValueAsDouble() * 360.0;
+    // return canCoder.getAbsolutePosition().getValueAsDouble() * 360.0;
+
+    return motor.getRotorPosition().getValueAsDouble();
   }
 
   public void setPositionPID(double degrees) {

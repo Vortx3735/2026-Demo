@@ -9,6 +9,9 @@ import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,6 +27,8 @@ public class Turret extends SubsystemBase {
   private static final double kMOI = 0.0117; // kg*m^2
   public double targetRotations = 0;
   private final double error = 0.005;
+  final DoubleEntry turretMotorSpeedEntry;
+  double speed;
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
@@ -69,7 +74,10 @@ public class Turret extends SubsystemBase {
     motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
     turretMotor.getConfigurator().apply(talonFXConfigs);
-
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable intakeTable = inst.getTable("Turret");
+    turretMotorSpeedEntry = intakeTable.getDoubleTopic("turretMotorSpeed").getEntry(0);
+    turretMotorSpeedEntry.set(0.1);
     // configure talonfx sim state if the mode is sim
     if (state == Mode.SIM) {
       var talonFXSim = turretMotor.getSimState();
@@ -78,8 +86,8 @@ public class Turret extends SubsystemBase {
     }
   }
 
-  public void setTurretSpeed(double speed) {
-    turretMotor.set(speed);
+  public void setSpeed(double speed) {
+    this.speed = speed;
   }
 
   public void setVoltage(double voltage) {
@@ -87,18 +95,21 @@ public class Turret extends SubsystemBase {
     turretMotor.setControl(request);
   }
 
-  public Command moveCommand(double speed) {
-    return run(() -> setTurretSpeed(speed)).withName("Move Turret");
+  public void set(double s) {
+    turretMotor.set(s);
   }
 
-  public void changeTurretPosition(double position) {
-    if (turretPosition < position) {
-      setTurretSpeed(0.5);
-    } else if (turretPosition > position) {
-      setTurretSpeed(-0.5);
-    } else {
-      setTurretSpeed(0);
-    }
+  public Command moveCommand(boolean reversed) {
+    return this.run(
+            () -> {
+              setSpeed(turretMotorSpeedEntry.getAsDouble());
+              if (reversed) {
+                this.set(-speed);
+              } else {
+                this.set(speed);
+              }
+            })
+        .withName("Move Turret");
   }
 
   public void setPositionPID(double rotations) {
