@@ -21,17 +21,19 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
-  private static TalonFX flywheelMotor;
-  private double motorSpeed;
-  public double currentVelocity;
   private static final double kGearRatio = 1.0;
   private static final double kMOI = 0.001; // kg*m^2
-  public double targetVelocity = 0;
+
+  private static TalonFX flywheelMotor;
   final DoubleEntry flywheelMotorSpeedEntry;
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), kMOI, kGearRatio),
           DCMotor.getKrakenX60(1));
+
+  private double motorSpeed;
+  public double currentVelocity;
+  public double targetVelocity = 0;
 
   public Flywheel(int flywheelMotorID, Mode state) {
     flywheelMotor = new TalonFX(flywheelMotorID);

@@ -18,8 +18,8 @@ public class Climber extends SubsystemBase {
 
   private final TalonFX climberMotor1;
   private final TalonFX climberMotor2;
-  private double speed = 0.25;
   final DoubleEntry flywheelMotorSpeedEntry;
+  private double speed = 0.25;
 
   public Climber(int motorIdLeft, int motorIdRight) {
     climberMotor1 = new TalonFX(motorIdLeft);

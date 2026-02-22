@@ -30,19 +30,25 @@ public class Hood extends SubsystemBase {
    *for example:
   public final Motor motor1;
    */
-  private final TalonFX motor;
-  private final CANcoder canCoder;
   private static final double kGearRatio = 1.0;
   private static final double kMOI = 0.001; // kg*m^2
-  public double targetAngle = 0;
-  public double hoodAngle = 0;
-  private final double error = 0.005;
+
+  private final TalonFX motor;
+  private final CANcoder canCoder;
+
+  // Network table entries
   final DoubleEntry hoodMotorSpeedEntry;
   double speed;
+
+  // Simulation model
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
           DCMotor.getKrakenX44(1));
+
+  public double targetAngle = 0;
+  public double hoodAngle = 0;
+  private final double error = 0.005;
   /*initialize subsystem objects in constructor
    *for good practice, pass in any constants through the constructor
    */
@@ -103,6 +109,16 @@ public class Hood extends SubsystemBase {
     this.speed = speed;
   }
 
+  public double getHoodAngleDegrees() {
+    // return canCoder.getAbsolutePosition().getValueAsDouble() * 360.0;
+
+    return motor.getRotorPosition().getValueAsDouble();
+  }
+
+  private void stop() {
+    motor.set(0);
+  }
+
   public void set(boolean reversed) {
     if (reversed) {
       motor.set(-speed);
@@ -111,8 +127,14 @@ public class Hood extends SubsystemBase {
     }
   }
 
-  private void stop() {
-    motor.set(0);
+  public void setPositionPID(double degrees) {
+    // create a Motion Magic request, voltage output
+    // if (Math.abs(turretPosition - rotations) > error) {
+    // final MotionMagicVoltage m_request = new MotionMagicVoltage((degrees / 360) * kGearRatio);
+    final PositionVoltage m_request = new PositionVoltage((degrees / 360) * kGearRatio);
+    motor.setControl(m_request);
+    // }
+    targetAngle = degrees;
   }
 
   public Command moveCommand(boolean reversed) {
@@ -126,22 +148,6 @@ public class Hood extends SubsystemBase {
 
   public Command stopCommand() {
     return new RunCommand(() -> stop(), this).withName("stop hood");
-  }
-
-  public double getHoodAngleDegrees() {
-    // return canCoder.getAbsolutePosition().getValueAsDouble() * 360.0;
-
-    return motor.getRotorPosition().getValueAsDouble();
-  }
-
-  public void setPositionPID(double degrees) {
-    // create a Motion Magic request, voltage output
-    // if (Math.abs(turretPosition - rotations) > error) {
-    // final MotionMagicVoltage m_request = new MotionMagicVoltage((degrees / 360) * kGearRatio);
-    final PositionVoltage m_request = new PositionVoltage((degrees / 360) * kGearRatio);
-    motor.setControl(m_request);
-    // }
-    targetAngle = degrees;
   }
 
   public Command setPositionPIDCommand(double degrees) {

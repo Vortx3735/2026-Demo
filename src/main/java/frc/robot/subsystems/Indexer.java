@@ -17,12 +17,12 @@ public class Indexer extends SubsystemBase {
   private final TalonFX rollerMotor;
   private final TalonFX beltMotor;
 
-  private double indexerSpeed;
-  private double rollerSpeed;
-
   // Network Table Entry
   final DoubleEntry indexerSpeedEntry;
   final DoubleEntry rollerSpeedEntry;
+
+  private double indexerSpeed;
+  private double rollerSpeed;
 
   public Indexer(int indexerID, int rollerID, int beltID) {
     indexerMotor = new TalonFX(indexerID);

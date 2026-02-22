@@ -16,10 +16,9 @@ import org.littletonrobotics.junction.Logger;
 public class Intake extends SubsystemBase {
 
   private final TalonFX motor;
-  private double speed = 0.25;
-
   // Network Table Entry
   final DoubleEntry intakeMotorSpeedEntry;
+  private double speed = 0.25;
 
   public Intake(int motorId) {
     motor = new TalonFX(motorId);

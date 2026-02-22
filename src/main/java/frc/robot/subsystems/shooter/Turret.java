@@ -20,15 +20,19 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
-  private final TalonFX turretMotor;
-  // private final CANcoder canCoder; // unsure if will be added yet
-  public double turretPosition;
   private static final double kGearRatio = 45.45;
   private static final double kMOI = 0.0117; // kg*m^2
+
+  private final TalonFX turretMotor;
+  // private final CANcoder canCoder; // unsure if will be added yet
+
+  public double turretPosition;
   public double targetRotations = 0;
   private final double error = 0.005;
+
   final DoubleEntry turretMotorSpeedEntry;
   double speed;
+
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
@@ -95,10 +99,29 @@ public class Turret extends SubsystemBase {
     turretMotor.setControl(request);
   }
 
+  public double getTurretPosition() {
+    return turretPosition;
+  }
+
+  public void setPositionPID(double rotations) {
+    // create a Motion Magic request, voltage output
+    // if (Math.abs(turretPosition - rotations) > error) {
+    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
+    final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
+    turretMotor.setControl(m_request);
+    // }
+    targetRotations = rotations;
+  }
+
   public void set(double s) {
     turretMotor.set(s);
   }
 
+  public void stop() {
+    turretMotor.set(0);
+  }
+
+  // command factories / command helpers
   public Command moveCommand(boolean reversed) {
     return this.run(
             () -> {
@@ -112,26 +135,8 @@ public class Turret extends SubsystemBase {
         .withName("Move Turret");
   }
 
-  public void setPositionPID(double rotations) {
-    // create a Motion Magic request, voltage output
-    // if (Math.abs(turretPosition - rotations) > error) {
-    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
-    final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
-    turretMotor.setControl(m_request);
-    // }
-    targetRotations = rotations;
-  }
-
   public Command setPositionPIDCommand(double rotations) {
     return runOnce(() -> setPositionPID(rotations)).withName("Set Turret Position PID");
-  }
-
-  public double getTurretPosition() {
-    return turretPosition;
-  }
-
-  public void stop() {
-    turretMotor.set(0);
   }
 
   public Command stopCommand() {
