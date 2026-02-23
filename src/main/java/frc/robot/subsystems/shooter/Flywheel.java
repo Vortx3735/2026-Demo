@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -58,6 +59,8 @@ public class Flywheel extends SubsystemBase {
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration = 500; // Target acceleration of 100 rps/s
     motionMagicConfigs.MotionMagicJerk = 6000; // Target jerk of 6000 rps/s/s (0.1 seconds)
+    
+    talonFXConfigs.MotorOutput.Inverted=InvertedValue.Clockwise_Positive;
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();

@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -92,6 +93,8 @@ public class Hood extends SubsystemBase {
         200; // Target acceleration of 160 rps/s (0.5 seconds)
     motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
+    talonFXConfigs.MotorOutput.Inverted=InvertedValue.Clockwise_Positive;
+    
     motor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Hood");
