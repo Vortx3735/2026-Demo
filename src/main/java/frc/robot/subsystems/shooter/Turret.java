@@ -29,7 +29,6 @@ public class Turret extends SubsystemBase {
 
   public double turretPosition;
   public double targetRotations = 0;
-  private final double error = 0.005;
 
   final DoubleEntry turretMotorSpeedEntry;
   double speed;
@@ -64,7 +63,7 @@ public class Turret extends SubsystemBase {
     //                 * DCMotor.getKrakenX44(1).rOhms
     //                 * kMOI))
     //         * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kP = 20; // A position error of 2.5 rotations results in 12 V output
+    slot0Configs.kP = 0; // A position error of 2.5 rotations results in 12 V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0; // A velocity error of 1 rps results in 0.1 V output
 
@@ -81,14 +80,14 @@ public class Turret extends SubsystemBase {
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (150.0 / 360.0) * kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (150.0 / 360.0) / kGearRatio;
     talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -(150.0 / 360.0) * kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -(150.0 / 360.0) / kGearRatio;
 
     turretMotor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTable intakeTable = inst.getTable("Turret");
-    turretMotorSpeedEntry = intakeTable.getDoubleTopic("turretMotorSpeed").getEntry(0);
+    NetworkTable table = inst.getTable("Turret");
+    turretMotorSpeedEntry = table.getDoubleTopic("turretMotorSpeed").getEntry(0);
     turretMotorSpeedEntry.set(0.1);
     // configure talonfx sim state if the mode is sim
     if (state == Mode.SIM) {

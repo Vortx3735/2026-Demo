@@ -27,21 +27,15 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Hood extends SubsystemBase {
-  /*define objects and variables here (e.g. motors, sensors, variables)
-   *for example:
-  public final Motor motor1;
-   */
   private static final double kGearRatio = 1.0;
   private static final double kMOI = 0.001; // kg*m^2
 
   private final TalonFX motor;
   private final CANcoder canCoder;
 
-  // Network table entries
   final DoubleEntry hoodMotorSpeedEntry;
   double speed;
 
-  // Simulation model
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
@@ -50,18 +44,13 @@ public class Hood extends SubsystemBase {
   public double targetAngle = 0;
   public double hoodAngle = 0;
   private final double error = 0.005;
-  /*initialize subsystem objects in constructor
-   *for good practice, pass in any constants through the constructor
-   */
+
   public Hood(int motorId, int canCoderId, Mode state) {
     motor = new TalonFX(motorId);
     canCoder = new CANcoder(canCoderId);
     var talonFXConfigs = new TalonFXConfiguration();
 
     var slot0Configs = talonFXConfigs.Slot0;
-    // slot0Configs.kS = 0.1; // Add 0.25 V output to overcome static friction
-    // slot0Configs.kV = 0.1178; // A velocity target of 1 rps results in 0.12 V output
-    // slot0Configs.kA = 0.02; // An acceleration of 1 rps/s requires 0.01 V output
     slot0Configs.kS = 0; // Add 0.25 V output to overcome static friction
     slot0Configs.kA =
         1
@@ -85,7 +74,6 @@ public class Hood extends SubsystemBase {
     // slot0Configs.kP = 0.59;
     // slot0Configs.kD = 0.07;
 
-    // set Motion Magic settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
         3 * kGearRatio; // target cruise velocity of 3 rps after gearing
@@ -100,7 +88,7 @@ public class Hood extends SubsystemBase {
     NetworkTable intakeTable = inst.getTable("Hood");
     hoodMotorSpeedEntry = intakeTable.getDoubleTopic("hoodMotorSpeed").getEntry(0);
     hoodMotorSpeedEntry.set(0.1);
-    // configure talonfx sim state if the mode is sim
+
     if (state == Mode.SIM) {
       var talonFXSim = motor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -113,9 +101,7 @@ public class Hood extends SubsystemBase {
   }
 
   public double getHoodAngleDegrees() {
-    // return canCoder.getAbsolutePosition().getValueAsDouble() * 360.0;
-
-    return motor.getRotorPosition().getValueAsDouble();
+    return motor.getRotorPosition().getValueAsDouble() * 360.0 / kGearRatio; // Convert to degrees
   }
 
   private void stop() {
@@ -131,12 +117,9 @@ public class Hood extends SubsystemBase {
   }
 
   public void setPositionPID(double degrees) {
-    // create a Motion Magic request, voltage output
-    // if (Math.abs(turretPosition - rotations) > error) {
     // final MotionMagicVoltage m_request = new MotionMagicVoltage((degrees / 360) * kGearRatio);
     final PositionVoltage m_request = new PositionVoltage((degrees / 360) * kGearRatio);
     motor.setControl(m_request);
-    // }
     targetAngle = degrees;
   }
 
