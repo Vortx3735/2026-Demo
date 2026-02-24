@@ -71,8 +71,8 @@ public class Constants {
     public static final int HOOD_CANCODER_ID = 17;
   }
 
-  public static class IndexerConstants {
-    public static final int INDEXER_MOTOR_ID = 18;
+  public static class HopperConstants {
+    public static final int HOPPER_MOTOR_ID = 18;
   }
 
   public static class TunnelConstants {

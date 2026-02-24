@@ -76,7 +76,7 @@ public class RobotContainer {
   public static final Flywheel flywheel =
       new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID, Constants.currentMode);
   public final Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-  public final Indexer indexer = new Indexer(Constants.IndexerConstants.INDEXER_MOTOR_ID);
+    public final Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
   public static final Tunnel tunnel =
       new Tunnel(
           Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
@@ -221,7 +221,7 @@ public class RobotContainer {
     // do not move the defaultcommands
     intake.setDefaultCommand(intake.stopCommand().withName("stop intake"));
     climber.setDefaultCommand(climber.stopCommand().withName("stop climber"));
-    indexer.setDefaultCommand(indexer.stopCommand().withName("stop indexer"));
+    hopper.setDefaultCommand(hopper.stopCommand().withName("stop hopper"));
     // hood.setDefaultCommand(hood.hold().withName("hold hood"));
     // flywheel.setDefaultCommand(flywheel.stopCommand().withName("hold flywheel velocity"));
     // turret.setDefaultCommand(
@@ -254,20 +254,20 @@ public class RobotContainer {
     // controller.povLeft.whileTrue(turret.moveCommand(-0.5));
     // controller.yButton.whileTrue(hood.setPositionPIDCommand(-45));
     // controller.bButton.whileTrue(hood.setPositionPIDCommand(0));
-    // controller.rt.whileTrue(indexer.runIndexerCommand(true));
+    // controller.rt.whileTrue(hopper.runHopperCommand(true));
     controller.lt.whileTrue(intake.intakeCommand());
-    // controller.aButton.whileTrue(indexer.runIndexerCommand(true));
+    // controller.aButton.whileTrue(hopper.runHopperCommand(true));
     // controller.xButton.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
 
     controller.povUp.whileTrue(climber.upCommand());
-    // controller.povRight.whileTrue(indexer.runIndexerMotorCommand());
+    // controller.povRight.whileTrue(hopper.runHopperCommand(true));
     // controller.povLeft.whileTrue(turret.setPositionPIDCommand(1));
     // controller.povRight.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
     controller.povDown.whileTrue(climber.downCommand());
-    controller.lb.whileTrue(indexer.runIndexerCommand(true));
+    controller.lb.whileTrue(hopper.runHopperCommand(true));
     // controller.rt.whileTrue(flywheel.setVelocityPIDCommand());
     controller.rt.whileTrue(CommandFactory.exampleCommand());
-    controller.rb.whileTrue(indexer.runIndexerCommand(false));
+    controller.rb.whileTrue(hopper.runHopperCommand(false));
 
     controller.yButton.whileTrue(hood.moveCommand(true));
     controller.xButton.whileTrue(turret.moveCommand(true));

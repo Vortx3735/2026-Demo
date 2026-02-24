@@ -41,10 +41,10 @@ public class AutoRoutines {
                 Commands.parallel(
                     // Run intake and indexer
                     m_container.intake.intakeCommand(),
-                    m_container.indexer.runIndexerCommand(false)),
+                    m_container.hopper.runHopperCommand(false)),
                 // Stop intake and indexer
                 m_container.intake.stopCommand(),
-                m_container.indexer.stopCommand(),
+                m_container.hopper.stopCommand(),
                 // Run flywheel then stop
                 m_container.flywheel.shootCommand(),
                 m_container.flywheel.stopCommand()));
