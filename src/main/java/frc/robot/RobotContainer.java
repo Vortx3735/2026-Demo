@@ -33,8 +33,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.TurretCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.drive.*;
@@ -73,14 +73,14 @@ public class RobotContainer {
           Constants.HoodConstants.HOOD_MOTOR_ID,
           Constants.HoodConstants.HOOD_CANCODER_ID,
           Constants.currentMode);
-  public final Flywheel flywheel =
+  public static final Flywheel flywheel =
       new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID, Constants.currentMode);
   public final Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-  public final Indexer indexer =
-      new Indexer(
-          Constants.IndexerConstants.INDEXER_MOTOR_ID,
-          Constants.IndexerConstants.INDEXER_ROLLER_MOTOR_ID,
-          Constants.IndexerConstants.INDEXER_BELT_MOTOR_ID);
+  public final Indexer indexer = new Indexer(Constants.IndexerConstants.INDEXER_MOTOR_ID);
+  public static final Tunnel tunnel =
+      new Tunnel(
+          Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
+          Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
 
   private SwerveDriveSimulation driveSimulation = null;
 
@@ -228,6 +228,7 @@ public class RobotContainer {
     //     TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to hub"));
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
+    tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
     turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
 
     // Default command, normal field-relative drive
@@ -260,11 +261,12 @@ public class RobotContainer {
 
     controller.povUp.whileTrue(climber.upCommand());
     // controller.povRight.whileTrue(indexer.runIndexerMotorCommand());
-    //controller.povLeft.whileTrue(turret.setPositionPIDCommand(1));
-    //controller.povRight.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
+    // controller.povLeft.whileTrue(turret.setPositionPIDCommand(1));
+    // controller.povRight.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
     controller.povDown.whileTrue(climber.downCommand());
     controller.lb.whileTrue(indexer.runIndexerCommand(true));
-    controller.rt.whileTrue(flywheel.setVelocityPIDCommand());
+    // controller.rt.whileTrue(flywheel.setVelocityPIDCommand());
+    controller.rt.whileTrue(CommandFactory.exampleCommand());
     controller.rb.whileTrue(indexer.runIndexerCommand(false));
 
     controller.yButton.whileTrue(hood.moveCommand(true));

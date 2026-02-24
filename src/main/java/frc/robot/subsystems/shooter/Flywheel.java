@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.controller.BangBangController;
@@ -23,7 +22,7 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
-  private static final double kGearRatio = 30 / 24.0;
+  private static final double kGearRatio = 24.0 / 30;
   private static final double kMOI = 0.001; // kg*m^2
   BangBangController controller = new BangBangController();
   private static TalonFX flywheelMotor;
@@ -44,24 +43,24 @@ public class Flywheel extends SubsystemBase {
 
     // set slot 0 gains
     var slot0Configs = talonFXConfigs.Slot0;
-    // slot0Configs.kS = 0.25;
-    slot0Configs.kV = 0.12;
+    slot0Configs.kS = 0.31;
+    slot0Configs.kV = 0.125;
+    slot0Configs.kP = 0; // An error of 1 rps results in 0.11 V output
+    slot0Configs.kI = 0; // no output for integrated error
+    slot0Configs.kD = 0; // no output for error derivative
     // slot0Configs.kA =
     //     1
     //         / (kGearRatio
     //             * DCMotor.getKrakenX60(1).KtNMPerAmp
     //             / (DCMotor.getKrakenX60(1).rOhms
     //                 * kMOI)); // An acceleration of 1 rps/s requires 0.01 V output
-    slot0Configs.kP = 40; // An error of 1 rps results in 0.11 V output
-    slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0; // no output for error derivative
 
     // set Motion Magic Velocity settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration = 500; // Target acceleration of 100 rps/s
     motionMagicConfigs.MotionMagicJerk = 6000; // Target jerk of 6000 rps/s/s (0.1 seconds)
 
-    //talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    // talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -97,12 +96,18 @@ public class Flywheel extends SubsystemBase {
     // if (Math.abs(turretPosition - rotations) > error) {
     // final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps *
     // kGearRatio);
-    final VelocityVoltage m_request =
-        new VelocityVoltage(flywheelMotorSpeedEntry.getAsDouble() * 100 * kGearRatio);
+    targetVelocity = flywheelMotorSpeedEntry.getAsDouble() * 100 * kGearRatio;
+
+    final VelocityVoltage m_request = new VelocityVoltage(targetVelocity);
     flywheelMotor.setControl(m_request);
     // }
-    targetVelocity = flywheelMotorSpeedEntry.getAsDouble() * 100;
     // flywheelMotor.set(controller.calculate(motorSpeed, targetVelocity));
+  }
+
+  public boolean isAtSpeed() {
+    double currentVelocity = flywheelMotor.getVelocity().getValueAsDouble();
+    double tolerance = 3;
+    return Math.abs(targetVelocity - currentVelocity) < tolerance;
   }
 
   public Command setVelocityPIDCommand() {
@@ -150,8 +155,8 @@ public class Flywheel extends SubsystemBase {
     // apply the new rotor position and velocity to the TalonFX;
     // note that this is rotor position/velocity (before gear ratio), but
     // DCMotorSim returns mechanism position/velocity (after gear ratio)
-    talonFXSim.setRawRotorPosition(m_motorSimModel.getAngularPosition().times(kGearRatio));
-    talonFXSim.setRotorVelocity(m_motorSimModel.getAngularVelocity().times(kGearRatio));
+    // talonFXSim.setRawRotorPosition(m_motorSimModel.getAngularPosition().times(kGearRatio));
+    // talonFXSim.setRotorVelocity(m_motorSimModel.getAngularVelocity().times(kGearRatio));
     currentVelocity = m_motorSimModel.getAngularVelocity().in(RotationsPerSecond);
     Logger.recordOutput("Flywheel/TargetVelocity(rps)", targetVelocity);
     Logger.recordOutput("Flywheel/SimulatedVelocity(rps)", currentVelocity);

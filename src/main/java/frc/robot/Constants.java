@@ -73,8 +73,11 @@ public class Constants {
 
   public static class IndexerConstants {
     public static final int INDEXER_MOTOR_ID = 18;
-    public static final int INDEXER_ROLLER_MOTOR_ID = 19;
-    public static final short INDEXER_BELT_MOTOR_ID = 20;
+  }
+
+  public static class TunnelConstants {
+    public static final int BOTTOM_TUNNEL_MOTOR_ID = 19;
+    public static final short TOP_TUNNEL_MOTOR_ID = 20;
   }
 
   public static class FieldConstants {

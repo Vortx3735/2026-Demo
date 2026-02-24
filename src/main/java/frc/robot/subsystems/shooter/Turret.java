@@ -69,7 +69,7 @@ public class Turret extends SubsystemBase {
     slot0Configs.kD = 0; // A velocity error of 1 rps results in 0.1 V output
 
     // Slow values for testing
-    //slot0Configs.kP = 1.15;
+    // slot0Configs.kP = 1.15;
 
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
