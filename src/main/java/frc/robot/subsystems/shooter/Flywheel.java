@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.controller.BangBangController;
@@ -23,11 +24,11 @@ import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
   private static final double kMOI = 0.001; // kg*m^2
-  private static final double kMaxSpeed = 100; // Max speed in RPS
+  private static final double kMaxSpeed = 90; // Max speed in RPS
   private static TalonFX flywheelMotor;
   public final DoubleEntry flywheelMotorSpeedEntry;
 
-  // private final BangBangController controller = new BangBangController();
+  private final BangBangController bangBangcontroller = new BangBangController();
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), kMOI, 1),
@@ -55,13 +56,13 @@ public class Flywheel extends SubsystemBase {
     motionMagicConfigs.MotionMagicAcceleration = 500; // Target acceleration of 100 rps/s
     motionMagicConfigs.MotionMagicJerk = 6000; // Target jerk of 6000 rps/s/s (0.1 seconds)
 
-    // talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTable intakeTable = inst.getTable("Flywheel");
-    flywheelMotorSpeedEntry = intakeTable.getDoubleTopic("flywheelMotorSpeed").getEntry(1);
-    flywheelMotorSpeedEntry.set(1);
+    NetworkTable flywheelTable = inst.getTable("Flywheel");
+    flywheelMotorSpeedEntry = flywheelTable.getDoubleTopic("flywheelMotorSpeed").getEntry(1);
+    flywheelMotorSpeedEntry.set(0.9);
     if (state == Mode.SIM) {
       var talonFXSim = flywheelMotor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -84,11 +85,11 @@ public class Flywheel extends SubsystemBase {
     targetrps = flywheelMotorSpeedEntry.getAsDouble() * kMaxSpeed;
     final VelocityVoltage m_request = new VelocityVoltage(targetrps);
     flywheelMotor.setControl(m_request);
-    // flywheelMotor.set(controller.calculate(motorSpeed, targetVelocity));
+    // flywheelMotor.set(bangBangcontroller.calculate(currentrps, targetrps));
+    // flywheelMotor.set(1);
   }
 
   public boolean isAtSpeed() {
-    double currentrps = flywheelMotor.getRotorVelocity().getValueAsDouble();
     double tolerance = 3;
     return Math.abs(targetrps - currentrps) < tolerance;
   }
@@ -102,18 +103,16 @@ public class Flywheel extends SubsystemBase {
   }
 
   public Command shootCommand() {
-    return this.run(
-            () -> 
-              this.shoot(flywheelMotorSpeedEntry.getAsDouble())
-            )
+    return this.run(() -> this.shoot(flywheelMotorSpeedEntry.getAsDouble()))
         .withName("shoot flywheel");
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    currentrps= flywheelMotor.getRotorVelocity().getValueAsDouble();
+    currentrps = flywheelMotor.getRotorVelocity().getValueAsDouble();
     Logger.recordOutput("Flywheel/currentRPS", currentrps);
+    Logger.recordOutput("Flywheel/targetRPS", targetrps);
   }
 
   @Override

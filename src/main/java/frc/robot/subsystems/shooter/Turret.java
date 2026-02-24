@@ -21,7 +21,7 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
-  private static final double kGearRatio = (14.0 * 10.0) / (50.0 * 83.0);
+  private static final double kGearRatio = (11.0 * 10.0) / (50.0 * 83.0);
   private static final double kMOI = 0.0117; // kg*m^2
 
   private final TalonFX turretMotor;
@@ -35,7 +35,7 @@ public class Turret extends SubsystemBase {
 
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
+          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, 1 / kGearRatio),
           DCMotor.getKrakenX44(1));
 
   public Turret(int turretMotorID, /*int canCoderId,*/ Mode state) {
@@ -80,11 +80,13 @@ public class Turret extends SubsystemBase {
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (150.0 / 360.0) / kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (90.0 / 360.0) / kGearRatio;
     talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -(150.0 / 360.0) / kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -(90.0 / 360.0) / kGearRatio;
 
     turretMotor.getConfigurator().apply(talonFXConfigs);
+
+    // turretMotor.setPosition(0);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable table = inst.getTable("Turret");
     turretMotorSpeedEntry = table.getDoubleTopic("turretMotorSpeed").getEntry(0);
@@ -113,8 +115,8 @@ public class Turret extends SubsystemBase {
   public void setPositionPID(double rotations) {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
-    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
-    final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
+    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations / kGearRatio);
+    final PositionVoltage m_request = new PositionVoltage(rotations / kGearRatio);
     turretMotor.setControl(m_request);
     // }
     targetRotations = rotations;
@@ -126,6 +128,10 @@ public class Turret extends SubsystemBase {
 
   public void stop() {
     turretMotor.set(0);
+  }
+
+  public void zero() {
+    turretMotor.setPosition(0);
   }
 
   // command factories / command helpers
@@ -153,7 +159,9 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    Logger.recordOutput("Turret/postion", turretMotor.getRotorPosition().getValueAsDouble());
+    Logger.recordOutput(
+        "Turret/currentPostion(rotations)",
+        turretMotor.getRotorPosition().getValueAsDouble() * kGearRatio);
   }
 
   @Override

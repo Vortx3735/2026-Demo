@@ -7,8 +7,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
-import edu.wpi.first.networktables.DoubleEntry;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,7 +16,7 @@ public class Climber extends SubsystemBase {
 
   private final TalonFX climberMotor1;
   private final TalonFX climberMotor2;
-  final DoubleEntry flywheelMotorSpeedEntry;
+  // final DoubleEntry flywheelMotorSpeedEntry;
   private double speed = 0.25;
 
   public Climber(int motorIdLeft, int motorIdRight) {
@@ -26,9 +24,9 @@ public class Climber extends SubsystemBase {
     climberMotor2 = new TalonFX(motorIdRight);
     climberMotor2.setControl(new Follower(motorIdLeft, MotorAlignmentValue.Opposed));
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTable intakeTable = inst.getTable("Intake");
-    flywheelMotorSpeedEntry = intakeTable.getDoubleTopic("flywheelMotorSpeed").getEntry(0);
-    flywheelMotorSpeedEntry.set(1);
+    // NetworkTable intakeTable = inst.getTable("Intake");
+    // flywheelMotorSpeedEntry = intakeTable.getDoubleTopic("flywheelMotorSpeed").getEntry(0);
+    // flywheelMotorSpeedEntry.set(1);
   }
 
   public double getSpeed() {
@@ -55,7 +53,7 @@ public class Climber extends SubsystemBase {
 
     return this.run(
             () -> {
-              setSpeed(flywheelMotorSpeedEntry.getAsDouble());
+              // setSpeed(flywheelMotorSpeedEntry.getAsDouble());
               this.up();
             })
         .withName("run intake");
@@ -70,7 +68,7 @@ public class Climber extends SubsystemBase {
 
     return this.run(
             () -> {
-              setSpeed(flywheelMotorSpeedEntry.getAsDouble());
+              // setSpeed(flywheelMotorSpeedEntry.getAsDouble());
               this.down();
             })
         .withName("run intake");

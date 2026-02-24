@@ -40,6 +40,8 @@ public class Tunnel extends SubsystemBase {
     NetworkTable tunnelTable = inst.getTable("Tunnel");
     bottomTunnelSpeedEntry = tunnelTable.getDoubleTopic("bottomTunnelSpeed").getEntry(1);
     topTunnelSpeedEntry = tunnelTable.getDoubleTopic("topTunnelSpeed").getEntry(1);
+    bottomTunnelSpeedEntry.set(1);
+    topTunnelSpeedEntry.set(1);
   }
 
   public void setTunnelSpeed(double bottomTunnelSpeed, double topTunnelSpeed) {
