@@ -21,7 +21,7 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
-  private static final double kGearRatio = 45.45;
+  private static final double kGearRatio = (14.0 * 10.0) / (50.0 * 83.0);
   private static final double kMOI = 0.0117; // kg*m^2
 
   private final TalonFX turretMotor;
@@ -64,12 +64,12 @@ public class Turret extends SubsystemBase {
     //                 * DCMotor.getKrakenX44(1).rOhms
     //                 * kMOI))
     //         * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kP = 4.4; // A position error of 2.5 rotations results in 12 V output
+    slot0Configs.kP = 20; // A position error of 2.5 rotations results in 12 V output
     slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.025; // A velocity error of 1 rps results in 0.1 V output
+    slot0Configs.kD = 0; // A velocity error of 1 rps results in 0.1 V output
 
     // Slow values for testing
-    slot0Configs.kP = 1.15;
+    //slot0Configs.kP = 1.15;
 
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
@@ -78,8 +78,13 @@ public class Turret extends SubsystemBase {
         200; // Target acceleration of 160 rps/s (0.5 seconds)
     motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-    talonFXConfigs.MotorOutput.Inverted=InvertedValue.Clockwise_Positive;
-    
+    talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (150.0 / 360.0) * kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -(150.0 / 360.0) * kGearRatio;
+
     turretMotor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Turret");
@@ -149,6 +154,7 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    Logger.recordOutput("Turret/postion", turretMotor.getRotorPosition().getValueAsDouble());
   }
 
   @Override

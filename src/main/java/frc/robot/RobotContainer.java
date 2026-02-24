@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.TurretCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.drive.*;
@@ -138,7 +139,9 @@ public class RobotContainer {
           // If the JNI library (like PhotonVision) fails to load (e.g. in CI environment),
           // fallback to a dummy implementation to allow the robot code to start up.
           visionIO = new VisionIO() {};
-          System.err.println("Warning: Failed to load VisionIOPhotonVisionSim, falling back to dummy implementation. Error: " + e.getMessage());
+          System.err.println(
+              "Warning: Failed to load VisionIOPhotonVisionSim, falling back to dummy implementation. Error: "
+                  + e.getMessage());
         }
         vision = new Vision(drive, visionIO);
         break;
@@ -251,16 +254,17 @@ public class RobotContainer {
     // controller.yButton.whileTrue(hood.setPositionPIDCommand(-45));
     // controller.bButton.whileTrue(hood.setPositionPIDCommand(0));
     // controller.rt.whileTrue(indexer.runIndexerCommand(true));
-    // controller.lt.whileTrue(intake.intakeCommand());
+    controller.lt.whileTrue(intake.intakeCommand());
     // controller.aButton.whileTrue(indexer.runIndexerCommand(true));
     // controller.xButton.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
 
     controller.povUp.whileTrue(climber.upCommand());
     // controller.povRight.whileTrue(indexer.runIndexerMotorCommand());
-    // controller.povLeft.whileTrue(indexer.runRollerMotorCommand());
+    //controller.povLeft.whileTrue(turret.setPositionPIDCommand(1));
+    //controller.povRight.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
     controller.povDown.whileTrue(climber.downCommand());
     controller.lb.whileTrue(indexer.runIndexerCommand(true));
-    controller.rt.whileTrue(flywheel.shootCommand());
+    controller.rt.whileTrue(flywheel.setVelocityPIDCommand());
     controller.rb.whileTrue(indexer.runIndexerCommand(false));
 
     controller.yButton.whileTrue(hood.moveCommand(true));

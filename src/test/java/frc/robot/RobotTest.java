@@ -20,8 +20,10 @@ public class RobotTest {
     assertNotNull(robot, "Robot should be instantiated successfully");
 
     // Attempt to call robotInit if possible, to verify further initialization logic
-    // robot.robotInit(); // robotInit is protected in IterativeRobotBase, but we are in the same package.
-    // However, since Robot.java doesn't override it and logic is in constructor, constructor is the main check.
+    // robot.robotInit(); // robotInit is protected in IterativeRobotBase, but we are in the same
+    // package.
+    // However, since Robot.java doesn't override it and logic is in constructor, constructor is the
+    // main check.
 
     // Close the robot to free resources
     robot.close();

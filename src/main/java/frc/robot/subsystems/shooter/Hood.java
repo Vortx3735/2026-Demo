@@ -93,8 +93,8 @@ public class Hood extends SubsystemBase {
         200; // Target acceleration of 160 rps/s (0.5 seconds)
     motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-    talonFXConfigs.MotorOutput.Inverted=InvertedValue.Clockwise_Positive;
-    
+    talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
     motor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Hood");

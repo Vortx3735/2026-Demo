@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.networktables.DoubleEntry;
@@ -22,9 +23,9 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
-  private static final double kGearRatio = 1.0;
+  private static final double kGearRatio = 30 / 24.0;
   private static final double kMOI = 0.001; // kg*m^2
-
+  BangBangController controller = new BangBangController();
   private static TalonFX flywheelMotor;
   final DoubleEntry flywheelMotorSpeedEntry;
   private final DCMotorSim m_motorSimModel =
@@ -43,15 +44,15 @@ public class Flywheel extends SubsystemBase {
 
     // set slot 0 gains
     var slot0Configs = talonFXConfigs.Slot0;
-    slot0Configs.kS = 0.25;
+    // slot0Configs.kS = 0.25;
     slot0Configs.kV = 0.12;
-    slot0Configs.kA =
-        1
-            / (kGearRatio
-                * DCMotor.getKrakenX60(1).KtNMPerAmp
-                / (DCMotor.getKrakenX60(1).rOhms
-                    * kMOI)); // An acceleration of 1 rps/s requires 0.01 V output
-    slot0Configs.kP = 1; // An error of 1 rps results in 0.11 V output
+    // slot0Configs.kA =
+    //     1
+    //         / (kGearRatio
+    //             * DCMotor.getKrakenX60(1).KtNMPerAmp
+    //             / (DCMotor.getKrakenX60(1).rOhms
+    //                 * kMOI)); // An acceleration of 1 rps/s requires 0.01 V output
+    slot0Configs.kP = 40; // An error of 1 rps results in 0.11 V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0; // no output for error derivative
 
@@ -59,13 +60,13 @@ public class Flywheel extends SubsystemBase {
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration = 500; // Target acceleration of 100 rps/s
     motionMagicConfigs.MotionMagicJerk = 6000; // Target jerk of 6000 rps/s/s (0.1 seconds)
-    
-    talonFXConfigs.MotorOutput.Inverted=InvertedValue.Clockwise_Positive;
+
+    //talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Flywheel");
-    flywheelMotorSpeedEntry = intakeTable.getDoubleTopic("flywheelMotorSpeed").getEntry(0);
+    flywheelMotorSpeedEntry = intakeTable.getDoubleTopic("flywheelMotorSpeed").getEntry(1);
     flywheelMotorSpeedEntry.set(1);
     if (state == Mode.SIM) {
       var talonFXSim = flywheelMotor.getSimState();
@@ -91,24 +92,25 @@ public class Flywheel extends SubsystemBase {
     targetVelocity = 0;
   }
 
-  public void setVelocityPID(double rps) {
+  public void setVelocityPID() {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
     // final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps *
     // kGearRatio);
-    final VelocityVoltage m_request = new VelocityVoltage(rps * kGearRatio);
+    final VelocityVoltage m_request =
+        new VelocityVoltage(flywheelMotorSpeedEntry.getAsDouble() * 100 * kGearRatio);
     flywheelMotor.setControl(m_request);
     // }
-    targetVelocity = rps;
+    targetVelocity = flywheelMotorSpeedEntry.getAsDouble() * 100;
+    // flywheelMotor.set(controller.calculate(motorSpeed, targetVelocity));
   }
 
-  public Command setVelocityPIDCommand(double rps) {
-    return Commands.run(() -> setVelocityPID(rps), this).withName("Set flywheel velocity PID");
+  public Command setVelocityPIDCommand() {
+    return Commands.run(() -> setVelocityPID(), this).withName("Set flywheel velocity PID");
   }
 
   public Command holdSpeed() {
-    return Commands.run(() -> setVelocityPID(targetVelocity), this)
-        .withName("hold flywheel velocity");
+    return Commands.run(() -> setVelocityPID(), this).withName("hold flywheel velocity");
   }
 
   public Command stopCommand() {
@@ -127,6 +129,8 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    Logger.recordOutput("Flywheel/currentVelocity", flywheelMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("Flywheel/targetVelocity", targetVelocity);
   }
 
   @Override
