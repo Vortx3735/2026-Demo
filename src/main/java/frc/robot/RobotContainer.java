@@ -73,11 +73,11 @@ public class RobotContainer {
           Constants.HoodConstants.HOOD_MOTOR_ID,
           Constants.HoodConstants.HOOD_CANCODER_ID,
           Constants.currentMode);
-  public static final Flywheel flywheel =
+  public final Flywheel flywheel =
       new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID, Constants.currentMode);
   public final Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-    public final Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
-  public static final Tunnel tunnel =
+  public final Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
+  public final Tunnel tunnel =
       new Tunnel(
           Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
           Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
@@ -266,7 +266,7 @@ public class RobotContainer {
     controller.povDown.whileTrue(climber.downCommand());
     controller.lb.whileTrue(hopper.runHopperCommand(true));
     // controller.rt.whileTrue(flywheel.setVelocityPIDCommand());
-    controller.rt.whileTrue(CommandFactory.exampleCommand());
+    controller.rt.whileTrue(CommandFactory.shootCommand(flywheel, tunnel));
     controller.rb.whileTrue(hopper.runHopperCommand(false));
 
     controller.yButton.whileTrue(hood.moveCommand(true));

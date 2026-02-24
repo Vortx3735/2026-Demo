@@ -26,12 +26,10 @@ public class Hopper extends SubsystemBase {
     NetworkTable hopperTable = inst.getTable("Hopper");
     hopperSpeedEntry = hopperTable.getDoubleTopic("hopperSpeed").getEntry(0);
     hopperSpeedEntry.set(0.1);
-
   }
 
   public void setHopperSpeed(double hopperSpeed) {
     this.hopperSpeed = hopperSpeed;
-
   }
 
   public double getHopperSpeed() {
@@ -52,11 +50,10 @@ public class Hopper extends SubsystemBase {
 
   public Command runHopperCommand(Boolean inverted) {
     // Execute setHopperSpeed AND set the motor every loop
-    return run(
-            () -> {
-              setHopperSpeed(hopperSpeedEntry.getAsDouble());
-              run(inverted); // Ensure the motor is actually updated
-            })
+    return run(() -> {
+          setHopperSpeed(hopperSpeedEntry.getAsDouble());
+          run(inverted); // Ensure the motor is actually updated
+        })
         .withName("run hopper");
   }
 

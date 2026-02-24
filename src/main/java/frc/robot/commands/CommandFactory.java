@@ -3,14 +3,24 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.RobotContainer;
+import frc.robot.subsystems.Hopper;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Tunnel;
+import frc.robot.subsystems.shooter.Flywheel;
 
 public class CommandFactory {
-  public static Command exampleCommand() {
+  public static Command shootCommand(Flywheel flywheel, Tunnel tunnel) {
     return Commands.parallel(
-        RobotContainer.flywheel.setVelocityPIDCommand(),
+        flywheel.setVelocityPIDCommand(),
         Commands.sequence(
-            new WaitUntilCommand(() -> RobotContainer.flywheel.isAtSpeed()),
-            RobotContainer.tunnel.runTunnelCommand(false)));
+            new WaitUntilCommand(() -> flywheel.isAtSpeed()), tunnel.runTunnelCommand(false)));
+  }
+
+  public static Command intakeCommand(Intake intake, Hopper hopper) {
+    return Commands.parallel(intake.intakeCommand(), hopper.runHopperCommand(false));
+  }
+
+  public static Command clearJamsCommand(Tunnel tunnel, Hopper hopper) {
+    return Commands.parallel(tunnel.runTunnelCommand(true), hopper.runHopperCommand(true));
   }
 }
