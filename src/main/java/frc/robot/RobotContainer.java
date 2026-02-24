@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
@@ -261,12 +262,12 @@ public class RobotContainer {
 
     controller.povUp.whileTrue(climber.upCommand());
     // controller.povRight.whileTrue(hopper.runHopperCommand(true));
-    controller.povLeft.whileTrue(turret.setPositionPIDCommand(1));
+    controller.povLeft.whileTrue(turret.setPositionPIDCommandManualSetpoint());
     // controller.povRight.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
     controller.povDown.whileTrue(climber.downCommand());
     controller.lb.whileTrue(hopper.runHopperCommand(true));
-    controller.rt.whileTrue(flywheel.setVelocityPIDCommand());
-    // controller.rt.whileTrue(CommandFactory.shootCommand(flywheel, tunnel));
+    // controller.rt.whileTrue(flywheel.setVelocityPIDCommand());
+    controller.rt.whileTrue(CommandFactory.shootCommand(flywheel, tunnel));
     controller.rb.whileTrue(hopper.runHopperCommand(false));
 
     controller.yButton.whileTrue(hood.moveCommand(true));
