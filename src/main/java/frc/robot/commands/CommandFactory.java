@@ -13,14 +13,14 @@ public class CommandFactory {
     return Commands.parallel(
         flywheel.setVelocityPIDCommand(),
         Commands.sequence(
-            new WaitUntilCommand(() -> flywheel.isAtSpeed()), tunnel.runTunnelCommand(false)));
+            new WaitUntilCommand(() -> flywheel.isAtSpeed()), tunnel.runTunnelCommand(false))).withName("shoot command group");
   }
 
   public static Command intakeCommand(Intake intake, Hopper hopper) {
-    return Commands.parallel(intake.intakeCommand(), hopper.runHopperCommand(false));
+    return Commands.parallel(intake.intakeCommand(), hopper.runHopperCommand(false)).withName("intake command group");
   }
 
   public static Command clearJamsCommand(Tunnel tunnel, Hopper hopper) {
-    return Commands.parallel(tunnel.runTunnelCommand(true), hopper.runHopperCommand(true));
+    return Commands.parallel(tunnel.runTunnelCommand(true), hopper.runHopperCommand(true)).withName("clear jams");
   }
 }
