@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.simulation.SimHooks;
 import frc.robot.Constants;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,7 @@ public class ClimberTest {
     climber.setSpeed(0.5);
     climber.climberMotor1.getSimState().setSupplyVoltage(12);
     climber.up();
+    SimHooks.stepTiming(0.02);
     assertTrue(
         climber.climberMotor1.getSimState().getMotorVoltage() > 0,
         "Motor voltage should be positive when climbing up");
@@ -57,6 +59,7 @@ public class ClimberTest {
     climber.setSpeed(0.5);
     climber.climberMotor1.getSimState().setSupplyVoltage(12);
     climber.down();
+    SimHooks.stepTiming(0.02);
     assertTrue(
         climber.climberMotor1.getSimState().getMotorVoltage() < 0,
         "Motor voltage should be negative when climbing down");

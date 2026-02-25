@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.simulation.SimHooks;
 import frc.robot.Constants;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,7 @@ public class TunnelTest {
     tunnel.setTunnelSpeed(0.5, 0.5);
     tunnel.bottomTunnelMotor.getSimState().setSupplyVoltage(12);
     tunnel.run(false);
+    SimHooks.stepTiming(0.02);
     assertTrue(
         tunnel.bottomTunnelMotor.getSimState().getMotorVoltage() > 0,
         "Bottom motor voltage should be positive when running forward");
@@ -68,6 +70,7 @@ public class TunnelTest {
     tunnel.setTunnelSpeed(0.5, 0.5);
     tunnel.bottomTunnelMotor.getSimState().setSupplyVoltage(12);
     tunnel.run(true);
+    SimHooks.stepTiming(0.02);
     assertTrue(
         tunnel.bottomTunnelMotor.getSimState().getMotorVoltage() < 0,
         "Bottom motor voltage should be negative when running inverted");
