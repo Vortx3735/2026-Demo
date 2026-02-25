@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.controller.BangBangController;
@@ -59,6 +60,8 @@ public class Flywheel extends SubsystemBase {
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
+    flywheelMotor.setNeutralMode(NeutralModeValue.Coast);
+
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable flywheelTable = inst.getTable("Flywheel");
     flywheelMotorSpeedEntry = flywheelTable.getDoubleTopic("flywheelMotorSpeed").getEntry(1);
