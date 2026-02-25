@@ -35,7 +35,6 @@ public class Hood extends SubsystemBase {
 
   final DoubleEntry hoodMotorSpeedEntry;
   double speed;
-  double lastOutput = 0;
 
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
@@ -112,10 +111,8 @@ public class Hood extends SubsystemBase {
   public void set(boolean reversed) {
     if (reversed) {
       motor.set(-speed);
-      lastOutput = -speed;
     } else {
       motor.set(speed);
-      lastOutput = speed;
     }
   }
 

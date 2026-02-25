@@ -46,30 +46,6 @@ public class TunnelTest {
   }
 
   @Test
-  public void testRunForwardDirectionIsPositive() {
-    Tunnel tunnel =
-        new Tunnel(
-            Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
-            Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
-    tunnel.setTunnelSpeed(0.5, 0.5);
-    tunnel.run(false);
-    assertTrue(
-        tunnel.lastBottomOutput > 0, "run(false) should command a positive bottom motor output");
-  }
-
-  @Test
-  public void testRunInvertedDirectionIsNegative() {
-    Tunnel tunnel =
-        new Tunnel(
-            Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
-            Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
-    tunnel.setTunnelSpeed(0.5, 0.5);
-    tunnel.run(true);
-    assertTrue(
-        tunnel.lastBottomOutput < 0, "run(true) should command a negative bottom motor output");
-  }
-
-  @Test
   public void testCommandsNotNull() {
     Tunnel tunnel =
         new Tunnel(

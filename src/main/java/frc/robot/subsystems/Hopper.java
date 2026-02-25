@@ -17,7 +17,6 @@ public class Hopper extends SubsystemBase {
   final DoubleEntry hopperSpeedEntry;
 
   private double hopperSpeed;
-  double lastOutput = 0;
 
   public Hopper(int hopperID) {
     hopperMotor = new TalonFX(hopperID);
@@ -40,10 +39,8 @@ public class Hopper extends SubsystemBase {
   public void run(Boolean inverted) {
     if (inverted) {
       hopperMotor.set(-hopperSpeed);
-      lastOutput = -hopperSpeed;
     } else {
       hopperMotor.set(hopperSpeed);
-      lastOutput = hopperSpeed;
     }
   }
 

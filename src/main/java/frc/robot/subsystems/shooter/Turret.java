@@ -34,7 +34,6 @@ public class Turret extends SubsystemBase {
   final DoubleEntry turretMotorSpeedEntry;
   final DoubleEntry turretMotorPositionEntry;
   double speed;
-  double lastOutput = 0;
 
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
@@ -127,7 +126,6 @@ public class Turret extends SubsystemBase {
 
   public void set(double s) {
     turretMotor.set(s);
-    lastOutput = s;
   }
 
   public void stop() {

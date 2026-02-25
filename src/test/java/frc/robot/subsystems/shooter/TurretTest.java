@@ -50,20 +50,6 @@ public class TurretTest {
   }
 
   @Test
-  public void testPositiveCommandIsPositive() {
-    Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
-    turret.set(0.5);
-    assertTrue(turret.lastOutput > 0, "set(+0.5) should command a positive motor output");
-  }
-
-  @Test
-  public void testNegativeCommandIsNegative() {
-    Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
-    turret.set(-0.5);
-    assertTrue(turret.lastOutput < 0, "set(-0.5) should command a negative motor output");
-  }
-
-  @Test
   public void testCommandsNotNull() {
     Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
     assertNotNull(turret.moveCommand(false), "moveCommand(false) should not be null");

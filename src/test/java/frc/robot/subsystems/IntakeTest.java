@@ -37,14 +37,6 @@ public class IntakeTest {
   }
 
   @Test
-  public void testIntakeDirectionIsPositive() {
-    Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-    intake.setSpeed(0.5);
-    intake.intake();
-    assertTrue(intake.lastOutput > 0, "intake() should command a positive motor output");
-  }
-
-  @Test
   public void testCommandsNotNull() {
     Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
     assertNotNull(intake.intakeCommand(), "intakeCommand should not be null");

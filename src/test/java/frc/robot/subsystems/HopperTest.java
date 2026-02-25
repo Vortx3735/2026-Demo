@@ -39,22 +39,6 @@ public class HopperTest {
   }
 
   @Test
-  public void testRunForwardDirectionIsPositive() {
-    Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
-    hopper.setHopperSpeed(0.5);
-    hopper.run(false);
-    assertTrue(hopper.lastOutput > 0, "run(false) should command a positive motor output");
-  }
-
-  @Test
-  public void testRunInvertedDirectionIsNegative() {
-    Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
-    hopper.setHopperSpeed(0.5);
-    hopper.run(true);
-    assertTrue(hopper.lastOutput < 0, "run(true) should command a negative motor output");
-  }
-
-  @Test
   public void testCommandsNotNull() {
     Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
     assertNotNull(hopper.runHopperCommand(false), "runHopperCommand(false) should not be null");

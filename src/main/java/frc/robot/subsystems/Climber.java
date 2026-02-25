@@ -18,7 +18,6 @@ public class Climber extends SubsystemBase {
   private final TalonFX climberMotor2;
   // final DoubleEntry flywheelMotorSpeedEntry;
   private double speed = 0.25;
-  double lastOutput = 0;
 
   public Climber(int motorIdLeft, int motorIdRight) {
     climberMotor1 = new TalonFX(motorIdLeft);
@@ -40,12 +39,10 @@ public class Climber extends SubsystemBase {
 
   public void up() {
     climberMotor1.set(speed);
-    lastOutput = speed;
   }
 
   public void down() {
     climberMotor1.set(-speed);
-    lastOutput = -speed;
   }
 
   public void stop() {

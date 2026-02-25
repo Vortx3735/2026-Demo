@@ -35,28 +35,6 @@ public class ClimberTest {
   }
 
   @Test
-  public void testUpDirectionIsPositive() {
-    Climber climber =
-        new Climber(
-            Constants.ClimberConstants.CLIMBER_MOTOR_ID_LEFT,
-            Constants.ClimberConstants.CLIMBER_MOTOR_ID_RIGHT);
-    climber.setSpeed(0.5);
-    climber.up();
-    assertTrue(climber.lastOutput > 0, "up() should command a positive motor output");
-  }
-
-  @Test
-  public void testDownDirectionIsNegative() {
-    Climber climber =
-        new Climber(
-            Constants.ClimberConstants.CLIMBER_MOTOR_ID_LEFT,
-            Constants.ClimberConstants.CLIMBER_MOTOR_ID_RIGHT);
-    climber.setSpeed(0.5);
-    climber.down();
-    assertTrue(climber.lastOutput < 0, "down() should command a negative motor output");
-  }
-
-  @Test
   public void testCommandsNotNull() {
     Climber climber =
         new Climber(

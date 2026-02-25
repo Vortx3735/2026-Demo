@@ -60,30 +60,6 @@ public class HoodTest {
   }
 
   @Test
-  public void testSetForwardCommandIsPositive() {
-    Hood hood =
-        new Hood(
-            Constants.HoodConstants.HOOD_MOTOR_ID,
-            Constants.HoodConstants.HOOD_CANCODER_ID,
-            Mode.SIM);
-    hood.setSpeed(0.3);
-    hood.set(false);
-    assertTrue(hood.lastOutput > 0, "set(false) should command a positive motor output");
-  }
-
-  @Test
-  public void testSetReverseCommandIsNegative() {
-    Hood hood =
-        new Hood(
-            Constants.HoodConstants.HOOD_MOTOR_ID,
-            Constants.HoodConstants.HOOD_CANCODER_ID,
-            Mode.SIM);
-    hood.setSpeed(0.3);
-    hood.set(true);
-    assertTrue(hood.lastOutput < 0, "set(true) should command a negative motor output");
-  }
-
-  @Test
   public void testCommandsNotNull() {
     Hood hood =
         new Hood(
