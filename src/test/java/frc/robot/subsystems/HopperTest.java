@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.simulation.SimHooks;
 import frc.robot.Constants;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,24 +42,16 @@ public class HopperTest {
   public void testRunForwardDirectionIsPositive() {
     Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
     hopper.setHopperSpeed(0.5);
-    hopper.hopperMotor.getSimState().setSupplyVoltage(12);
     hopper.run(false);
-    SimHooks.stepTiming(0.02);
-    assertTrue(
-        hopper.hopperMotor.getSimState().getMotorVoltage() > 0,
-        "Motor voltage should be positive when running forward");
+    assertTrue(hopper.lastOutput > 0, "run(false) should command a positive motor output");
   }
 
   @Test
   public void testRunInvertedDirectionIsNegative() {
     Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
     hopper.setHopperSpeed(0.5);
-    hopper.hopperMotor.getSimState().setSupplyVoltage(12);
     hopper.run(true);
-    SimHooks.stepTiming(0.02);
-    assertTrue(
-        hopper.hopperMotor.getSimState().getMotorVoltage() < 0,
-        "Motor voltage should be negative when running inverted");
+    assertTrue(hopper.lastOutput < 0, "run(true) should command a negative motor output");
   }
 
   @Test

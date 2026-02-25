@@ -22,6 +22,7 @@ public class Tunnel extends SubsystemBase {
 
   private double topTunnelSpeed;
   private double bottomTunnelSpeed;
+  double lastBottomOutput = 0;
 
   public Tunnel(int bottomTunnelId, int topTunnelId) {
     bottomTunnelMotor = new TalonFX(bottomTunnelId);
@@ -57,9 +58,11 @@ public class Tunnel extends SubsystemBase {
     if (inverted) {
       bottomTunnelMotor.set(-bottomTunnelSpeed);
       topTunnelMotor.set(-topTunnelSpeed);
+      lastBottomOutput = -bottomTunnelSpeed;
     } else {
       bottomTunnelMotor.set(bottomTunnelSpeed);
       topTunnelMotor.set(topTunnelSpeed);
+      lastBottomOutput = bottomTunnelSpeed;
     }
   }
 

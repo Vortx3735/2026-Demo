@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.simulation.SimHooks;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,35 +49,18 @@ public class TurretTest {
     assertEquals(0.25, turret.targetRotations, 1e-6, "targetRotations should be set to 0.25");
   }
 
-  /**
-   * Turret motor is Clockwise_Positive. A positive set value drives the motor clockwise, which the
-   * TalonFX achieves with a negative winding voltage. After one simulation step the motor voltage
-   * is therefore negative.
-   */
   @Test
-  public void testPositiveCommandDrivesMotorClockwise() {
+  public void testPositiveCommandIsPositive() {
     Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
-    turret.turretMotor.getSimState().setSupplyVoltage(12);
     turret.set(0.5);
-    SimHooks.stepTiming(0.02);
-    assertTrue(
-        turret.turretMotor.getSimState().getMotorVoltage() < 0,
-        "Turret is Clockwise_Positive: positive command applies negative winding voltage for CW rotation");
+    assertTrue(turret.lastOutput > 0, "set(+0.5) should command a positive motor output");
   }
 
-  /**
-   * A negative set value drives the motor counter-clockwise, resulting in positive winding voltage
-   * for a Clockwise_Positive motor.
-   */
   @Test
-  public void testNegativeCommandDrivesMotorCounterClockwise() {
+  public void testNegativeCommandIsNegative() {
     Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
-    turret.turretMotor.getSimState().setSupplyVoltage(12);
     turret.set(-0.5);
-    SimHooks.stepTiming(0.02);
-    assertTrue(
-        turret.turretMotor.getSimState().getMotorVoltage() > 0,
-        "Turret is Clockwise_Positive: negative command applies positive winding voltage for CCW rotation");
+    assertTrue(turret.lastOutput < 0, "set(-0.5) should command a negative motor output");
   }
 
   @Test

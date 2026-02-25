@@ -19,6 +19,7 @@ public class Intake extends SubsystemBase {
   // Network Table Entry
   final DoubleEntry intakeMotorSpeedEntry;
   private double speed = 0.25;
+  double lastOutput = 0;
 
   public Intake(int motorId) {
     motor = new TalonFX(motorId);
@@ -45,6 +46,7 @@ public class Intake extends SubsystemBase {
 
   public void intake() {
     motor.set(speed);
+    lastOutput = speed;
   }
 
   public Command intakeCommand() {
