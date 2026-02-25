@@ -5,10 +5,15 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,29 +22,33 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
-  public static TalonFX turretMotor;
-  public double turretPosition;
-  private static final double kGearRatio = 45.45;
+  private static final double kGearRatio = (11.0 * 10.0) / (50.0 * 83.0);
   private static final double kMOI = 0.0117; // kg*m^2
-  private static final double approachLimitRange =
-      (150.0 / 360)
-          * (13.0 / 15); // Range to slow motor down as its close to its limit (to prevent overshoot)
+
+  private final TalonFX turretMotor;
+  // private final CANcoder canCoder; // unsure if will be added yet
+
+  public double turretPosition;
   public double targetRotations = 0;
-  private final double error = 0.005;
+
+  final DoubleEntry turretMotorSpeedEntry;
+  final DoubleEntry turretMotorPositionEntry;
+  double speed;
+
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
+          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, 1 / kGearRatio),
           DCMotor.getKrakenX44(1));
 
-  public Turret(int turretMotorID, Mode state) {
+  public Turret(int turretMotorID, /*int canCoderId,*/ Mode state) {
     turretMotor = new TalonFX(turretMotorID);
+    // canCoder = new CANcoder(canCoderId); // unsure if will be added yet
 
     var talonFXConfigs = new TalonFXConfiguration();
 
     var slot0Configs = talonFXConfigs.Slot0;
-    slot0Configs.kS = 0.0060924;
-    slot0Configs.kV = 0.11931;
-    slot0Configs.kA = 0.0017373;
+    slot0Configs.kS = 0.36;
+    // slot0Configs.kV = 0.11931;
     // slot0Configs.kS = 0.0060924;
     // slot0Configs.kA =
     //     1
@@ -55,18 +64,12 @@ public class Turret extends SubsystemBase {
     //                 * DCMotor.getKrakenX44(1).rOhms
     //                 * kMOI))
     //         * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kP = 4.4; // A position error of 2.5 rotations results in 12 V output
+    slot0Configs.kP = 9; // A position error of 2.5 rotations results in 12 V output
     slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.025; // A velocity error of 1 rps results in 0.1 V output
+    slot0Configs.kD = 0.01; // A velocity error of 1 rps results in 0.1 V output
 
     // Slow values for testing
-    slot0Configs.kP = 1.15;
-
-    // Limit turret rotations
-    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 150.0 / 360 * kGearRatio;
-    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -(150.0 / 360) * kGearRatio;
+    // slot0Configs.kP = 1.15;
 
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity =
@@ -74,9 +77,22 @@ public class Turret extends SubsystemBase {
     motionMagicConfigs.MotionMagicAcceleration =
         200; // Target acceleration of 160 rps/s (0.5 seconds)
     motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
+    talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (90.0 / 360.0) / kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -(90.0 / 360.0) / kGearRatio;
 
     turretMotor.getConfigurator().apply(talonFXConfigs);
-
+    turretMotor.setNeutralMode(NeutralModeValue.Coast);
+    // turretMotor.setPosition(0);
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable table = inst.getTable("Turret");
+    turretMotorSpeedEntry = table.getDoubleTopic("turretMotorSpeed").getEntry(0);
+    turretMotorSpeedEntry.set(0.1);
+    turretMotorPositionEntry = table.getDoubleTopic("turretPosition(rotations)").getEntry(0);
+    turretMotorPositionEntry.set(0);
     // configure talonfx sim state if the mode is sim
     if (state == Mode.SIM) {
       var talonFXSim = turretMotor.getSimState();
@@ -85,14 +101,8 @@ public class Turret extends SubsystemBase {
     }
   }
 
-  public void setTurretSpeed(double speed) {
-    double motorPos = turretMotor.getRotorPosition().getValueAsDouble() / kGearRatio;
-
-    if (motorPos >= approachLimitRange || motorPos <= -(approachLimitRange)) {
-      turretMotor.set(speed * 0.6);
-    } else {
-      turretMotor.set(speed);
-    }
+  public void setSpeed(double speed) {
+    this.speed = speed;
   }
 
   public void setVoltage(double voltage) {
@@ -100,40 +110,53 @@ public class Turret extends SubsystemBase {
     turretMotor.setControl(request);
   }
 
-  public Command moveCommand(double speed) {
-    return run(() -> setTurretSpeed(speed)).withName("Move Turret");
-  }
-
-  public void changeTurretPosition(double position) {
-    if (turretPosition < position) {
-      setTurretSpeed(0.5);
-    } else if (turretPosition > position) {
-      setTurretSpeed(-0.5);
-    } else {
-      setTurretSpeed(0);
-    }
+  public double getTurretPosition() {
+    return turretPosition;
   }
 
   public void setPositionPID(double rotations) {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
-    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations * kGearRatio);
-    final PositionVoltage m_request = new PositionVoltage(rotations * kGearRatio);
+    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations / kGearRatio);
+    final PositionVoltage m_request = new PositionVoltage(rotations / kGearRatio);
     turretMotor.setControl(m_request);
     // }
     targetRotations = rotations;
   }
 
-  public Command setPositionPIDCommand(double rotations) {
-    return runOnce(() -> setPositionPID(rotations)).withName("Set Turret Position PID");
-  }
-
-  public double getTurretPosition() {
-    return turretPosition;
+  public void set(double s) {
+    turretMotor.set(s);
   }
 
   public void stop() {
     turretMotor.set(0);
+  }
+
+  public void zero() {
+    turretMotor.setPosition(0);
+  }
+
+  // command factories / command helpers
+  public Command moveCommand(boolean reversed) {
+    return this.run(
+            () -> {
+              setSpeed(turretMotorSpeedEntry.getAsDouble());
+              if (reversed) {
+                this.set(-speed);
+              } else {
+                this.set(speed);
+              }
+            })
+        .withName("Move Turret");
+  }
+
+  public Command setPositionPIDCommand(double rotations) {
+    return run(() -> setPositionPID(rotations)).withName("Set Turret Position PID");
+  }
+
+  public Command setPositionPIDCommandManualSetpoint() {
+    return run(() -> setPositionPID(turretMotorPositionEntry.getAsDouble()))
+        .withName("Set Turret Position PID (manual setpoint)");
   }
 
   public Command stopCommand() {
@@ -143,11 +166,15 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    turretPosition = turretMotor.getRotorPosition().getValueAsDouble() * kGearRatio;
+    Logger.recordOutput("Turret/currentPostion(rotations)", turretPosition);
+    Logger.recordOutput("Turret/targetPostion(rotations)", targetRotations);
   }
 
   @Override
   public void simulationPeriodic() {
     var talonFXSim = turretMotor.getSimState();
+    // var canCoderSim = canCoder.getSimState();
 
     // set the supply voltage of the TalonFX
     talonFXSim.setSupplyVoltage(12);
@@ -164,6 +191,10 @@ public class Turret extends SubsystemBase {
     // DCMotorSim returns mechanism position/velocity (after gear ratio)
     talonFXSim.setRawRotorPosition(m_motorSimModel.getAngularPosition().times(kGearRatio));
     talonFXSim.setRotorVelocity(m_motorSimModel.getAngularVelocity().times(kGearRatio));
+
+    // apply stuff to CANCoder
+    /*canCoderSim.setRawPosition(m_motorSimModel.getAngularPosition());
+    canCoderSim.setVelocity(m_motorSimModel.getAngularVelocity());*/
 
     turretPosition = m_motorSimModel.getAngularPosition().in(Units.Rotations);
     Logger.recordOutput("Turret/TargetPosition", targetRotations);

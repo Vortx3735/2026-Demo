@@ -38,7 +38,7 @@ public class Constants {
     public static final int BACKRIGHT_TURN_ID = 11;
     public static final int BACKRIGHT_CANCODER = 12;
 
-    public static final int PIGEON_ID = 13;
+    public static final int PIGEON_ID = 23;
   }
 
   public static class OperatorConstants {
@@ -52,25 +52,32 @@ public class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int INTAKE_MOTOR_ID = 15;
+    public static final int INTAKE_MOTOR_ID = 13;
   }
 
   public static class ClimberConstants {
-    public static final int CLIMBER_MOTOR_ID = 16;
+    public static final int CLIMBER_MOTOR_ID_LEFT = 21;
+    public static final int CLIMBER_MOTOR_ID_RIGHT = 22;
   }
 
   public static class TurretConstants {
-    public static final int TURRET_MOTOR_ID = 17;
+    public static final int TURRET_MOTOR_ID = 15;
+    public static final int TURRET_CANCODER_ID =
+        67; // placeholder, unsure if CANCoder will be added yet
   }
 
   public static class HoodConstants {
-    public static final int HOOD_MOTOR_ID = 18;
-    public static final int HOOD_CANCODER_ID = 19;
+    public static final int HOOD_MOTOR_ID = 16;
+    public static final int HOOD_CANCODER_ID = 17;
   }
 
-  public static class IndexerConstants {
-    public static final int INDEXER_MOTOR_ID = 20;
-    public static final int INDEXER_ROLLER_MOTOR_ID = 21;
+  public static class HopperConstants {
+    public static final int HOPPER_MOTOR_ID = 18;
+  }
+
+  public static class TunnelConstants {
+    public static final int BOTTOM_TUNNEL_MOTOR_ID = 19;
+    public static final short TOP_TUNNEL_MOTOR_ID = 20;
   }
 
   public static class FieldConstants {

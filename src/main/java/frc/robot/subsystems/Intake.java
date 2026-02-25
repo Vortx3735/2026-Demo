@@ -11,14 +11,14 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
   private final TalonFX motor;
-  private double speed = 0.25;
-
   // Network Table Entry
   final DoubleEntry intakeMotorSpeedEntry;
+  private double speed = 0.25;
 
   public Intake(int motorId) {
     motor = new TalonFX(motorId);
@@ -27,7 +27,7 @@ public class Intake extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Intake");
     intakeMotorSpeedEntry = intakeTable.getDoubleTopic("intakeMotorSpeed").getEntry(0);
-    intakeMotorSpeedEntry.set(1);
+    intakeMotorSpeedEntry.set(0.5);
   }
 
   public double getSpeed() {
@@ -61,17 +61,11 @@ public class Intake extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-    publishTelemetry();
-  }
+  public void periodic() {}
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
-  }
-
-  // Publish motor speed to dashboard
-  private void publishTelemetry() {
-    intakeMotorSpeedEntry.set(motor.getDutyCycle().getValueAsDouble());
+    Logger.recordOutput("Intake/simulatedVoltage", motor.getSimState().getMotorVoltage());
   }
 }

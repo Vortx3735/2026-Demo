@@ -18,9 +18,12 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "camera_0";
-  public static String camera1Name = "camera_1";
+  public static String camera0Name = "usbcLeft";
+  public static String camera1Name = "usbcRight";
+  public static String camera2Name = "usb2.0top";
+  public static String camera3Name = "usb3.0bottom";
 
+  // note: zero z component is 0.5 meters above the ground
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d robotToCamera0 =
@@ -42,7 +45,9 @@ public class VisionConstants {
   public static double[] cameraStdDevFactors =
       new double[] {
         1.0, // Camera 0
-        1.0 // Camera 1
+        1.0, // Camera 1
+        1.0, // Camera 2
+        1.0 // Camera 3
       };
 
   // Multipliers to apply for MegaTag 2 observations
