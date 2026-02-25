@@ -25,7 +25,7 @@ public class Turret extends SubsystemBase {
   private static final double kGearRatio = (11.0 * 10.0) / (50.0 * 83.0);
   private static final double kMOI = 0.0117; // kg*m^2
 
-  private final TalonFX turretMotor;
+  final TalonFX turretMotor;
   // private final CANcoder canCoder; // unsure if will be added yet
 
   public double turretPosition;

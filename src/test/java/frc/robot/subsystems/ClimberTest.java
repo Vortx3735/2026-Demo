@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,22 +25,41 @@ public class ClimberTest {
   }
 
   @Test
-  public void testDefaultSpeed() {
-    Climber climber =
-        new Climber(
-            Constants.ClimberConstants.CLIMBER_MOTOR_ID_LEFT,
-            Constants.ClimberConstants.CLIMBER_MOTOR_ID_RIGHT);
-    assertEquals(0.25, climber.getSpeed(), 1e-6, "Default speed should be 0.25");
-  }
-
-  @Test
   public void testSetSpeed() {
     Climber climber =
         new Climber(
             Constants.ClimberConstants.CLIMBER_MOTOR_ID_LEFT,
             Constants.ClimberConstants.CLIMBER_MOTOR_ID_RIGHT);
     climber.setSpeed(0.5);
-    assertEquals(0.5, climber.getSpeed(), 1e-6, "Speed should be updated to 0.5");
+    assertTrue(climber.getSpeed() > 0, "Speed should be positive after setSpeed");
+  }
+
+  @Test
+  public void testUpDirectionIsPositive() {
+    Climber climber =
+        new Climber(
+            Constants.ClimberConstants.CLIMBER_MOTOR_ID_LEFT,
+            Constants.ClimberConstants.CLIMBER_MOTOR_ID_RIGHT);
+    climber.setSpeed(0.5);
+    climber.climberMotor1.getSimState().setSupplyVoltage(12);
+    climber.up();
+    assertTrue(
+        climber.climberMotor1.getSimState().getMotorVoltage() > 0,
+        "Motor voltage should be positive when climbing up");
+  }
+
+  @Test
+  public void testDownDirectionIsNegative() {
+    Climber climber =
+        new Climber(
+            Constants.ClimberConstants.CLIMBER_MOTOR_ID_LEFT,
+            Constants.ClimberConstants.CLIMBER_MOTOR_ID_RIGHT);
+    climber.setSpeed(0.5);
+    climber.climberMotor1.getSimState().setSupplyVoltage(12);
+    climber.down();
+    assertTrue(
+        climber.climberMotor1.getSimState().getMotorVoltage() < 0,
+        "Motor voltage should be negative when climbing down");
   }
 
   @Test

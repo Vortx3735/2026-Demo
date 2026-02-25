@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Climber extends SubsystemBase {
 
-  private final TalonFX climberMotor1;
+  final TalonFX climberMotor1;
   private final TalonFX climberMotor2;
   // final DoubleEntry flywheelMotorSpeedEntry;
   private double speed = 0.25;

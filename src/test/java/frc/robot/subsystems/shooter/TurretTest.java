@@ -50,6 +50,26 @@ public class TurretTest {
   }
 
   @Test
+  public void testMoveForwardDirectionIsPositive() {
+    Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
+    turret.turretMotor.getSimState().setSupplyVoltage(12);
+    turret.set(0.5);
+    assertTrue(
+        turret.turretMotor.getSimState().getMotorVoltage() > 0,
+        "Motor voltage should be positive when set to a positive value");
+  }
+
+  @Test
+  public void testMoveReverseDirectionIsNegative() {
+    Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
+    turret.turretMotor.getSimState().setSupplyVoltage(12);
+    turret.set(-0.5);
+    assertTrue(
+        turret.turretMotor.getSimState().getMotorVoltage() < 0,
+        "Motor voltage should be negative when set to a negative value");
+  }
+
+  @Test
   public void testCommandsNotNull() {
     Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
     assertNotNull(turret.moveCommand(false), "moveCommand(false) should not be null");

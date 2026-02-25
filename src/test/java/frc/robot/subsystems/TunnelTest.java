@@ -46,6 +46,34 @@ public class TunnelTest {
   }
 
   @Test
+  public void testRunForwardDirectionIsPositive() {
+    Tunnel tunnel =
+        new Tunnel(
+            Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
+            Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
+    tunnel.setTunnelSpeed(0.5, 0.5);
+    tunnel.bottomTunnelMotor.getSimState().setSupplyVoltage(12);
+    tunnel.run(false);
+    assertTrue(
+        tunnel.bottomTunnelMotor.getSimState().getMotorVoltage() > 0,
+        "Bottom motor voltage should be positive when running forward");
+  }
+
+  @Test
+  public void testRunInvertedDirectionIsNegative() {
+    Tunnel tunnel =
+        new Tunnel(
+            Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
+            Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
+    tunnel.setTunnelSpeed(0.5, 0.5);
+    tunnel.bottomTunnelMotor.getSimState().setSupplyVoltage(12);
+    tunnel.run(true);
+    assertTrue(
+        tunnel.bottomTunnelMotor.getSimState().getMotorVoltage() < 0,
+        "Bottom motor voltage should be negative when running inverted");
+  }
+
+  @Test
   public void testCommandsNotNull() {
     Tunnel tunnel =
         new Tunnel(

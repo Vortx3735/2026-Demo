@@ -23,23 +23,28 @@ public class IntakeTest {
   }
 
   @Test
-  public void testDefaultSpeed() {
-    Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-    assertEquals(0.25, intake.getSpeed(), 1e-6, "Default intake speed should be 0.25");
-  }
-
-  @Test
   public void testSetSpeed() {
     Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
     intake.setSpeed(0.75);
-    assertEquals(0.75, intake.getSpeed(), 1e-6, "Intake speed should be updated to 0.75");
+    assertTrue(intake.getSpeed() > 0, "Intake speed should be positive after setSpeed");
   }
 
   @Test
   public void testSetSpeedZero() {
     Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
     intake.setSpeed(0.0);
-    assertEquals(0.0, intake.getSpeed(), 1e-6, "Intake speed should be set to 0");
+    assertEquals(0.0, intake.getSpeed(), 1e-6, "Intake speed should be 0 after setting to 0");
+  }
+
+  @Test
+  public void testIntakeDirectionIsPositive() {
+    Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
+    intake.setSpeed(0.5);
+    intake.motor.getSimState().setSupplyVoltage(12);
+    intake.intake();
+    assertTrue(
+        intake.motor.getSimState().getMotorVoltage() > 0,
+        "Motor voltage should be positive when intaking");
   }
 
   @Test

@@ -60,6 +60,36 @@ public class HoodTest {
   }
 
   @Test
+  public void testSetForwardDirectionIsPositive() {
+    Hood hood =
+        new Hood(
+            Constants.HoodConstants.HOOD_MOTOR_ID,
+            Constants.HoodConstants.HOOD_CANCODER_ID,
+            Mode.SIM);
+    hood.setSpeed(0.3);
+    hood.motor.getSimState().setSupplyVoltage(12);
+    hood.set(false);
+    assertTrue(
+        hood.motor.getSimState().getMotorVoltage() > 0,
+        "Motor voltage should be positive when moving forward (reversed=false)");
+  }
+
+  @Test
+  public void testSetReverseDirectionIsNegative() {
+    Hood hood =
+        new Hood(
+            Constants.HoodConstants.HOOD_MOTOR_ID,
+            Constants.HoodConstants.HOOD_CANCODER_ID,
+            Mode.SIM);
+    hood.setSpeed(0.3);
+    hood.motor.getSimState().setSupplyVoltage(12);
+    hood.set(true);
+    assertTrue(
+        hood.motor.getSimState().getMotorVoltage() < 0,
+        "Motor voltage should be negative when moving in reverse (reversed=true)");
+  }
+
+  @Test
   public void testCommandsNotNull() {
     Hood hood =
         new Hood(

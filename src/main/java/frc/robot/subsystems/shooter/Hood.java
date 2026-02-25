@@ -30,7 +30,7 @@ public class Hood extends SubsystemBase {
   private static final double kGearRatio = 1.0;
   private static final double kMOI = 0.001; // kg*m^2
 
-  private final TalonFX motor;
+  final TalonFX motor;
   private final CANcoder canCoder;
 
   final DoubleEntry hoodMotorSpeedEntry;
