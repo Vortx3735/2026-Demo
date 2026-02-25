@@ -274,7 +274,6 @@ public class RobotContainer {
     controller.bButton.whileTrue(turret.moveCommand(false));
     controller.aButton.whileTrue(hood.moveCommand(false));
 
-    controller.menu.onTrue(hood.setPositionPIDCommand(0));
     // controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
   }
 

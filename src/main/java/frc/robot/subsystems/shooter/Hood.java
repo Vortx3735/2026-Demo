@@ -102,7 +102,9 @@ public class Hood extends SubsystemBase {
   }
 
   public double getHoodAngleDegrees() {
-    return hoodMotor.getRotorPosition().getValueAsDouble() * 360.0 / kGearRatio; // Convert to degrees
+    return hoodMotor.getRotorPosition().getValueAsDouble()
+        * 360.0
+        / kGearRatio; // Convert to degrees
   }
 
   private void stop() {
