@@ -31,23 +31,23 @@ public class Hood extends SubsystemBase {
   ;
   private static final double kMOI = 0.001; // kg*m^2
 
-  private final TalonFX motor;
+  private final TalonFX hoodMotor;
   private final CANcoder canCoder;
 
   final DoubleEntry hoodMotorSpeedEntry;
-  double speed;
+  private double speed;
 
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
           DCMotor.getKrakenX44(1));
 
-  public double targetAngle = 0;
   public double hoodAngle = 0;
+  public double targetAngle = 0;
   private final double error = 0.005;
 
   public Hood(int motorId, int canCoderId, Mode state) {
-    motor = new TalonFX(motorId);
+    hoodMotor = new TalonFX(motorId);
     canCoder = new CANcoder(canCoderId);
     var talonFXConfigs = new TalonFXConfiguration();
 
@@ -84,14 +84,14 @@ public class Hood extends SubsystemBase {
 
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    motor.getConfigurator().apply(talonFXConfigs);
+    hoodMotor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Hood");
     hoodMotorSpeedEntry = intakeTable.getDoubleTopic("hoodMotorSpeed").getEntry(0);
     hoodMotorSpeedEntry.set(0.1);
 
     if (state == Mode.SIM) {
-      var talonFXSim = motor.getSimState();
+      var talonFXSim = hoodMotor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
       talonFXSim.setMotorType(TalonFXSimState.MotorType.KrakenX44);
     }
@@ -102,26 +102,31 @@ public class Hood extends SubsystemBase {
   }
 
   public double getHoodAngleDegrees() {
-    return motor.getRotorPosition().getValueAsDouble() * 360.0 / kGearRatio; // Convert to degrees
+    return hoodMotor.getRotorPosition().getValueAsDouble() * 360.0 / kGearRatio; // Convert to degrees
   }
 
   private void stop() {
-    motor.set(0);
+    hoodMotor.set(0);
   }
 
   public void set(boolean reversed) {
     if (reversed) {
-      motor.set(-speed);
+      hoodMotor.set(-speed);
     } else {
-      motor.set(speed);
+      hoodMotor.set(speed);
     }
   }
 
   public void setPositionPID(double degrees) {
     // final MotionMagicVoltage m_request = new MotionMagicVoltage((degrees / 360) * kGearRatio);
     final PositionVoltage m_request = new PositionVoltage((degrees / 360) * kGearRatio);
-    motor.setControl(m_request);
+    hoodMotor.setControl(m_request);
     targetAngle = degrees;
+  }
+
+  public boolean isFinished() {
+    double tolerance = 3;
+    return Math.abs(targetAngle - hoodAngle) < tolerance;
   }
 
   public Command moveCommand(boolean reversed) {
@@ -148,13 +153,15 @@ public class Hood extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    
+    hoodAngle = hoodMotor.getRotorPosition().getValue().in(Units.Degrees);
+    Logger.recordOutput("Hood/currentAngle", hoodAngle);
+    Logger.recordOutput("Hood/targetAngle", targetAngle);
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
-    var talonFXSim = motor.getSimState();
+    var talonFXSim = hoodMotor.getSimState();
     var canCoderSim = canCoder.getSimState();
 
     // set the supply voltage of the TalonFX

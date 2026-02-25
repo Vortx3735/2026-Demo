@@ -26,7 +26,9 @@ import org.littletonrobotics.junction.Logger;
 public class Flywheel extends SubsystemBase {
   private static final double kMOI = 0.001; // kg*m^2
   private static final double kMaxSpeed = 90; // Max speed in RPS
+
   private static TalonFX flywheelMotor;
+
   public final DoubleEntry flywheelMotorSpeedEntry;
 
   private final BangBangController bangBangcontroller = new BangBangController();
@@ -35,9 +37,9 @@ public class Flywheel extends SubsystemBase {
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), kMOI, 1),
           DCMotor.getKrakenX60(1));
 
-  private double currentrps;
-  public double currentVelocity;
-  public double targetrps = 0;
+  public double currentRPS;
+  public double targetRPS = 0;
+  public double simulatedVelocity;
 
   public Flywheel(int flywheelMotorID, Mode state) {
     flywheelMotor = new TalonFX(flywheelMotorID);
@@ -56,12 +58,11 @@ public class Flywheel extends SubsystemBase {
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration = 500; // Target acceleration of 100 rps/s
     motionMagicConfigs.MotionMagicJerk = 6000; // Target jerk of 6000 rps/s/s (0.1 seconds)
-
+    
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
     flywheelMotor.setNeutralMode(NeutralModeValue.Coast);
-
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable flywheelTable = inst.getTable("Flywheel");
     flywheelMotorSpeedEntry = flywheelTable.getDoubleTopic("flywheelMotorSpeed").getEntry(1);
@@ -79,14 +80,14 @@ public class Flywheel extends SubsystemBase {
 
   public void stop() {
     flywheelMotor.set(0);
-    targetrps = 0;
+    targetRPS = 0;
   }
 
   public void setVelocityPID() {
     // final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps *
     // kGearRatio);
-    targetrps = flywheelMotorSpeedEntry.getAsDouble() * kMaxSpeed;
-    final VelocityVoltage m_request = new VelocityVoltage(targetrps);
+    targetRPS = flywheelMotorSpeedEntry.getAsDouble() * kMaxSpeed;
+    final VelocityVoltage m_request = new VelocityVoltage(targetRPS);
     flywheelMotor.setControl(m_request);
     // flywheelMotor.set(bangBangcontroller.calculate(currentrps, targetrps));
     // flywheelMotor.set(1);
@@ -94,7 +95,7 @@ public class Flywheel extends SubsystemBase {
 
   public boolean isAtSpeed() {
     double tolerance = 3;
-    return Math.abs(targetrps - currentrps) < tolerance;
+    return Math.abs(targetRPS - currentRPS) < tolerance;
   }
 
   public Command setVelocityPIDCommand() {
@@ -113,9 +114,9 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    currentrps = flywheelMotor.getRotorVelocity().getValueAsDouble();
-    Logger.recordOutput("Flywheel/currentRPS", currentrps);
-    Logger.recordOutput("Flywheel/targetRPS", targetrps);
+    currentRPS = flywheelMotor.getRotorVelocity().getValueAsDouble();
+    Logger.recordOutput("Flywheel/currentRPS", currentRPS);
+    Logger.recordOutput("Flywheel/targetRPS", targetRPS);
   }
 
   @Override
@@ -137,8 +138,8 @@ public class Flywheel extends SubsystemBase {
     // DCMotorSim returns mechanism position/velocity (after gear ratio)
     // talonFXSim.setRawRotorPosition(m_motorSimModel.getAngularPosition().times(kGearRatio));
     // talonFXSim.setRotorVelocity(m_motorSimModel.getAngularVelocity().times(kGearRatio));
-    currentVelocity = m_motorSimModel.getAngularVelocity().in(RotationsPerSecond);
-    Logger.recordOutput("Flywheel/TargetVelocity(rps)", targetrps);
-    Logger.recordOutput("Flywheel/SimulatedVelocity(rps)", currentVelocity);
+    simulatedVelocity = m_motorSimModel.getAngularVelocity().in(RotationsPerSecond);
+    Logger.recordOutput("Flywheel/TargetVelocity(rps)", targetRPS);
+    Logger.recordOutput("Flywheel/SimulatedVelocity(rps)", simulatedVelocity);
   }
 }

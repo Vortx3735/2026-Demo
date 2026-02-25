@@ -28,17 +28,17 @@ public class Turret extends SubsystemBase {
   private final TalonFX turretMotor;
   // private final CANcoder canCoder; // unsure if will be added yet
 
-  public double turretPosition;
-  public double targetRotations = 0;
-
   final DoubleEntry turretMotorSpeedEntry;
   final DoubleEntry turretMotorPositionEntry;
-  double speed;
+  private double speed;
 
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, 1 / kGearRatio),
           DCMotor.getKrakenX44(1));
+
+  public double currentPosition; // rotations
+  public double targetPosition = 0;
 
   public Turret(int turretMotorID, /*int canCoderId,*/ Mode state) {
     turretMotor = new TalonFX(turretMotorID);
@@ -110,8 +110,8 @@ public class Turret extends SubsystemBase {
     turretMotor.setControl(request);
   }
 
-  public double getTurretPosition() {
-    return turretPosition;
+  public double getCurrentPosition() {
+    return currentPosition;
   }
 
   public void setPositionPID(double rotations) {
@@ -121,7 +121,12 @@ public class Turret extends SubsystemBase {
     final PositionVoltage m_request = new PositionVoltage(rotations / kGearRatio);
     turretMotor.setControl(m_request);
     // }
-    targetRotations = rotations;
+    targetPosition = rotations;
+  }
+
+  public boolean isFinished() {
+    double tolerance = 0.25; // Tolerance of 1/4 of a rotation
+    return Math.abs(targetPosition - currentPosition) < tolerance;
   }
 
   public void set(double s) {
@@ -166,9 +171,9 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    turretPosition = turretMotor.getRotorPosition().getValueAsDouble() * kGearRatio;
-    Logger.recordOutput("Turret/currentPostion(rotations)", turretPosition);
-    Logger.recordOutput("Turret/targetPostion(rotations)", targetRotations);
+    currentPosition = turretMotor.getRotorPosition().getValueAsDouble() * kGearRatio;
+    Logger.recordOutput("Turret/currentPostion(rotations)", currentPosition);
+    Logger.recordOutput("Turret/targetPostion(rotations)", targetPosition);
   }
 
   @Override
@@ -196,8 +201,8 @@ public class Turret extends SubsystemBase {
     /*canCoderSim.setRawPosition(m_motorSimModel.getAngularPosition());
     canCoderSim.setVelocity(m_motorSimModel.getAngularVelocity());*/
 
-    turretPosition = m_motorSimModel.getAngularPosition().in(Units.Rotations);
-    Logger.recordOutput("Turret/TargetPosition", targetRotations);
-    Logger.recordOutput("Turret/SimulatedTurretPosition", turretPosition);
+    currentPosition = m_motorSimModel.getAngularPosition().in(Units.Rotations);
+    Logger.recordOutput("Turret/TargetPosition", targetPosition);
+    Logger.recordOutput("Turret/SimulatedTurretPosition", currentPosition);
   }
 }
