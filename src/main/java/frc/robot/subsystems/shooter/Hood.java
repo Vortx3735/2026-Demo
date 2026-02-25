@@ -152,7 +152,7 @@ public class Hood extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    hoodAngle = hoodMotor.getRotorVelocity().getValueAsDouble();
+    hoodAngle = hoodMotor.getRotorPosition().getValue().in(Units.Degrees);
     Logger.recordOutput("Hood/currentAngle", hoodAngle);
     Logger.recordOutput("Hood/targetAngle", targetAngle);
   }

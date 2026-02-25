@@ -125,7 +125,7 @@ public class Turret extends SubsystemBase {
   }
 
   public boolean isFinished() {
-    double tolerance = 3;
+    double tolerance = 0.25; // Tolerance of 1/4 of a rotation
     return Math.abs(targetPosition - currentPosition) < tolerance;
   }
 
