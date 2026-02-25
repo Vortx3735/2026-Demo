@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Tunnel extends SubsystemBase {
-  final TalonFX bottomTunnelMotor;
-  final TalonFX topTunnelMotor;
+  private final TalonFX bottomTunnelMotor;
+  private final TalonFX topTunnelMotor;
 
   // Network Table Entry
   final DoubleEntry topTunnelSpeedEntry;

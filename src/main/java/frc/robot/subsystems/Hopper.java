@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Hopper extends SubsystemBase {
-  final TalonFX hopperMotor;
+  private final TalonFX hopperMotor;
 
   // Network Table Entry
   final DoubleEntry hopperSpeedEntry;
