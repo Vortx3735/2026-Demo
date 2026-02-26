@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.TurretCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.drive.*;
@@ -249,6 +250,9 @@ public class RobotContainer {
     controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
     // Set bindings
+
+    // Test Binds
+
     // controller.povUp.whileTrue(flywheel.setVelocityPIDCommand(100));
     // controller.povDown.whileTrue(flywheel.setVelocityPIDCommand(0));
     // controller.povRight.whileTrue(turret.moveCommand(0.5));
@@ -276,6 +280,26 @@ public class RobotContainer {
     controller.aButton.whileTrue(hood.moveCommand(false));
 
     controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
+
+    /*// Actual Binds
+    d
+    */
+    // Shooter Binds
+    //controller.lt.onTrue(TurretCommands.AimToSide(turret, () -> drive.getPose())); does AimToSide aim to a side of the field?
+    controller.lb.whileTrue(turret.moveCommand(true));
+    controller.rb.whileTrue(turret.moveCommand(false));
+    controller.rt.whileTrue(CommandFactory.shootCommand(flywheel, tunnel));
+    controller.povLeft.whileTrue(hood.moveCommand(true));
+    controller.povRight.whileTrue(hood.moveCommand(false));
+    controller.yButton.whileTrue(TurretCommands.AimToHub(turret, () -> drive.getPose()));
+    
+    // Climber Binds
+    controller.povUp.whileTrue(climber.upCommand());
+    controller.povDown.whileTrue(climber.downCommand());
+
+    // Intake Binds
+    controller.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
+    controller.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
   }
 
   /**
