@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Mode;
@@ -177,10 +178,11 @@ public class Turret extends SubsystemBase {
             .andThen(
                 () -> {
                   Logger.recordOutput("Turret/SetPositionTimeout", 1.0);
-                  System.err.println(
+                  DriverStation.reportWarning(
                       "Turret.setPositionPIDCommand: timed out waiting for turret to reach "
                           + rotations
-                          + " rotations");
+                          + " rotations",
+                      false);
                 });
     return Commands.sequence(
             runOnce(() -> setPositionPID(rotations)), Commands.waitUntil(this::isFinished))
