@@ -126,10 +126,6 @@ public class ShooterCommands {
     }
   }
 
-  /**
-   * Returns a Runnable that, when run, reads the robot and hub poses from the suppliers, computes
-   * the relative angle and commands the turret position PID.
-   */
   /** Returns a Command that aims the turret at the hub using the provided pose suppliers. */
   private static Command turretAimCommand(
       Turret turret, Supplier<Pose2d> robotPoseSupplier, Supplier<Pose2d> hubPoseSupplier) {
