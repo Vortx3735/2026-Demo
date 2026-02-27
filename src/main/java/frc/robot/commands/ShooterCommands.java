@@ -160,11 +160,20 @@ public class ShooterCommands {
 
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
 
-    return Commands.sequence(
-            Commands.parallel(
-                turretAimCommand(turret, poseSupplier, hubPoseSupplier),
-                hood.setPositionPIDCommand(theta)),
-            flywheel.shootCommand(targetRpsSupplier))
+    // While shooting, continuously aim the turret and hold the hood at the desired angle.
+    // The flywheel shoot command acts as the deadline: when it finishes, aiming/hood are interrupted.
+    return Commands.deadline(
+            flywheel.shootCommand(targetRpsSupplier),
+            Commands.run(
+                () -> {
+                  Pose2d rp = poseSupplier.get();
+                  Pose2d hp = hubPoseSupplier.get();
+                  double angleRelative = getAngleRelativeToHub(rp, hp);
+                  double rotations = angleRelative / (2 * Math.PI);
+                  turret.setPositionPID(rotations);
+                },
+                turret),
+            hood.setPositionPIDCommand(theta))
         .withName("AimToHub");
   }
 
