@@ -28,7 +28,6 @@ import org.littletonrobotics.junction.Logger;
 
 public class Hood extends SubsystemBase {
   private static final double kGearRatio = (9.0 * 15.0 * 10.0) / (48.0 * 30.0 * 15.0);
-  ;
   private static final double kMOI = 0.001; // kg*m^2
 
   private final TalonFX hoodMotor;
