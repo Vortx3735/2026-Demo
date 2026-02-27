@@ -101,12 +101,8 @@ public class Flywheel extends SubsystemBase {
       final double kS = 0.31; // static volts (matches slot0 kS)
       final double kV = 0.125; // volts per RPS (matches slot0 kV)
       simulatedInputVoltage = Math.signum(targetRPS) * (kS + kV * Math.abs(targetRPS));
-      // Debug: announce when shoot() is called in simulation so we can trace races
-      System.out.println(
-          "[Flywheel] shoot() called: targetRPS="
-              + targetRPS
-              + " simulatedInputVoltage="
-              + simulatedInputVoltage);
+      Logger.recordOutput("Flywheel/SimShootTargetRPS", targetRPS);
+      Logger.recordOutput("Flywheel/SimShootInputVoltage", simulatedInputVoltage);
     }
   }
 
@@ -210,11 +206,7 @@ public class Flywheel extends SubsystemBase {
     simulatedVelocity = m_motorSimModel.getAngularVelocity().in(RotationsPerSecond);
     Logger.recordOutput("Flywheel/TargetVelocity(rps)", targetRPS);
     Logger.recordOutput("Flywheel/SimulatedVelocity(rps)", simulatedVelocity);
-    // Debug: print applied voltage and simulated velocity to assist CI troubleshooting.
-    if (isSim) {
-      System.out.println(
-          "[FlywheelSim] appliedVoltage=" + voltageIn + " simulatedVelocity=" + simulatedVelocity);
-    }
+    Logger.recordOutput("Flywheel/SimAppliedVoltage", voltageIn);
     // If we've reached the target (or target was cleared), clear the precomputed input
     if (Math.abs(targetRPS) < 1e-6 || Math.abs(simulatedVelocity - targetRPS) < 0.5) {
       simulatedInputVoltage = 0.0;
