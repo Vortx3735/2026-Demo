@@ -63,6 +63,7 @@ public class Flywheel extends SubsystemBase {
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
     flywheelMotor.setNeutralMode(NeutralModeValue.Coast);
+
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable flywheelTable = inst.getTable("Flywheel");
     flywheelMotorSpeedEntry = flywheelTable.getDoubleTopic("flywheelMotorSpeed").getEntry(1);
