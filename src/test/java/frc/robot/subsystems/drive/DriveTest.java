@@ -53,7 +53,8 @@ public class DriveTest {
 
   @Test
   public void testGetModuleTranslationsFour() {
-    assertEquals(4, Drive.getModuleTranslations().length, "Drive should have 4 module translations");
+    assertEquals(
+        4, Drive.getModuleTranslations().length, "Drive should have 4 module translations");
   }
 
   @Test
