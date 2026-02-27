@@ -114,7 +114,7 @@ public class Hood extends SubsystemBase {
     hoodMotor.set(0);
   }
 
-  public void run(boolean reversed) {
+  public void setOpenLoop(boolean reversed) {
     if (reversed) {
       hoodMotor.set(-hoodSpeedEntry.get());
     } else {
@@ -146,7 +146,7 @@ public class Hood extends SubsystemBase {
   public Command moveCommand(boolean reversed) {
     return this.run(
             () -> {
-              this.run(reversed);
+              this.setOpenLoop(reversed);
             })
         .withName("move hood");
   }
