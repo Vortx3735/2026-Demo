@@ -34,8 +34,7 @@ public class Hood extends SubsystemBase {
   private final TalonFX hoodMotor;
   private final CANcoder canCoder;
 
-  final DoubleEntry hoodMotorSpeedEntry;
-  private double speed;
+  final DoubleEntry hoodSpeedEntry;
 
   private final DCMotorSim m_motorSimModel =
       new DCMotorSim(
@@ -87,18 +86,14 @@ public class Hood extends SubsystemBase {
     hoodMotor.getConfigurator().apply(talonFXConfigs);
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Hood");
-    hoodMotorSpeedEntry = intakeTable.getDoubleTopic("hoodMotorSpeed").getEntry(0);
-    hoodMotorSpeedEntry.set(0.1);
+    hoodSpeedEntry = intakeTable.getDoubleTopic("hoodMotorSpeed").getEntry(0);
+    hoodSpeedEntry.set(0.1);
 
     if (state == Mode.SIM) {
       var talonFXSim = hoodMotor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
       talonFXSim.setMotorType(TalonFXSimState.MotorType.KrakenX44);
     }
-  }
-
-  public void setSpeed(double speed) {
-    this.speed = speed;
   }
 
   public double getHoodAngleDegrees() {
@@ -109,11 +104,11 @@ public class Hood extends SubsystemBase {
     hoodMotor.set(0);
   }
 
-  public void set(boolean reversed) {
+  public void run(boolean reversed) {
     if (reversed) {
-      hoodMotor.set(-speed);
+      hoodMotor.set(-hoodSpeedEntry.get());
     } else {
-      hoodMotor.set(speed);
+      hoodMotor.set(hoodSpeedEntry.get());
     }
   }
 
@@ -132,8 +127,7 @@ public class Hood extends SubsystemBase {
   public Command moveCommand(boolean reversed) {
     return this.run(
             () -> {
-              setSpeed(hoodMotorSpeedEntry.getAsDouble());
-              this.set(reversed);
+              this.run(reversed);
             })
         .withName("move hood");
   }

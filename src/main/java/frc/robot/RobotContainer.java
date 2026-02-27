@@ -35,13 +35,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.TurretCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.intake.*;
 import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.shooter.Flywheel;
-import frc.robot.subsystems.shooter.Hood;
-import frc.robot.subsystems.shooter.Turret;
+import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.*;
 import org.ironmaple.simulation.SimulatedArena;
@@ -287,10 +286,10 @@ public class RobotContainer {
     //controller.lt.onTrue(TurretCommands.AimToSide(turret, () -> drive.getPose())); does AimToSide aim to a side of the field?
     controller.lb.whileTrue(turret.moveCommand(true));
     controller.rb.whileTrue(turret.moveCommand(false));
-    controller.rt.whileTrue(CommandFactory.shootCommand(flywheel, tunnel));
+    controller.rt.whileTrue(CommandFactory.manualShootCommand(flywheel, tunnel));
     controller.povLeft.whileTrue(hood.moveCommand(true));
     controller.povRight.whileTrue(hood.moveCommand(false));
-    controller.yButton.whileTrue(TurretCommands.AimToHub(turret, () -> drive.getPose()));
+    controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
     
     // Climber Binds
     controller.povUp.whileTrue(climber.upCommand());

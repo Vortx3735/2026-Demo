@@ -31,11 +31,9 @@ public class Flywheel extends SubsystemBase {
 
   public final DoubleEntry flywheelMotorSpeedEntry;
 
-  private final BangBangController bangBangcontroller = new BangBangController();
-  private final DCMotorSim m_motorSimModel =
-      new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), kMOI, 1),
-          DCMotor.getKrakenX60(1));
+  private final DCMotorSim m_motorSimModel = new DCMotorSim(
+      LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), kMOI, 1),
+      DCMotor.getKrakenX60(1));
 
   public double currentRPS;
   public double targetRPS = 0;
@@ -58,7 +56,7 @@ public class Flywheel extends SubsystemBase {
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration = 500; // Target acceleration of 100 rps/s
     motionMagicConfigs.MotionMagicJerk = 6000; // Target jerk of 6000 rps/s/s (0.1 seconds)
-    
+
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     flywheelMotor.getConfigurator().apply(talonFXConfigs);
@@ -74,23 +72,9 @@ public class Flywheel extends SubsystemBase {
     }
   }
 
-  public void shoot(double speed) {
-    flywheelMotor.set(speed);
-  }
-
   public void stop() {
     flywheelMotor.set(0);
     targetRPS = 0;
-  }
-
-  public void setVelocityPID() {
-    // final MotionMagicVelocityVoltage m_request = new MotionMagicVelocityVoltage(rps *
-    // kGearRatio);
-    targetRPS = flywheelMotorSpeedEntry.getAsDouble() * kMaxSpeed;
-    final VelocityVoltage m_request = new VelocityVoltage(targetRPS);
-    flywheelMotor.setControl(m_request);
-    // flywheelMotor.set(bangBangcontroller.calculate(currentrps, targetrps));
-    // flywheelMotor.set(1);
   }
 
   public boolean isAtSpeed() {
@@ -98,17 +82,25 @@ public class Flywheel extends SubsystemBase {
     return Math.abs(targetRPS - currentRPS) < tolerance;
   }
 
-  public Command setVelocityPIDCommand() {
-    return Commands.run(() -> setVelocityPID(), this).withName("Set flywheel velocity PID");
+
+  public void shoot(double targetRPS) {
+    this.targetRPS = targetRPS;
+    final VelocityVoltage m_request = new VelocityVoltage(targetRPS);
+    flywheelMotor.setControl(m_request);
+  }
+
+  // For testing purposes, allows setting flywheel speed directly from Network Tables
+  public Command manualShootCommand() {
+    return this.shootCommand(flywheelMotorSpeedEntry.get());
+  }
+
+  public Command shootCommand(double speed) {
+    return this.run(() -> this.shoot(speed))
+        .withName("shoot flywheel");
   }
 
   public Command stopCommand() {
     return Commands.run(() -> stop(), this).withName("stop flywheel");
-  }
-
-  public Command shootCommand() {
-    return this.run(() -> this.shoot(flywheelMotorSpeedEntry.getAsDouble()))
-        .withName("shoot flywheel");
   }
 
   @Override

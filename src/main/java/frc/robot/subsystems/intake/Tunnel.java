@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,9 +19,6 @@ public class Tunnel extends SubsystemBase {
   // Network Table Entry
   final DoubleEntry topTunnelSpeedEntry;
   final DoubleEntry bottomTunnelSpeedEntry;
-
-  private double topTunnelSpeed;
-  private double bottomTunnelSpeed;
 
   public Tunnel(int bottomTunnelId, int topTunnelId) {
     bottomTunnelMotor = new TalonFX(bottomTunnelId);
@@ -44,22 +41,21 @@ public class Tunnel extends SubsystemBase {
     topTunnelSpeedEntry.set(1);
   }
 
-  public void setTunnelSpeed(double bottomTunnelSpeed, double topTunnelSpeed) {
-    this.bottomTunnelSpeed = bottomTunnelSpeed;
-    this.topTunnelSpeed = topTunnelSpeed;
+    public double getTopTunnelSpeed() {
+    return topTunnelSpeedEntry.get();
   }
 
   public double getBottomTunnelSpeed() {
-    return bottomTunnelSpeed;
+    return bottomTunnelSpeedEntry.get();
   }
 
   public void run(Boolean inverted) {
     if (inverted) {
-      bottomTunnelMotor.set(-bottomTunnelSpeed);
-      topTunnelMotor.set(-topTunnelSpeed);
+      bottomTunnelMotor.set(-getBottomTunnelSpeed());
+      topTunnelMotor.set(-getTopTunnelSpeed());
     } else {
-      bottomTunnelMotor.set(bottomTunnelSpeed);
-      topTunnelMotor.set(topTunnelSpeed);
+      bottomTunnelMotor.set(getBottomTunnelSpeed());
+      topTunnelMotor.set(getTopTunnelSpeed());
     }
   }
 
@@ -68,13 +64,12 @@ public class Tunnel extends SubsystemBase {
     topTunnelMotor.set(0);
   }
 
-  public Command runTunnelCommand(Boolean inverted) {
-    // Execute setTunnelSpeed AND set the motor every loop
-    return run(() -> {
-          setTunnelSpeed(bottomTunnelSpeedEntry.getAsDouble(), topTunnelSpeedEntry.getAsDouble());
-          run(inverted); // Ensure the motor is actually updated
-        })
-        .withName("run tunnel");
+  public Command intakeCommand() {
+    return new RunCommand(()-> run(false)).withName("intake tunnel");
+  }
+
+  public Command outtakeCommand() {
+    return new RunCommand(()-> run(true)).withName("outtake tunnel");
   }
 
   public Command stopCommand() {
