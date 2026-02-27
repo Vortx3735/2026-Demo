@@ -86,17 +86,18 @@ public class ShooterCommands {
     return rps * efficiencyFactor;
   }
 
+  /** Conversion factor from meters to feet. */
+  private static final double METERS_TO_FEET = 3.28084;
+
   /**
-   * Returns horizontal distance to the hub (xs) in feet given robot and hub poses. Extracted so
-   * multiple commands can reuse the same calculation in parallel.
+   * Returns horizontal distance to the hub (xs) in feet given robot and hub poses (in meters).
+   * Extracted so multiple commands can reuse the same calculation in parallel.
    */
   public static double getHorizontalDistanceToHub(Pose2d robotPose, Pose2d hubPose) {
-    // Horizontal distance in field coordinates (feet)
+    // Pose2d field coordinates are in meters; convert to feet for calculateShooterRPS
     double dx = hubPose.getX() - robotPose.getX();
     double dy = hubPose.getY() - robotPose.getY();
-    // distance along the forward (x) axis relative to robot — we want planar
-    // distance in feet
-    return Math.hypot(dx, dy);
+    return Math.hypot(dx, dy) * METERS_TO_FEET;
   }
 
   /** Returns the angle from the robot's heading to the hub, normalized to [-pi, pi]. */
