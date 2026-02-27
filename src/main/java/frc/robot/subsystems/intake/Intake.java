@@ -50,11 +50,11 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return new RunCommand(() -> run(false)).withName("intake intake");
+    return new RunCommand(() -> run(false), this).withName("intake intake");
   }
 
   public Command outtakeCommand() {
-    return new RunCommand(() -> run(true)).withName("outtake intake");
+    return new RunCommand(() -> run(true), this).withName("outtake intake");
   }
 
   public Command stopCommand() {
