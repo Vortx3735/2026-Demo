@@ -108,7 +108,7 @@ public class Hood extends SubsystemBase {
     }
     return hoodMotor.getRotorPosition().getValueAsDouble()
         * 360.0
-        / kGearRatio; // Convert to degrees
+        * kGearRatio; // Convert to mechanism degrees using gear ratio
   }
 
   private void stop() {
