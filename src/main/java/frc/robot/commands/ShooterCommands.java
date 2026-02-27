@@ -168,8 +168,7 @@ public class ShooterCommands {
         .withName("AimToHub");
   }
 
-  public static Command AimToSide(
-      Turret turret, Flywheel flywheel, Hood hood, Supplier<Pose2d> poseSupplier) {
+  public static Command AimToSide(Turret turret, Supplier<Pose2d> poseSupplier) {
     Supplier<Pose2d> hubPoseSupplier = () -> chooseSideHubPose(poseSupplier.get());
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier);
   }
