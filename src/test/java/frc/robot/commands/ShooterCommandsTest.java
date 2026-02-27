@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 public class ShooterCommandsTest {
 
+  private static final double METERS_TO_FEET = 3.28084;
+
   @BeforeAll
   static void halInit() {
     assertTrue(HAL.initialize(500, 0), "HAL failed to initialize");
@@ -20,7 +22,7 @@ public class ShooterCommandsTest {
     Pose2d a = new Pose2d(0, 0, new Rotation2d());
     Pose2d b = new Pose2d(3, 4, new Rotation2d());
     // Poses are in meters; getHorizontalDistanceToHub converts to feet (5m * 3.28084 ft/m)
-    assertEquals(5.0 * 3.28084, ShooterCommands.getHorizontalDistanceToHub(a, b), 1e-3);
+    assertEquals(5.0 * METERS_TO_FEET, ShooterCommands.getHorizontalDistanceToHub(a, b), 1e-3);
   }
 
   @Test
