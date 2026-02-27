@@ -281,9 +281,11 @@ public class Hood extends SubsystemBase {
     // existing periodic sets hoodAngle when not sim; ensure hoodVelocity is set from sensor when
     // not sim
     if (!isSim) {
-      hoodAngle = hoodMotor.getRotorPosition().getValue().in(Units.Degrees) / kGearRatio;
+      // Convert motor (rotor) position to hood (mechanism) angle using kGearRatio (mechanism/rotor)
+      hoodAngle = hoodMotor.getRotorPosition().getValue().in(Units.Degrees) * kGearRatio;
       try {
-        hoodVelocity = hoodMotor.getRotorVelocity().getValueAsDouble() * 360.0 / kGearRatio;
+        // Convert motor (rotor) velocity (rotations per second) to hood angular velocity in deg/s
+        hoodVelocity = hoodMotor.getRotorVelocity().getValueAsDouble() * 360.0 * kGearRatio;
       } catch (Exception e) {
         // ignore if not available
       }
