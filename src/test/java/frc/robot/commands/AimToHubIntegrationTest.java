@@ -56,16 +56,6 @@ public class AimToHubIntegrationTest {
       flywheel.periodic();
     }
 
-    // Debug output to help trace simulation values
-    System.out.println("expectedRps=" + expectedRps);
-    System.out.println("flywheel.targetRPS=" + flywheel.targetRPS);
-    System.out.println("flywheel.currentRPS=" + flywheel.currentRPS);
-    System.out.println("flywheel.simulatedVelocity=" + flywheel.simulatedVelocity);
-    System.out.println("turret.targetPosition=" + turret.targetPosition);
-    System.out.println("turret.currentPosition=" + turret.getCurrentPosition());
-    System.out.println("hood.targetAngle=" + hood.targetAngle);
-    System.out.println("hood.hoodAngle=" + hood.hoodAngle);
-
     // Verify turret/hood targets are set and flywheel is spinning (in simulation)
     assertEquals(
         expectedRotations,
