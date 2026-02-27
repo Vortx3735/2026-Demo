@@ -96,7 +96,7 @@ public class Flywheel extends SubsystemBase {
     final VelocityVoltage m_request = new VelocityVoltage(targetRPS);
     flywheelMotor.setControl(m_request);
     // In simulation, pre-compute a feedforward voltage so the DCMotorSim receives a
-    // deterministic input even if the Talon sim doesn't propogate motorVoltage.
+    // deterministic input even if the Talon sim doesn't propagate motorVoltage.
     if (isSim) {
       final double kS = 0.31; // static volts (matches slot0 kS)
       final double kV = 0.125; // volts per RPS (matches slot0 kV)
