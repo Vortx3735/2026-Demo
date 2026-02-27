@@ -21,7 +21,7 @@ public class Hopper extends SubsystemBase {
 
     // Hopper Network Table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTable hopperTable = inst.getTable("Hopper");
+    NetworkTable hopperTable = inst.getTable("Subsystems/Hopper");
     hopperSpeedEntry = hopperTable.getDoubleTopic("hopperSpeed").getEntry(0);
     hopperSpeedEntry.set(0.1);
   }
@@ -33,10 +33,10 @@ public class Hopper extends SubsystemBase {
   // Invert true is outtake. false is intake
   public void run(Boolean inverted) {
     if (inverted) {
-      //outtake
+      // outtake
       hopperMotor.set(-getHopperSpeed());
     } else {
-      //intake
+      // intake
       hopperMotor.set(getHopperSpeed());
     }
   }
@@ -46,11 +46,11 @@ public class Hopper extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return new RunCommand(()-> run(false)).withName("intake hopper");
+    return new RunCommand(() -> run(false)).withName("intake hopper");
   }
 
   public Command outtakeCommand() {
-    return new RunCommand(()-> run(true)).withName("outtake hopper");
+    return new RunCommand(() -> run(true)).withName("outtake hopper");
   }
 
   public Command stopCommand() {

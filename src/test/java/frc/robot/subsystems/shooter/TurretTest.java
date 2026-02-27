@@ -26,27 +26,27 @@ public class TurretTest {
   @Test
   public void testInitialTargetRotations() {
     Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
-    assertEquals(0.0, turret.targetRotations, 1e-6, "Initial targetRotations should be 0");
+    assertEquals(0.0, turret.targetPosition, 1e-6, "Initial targetPosition should be 0");
   }
 
   @Test
   public void testInitialTurretPosition() {
     Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
-    assertEquals(0.0, turret.getTurretPosition(), 1e-6, "Initial turret position should be 0");
+    assertEquals(0.0, turret.getCurrentPosition(), 1e-6, "Initial turret position should be 0");
   }
 
   @Test
   public void testSetSpeed() {
     Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
-    turret.setSpeed(0.5);
-    assertEquals(0.5, turret.speed, 1e-6, "Turret speed should be updated to 0.5");
+    // Turret does not expose a public speed field; ensure moveCommand exists
+    assertNotNull(turret.moveCommand(false), "moveCommand(false) should not be null");
   }
 
   @Test
   public void testSetPositionPIDUpdatesTargetRotations() {
     Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
     turret.setPositionPID(0.25);
-    assertEquals(0.25, turret.targetRotations, 1e-6, "targetRotations should be set to 0.25");
+    assertEquals(0.25, turret.targetPosition, 1e-6, "targetPosition should be set to 0.25");
   }
 
   @Test
@@ -59,5 +59,26 @@ public class TurretTest {
     assertNotNull(
         turret.setPositionPIDCommandManualSetpoint(),
         "setPositionPIDCommandManualSetpoint should not be null");
+  }
+
+  @Test
+  public void testSetPositionCommandFinishes() {
+    Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
+    var cmd = turret.setPositionPIDCommand(0.5);
+    var scheduler = edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance();
+    scheduler.cancelAll();
+    scheduler.schedule(cmd);
+
+    boolean finished = false;
+    for (int i = 0; i < 400; i++) {
+      scheduler.run();
+      turret.simulationPeriodic();
+      turret.periodic();
+      if (cmd.isFinished()) {
+        finished = true;
+        break;
+      }
+    }
+    assertTrue(finished, "Turret setPositionPIDCommand should finish");
   }
 }

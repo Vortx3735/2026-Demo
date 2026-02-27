@@ -2,18 +2,15 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.subsystems.*;
 import frc.robot.subsystems.intake.*;
 import frc.robot.subsystems.shooter.*;
-import frc.robot.subsystems.shooter.Flywheel;
 
 public class CommandFactory {
 
   public static Command manualShootCommand(Flywheel flywheel, Tunnel tunnel) {
     return Commands.parallel(
-            flywheel.manualShootCommand(),
+            flywheel.shootCommand(),
             Commands.sequence(
                 new WaitUntilCommand(() -> flywheel.isAtSpeed()), tunnel.intakeCommand()))
         .withName("manual shoot command group");

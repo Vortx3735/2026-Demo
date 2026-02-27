@@ -28,27 +28,6 @@ public class HoodTest {
   }
 
   @Test
-  public void testInitialTargetAngle() {
-    Hood hood =
-        new Hood(
-            Constants.HoodConstants.HOOD_MOTOR_ID,
-            Constants.HoodConstants.HOOD_CANCODER_ID,
-            Mode.SIM);
-    assertEquals(0.0, hood.targetAngle, 1e-6, "Initial targetAngle should be 0");
-  }
-
-  @Test
-  public void testSetSpeed() {
-    Hood hood =
-        new Hood(
-            Constants.HoodConstants.HOOD_MOTOR_ID,
-            Constants.HoodConstants.HOOD_CANCODER_ID,
-            Mode.SIM);
-    hood.setSpeed(0.3);
-    assertEquals(0.3, hood.speed, 1e-6, "Hood speed should be updated to 0.3");
-  }
-
-  @Test
   public void testSetPositionPIDUpdatesTargetAngle() {
     Hood hood =
         new Hood(

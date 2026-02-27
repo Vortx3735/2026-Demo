@@ -25,8 +25,8 @@ public class Intake extends SubsystemBase {
 
     // Intake Network Table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTable intakeTable = inst.getTable("Intake");
-    intakeSpeedEntry = intakeTable.getDoubleTopic("intakeMotorSpeed").getEntry(0);
+    NetworkTable intakeTable = inst.getTable("Subsystems/Intake");
+    intakeSpeedEntry = intakeTable.getDoubleTopic("intakeSpeed").getEntry(0);
     intakeSpeedEntry.set(0.5);
   }
 
@@ -37,10 +37,10 @@ public class Intake extends SubsystemBase {
   // Invert true is outtake. false is intake
   public void run(Boolean inverted) {
     if (inverted) {
-      //outtake
+      // outtake
       intakeMotor.set(-getIntakeSpeed());
     } else {
-      //intake
+      // intake
       intakeMotor.set(getIntakeSpeed());
     }
   }
@@ -50,17 +50,16 @@ public class Intake extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return new RunCommand(()-> run(false)).withName("intake intake");
+    return new RunCommand(() -> run(false)).withName("intake intake");
   }
 
   public Command outtakeCommand() {
-    return new RunCommand(()-> run(true)).withName("outtake intake");
+    return new RunCommand(() -> run(true)).withName("outtake intake");
   }
 
   public Command stopCommand() {
     return new RunCommand(() -> stop(), this).withName("stop intake");
   }
-
 
   @Override
   public void periodic() {}

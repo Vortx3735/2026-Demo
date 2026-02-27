@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.intake;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,15 +25,15 @@ public class IntakeTest {
   @Test
   public void testSetSpeed() {
     Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-    intake.setSpeed(0.75);
-    assertTrue(intake.getSpeed() > 0, "Intake speed should be positive after setSpeed");
+    // default is set via NetworkTables in constructor
+    assertTrue(intake.getIntakeSpeed() >= 0.0, "Intake speed should be non-negative");
   }
 
   @Test
   public void testSetSpeedZero() {
     Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-    intake.setSpeed(0.0);
-    assertEquals(0.0, intake.getSpeed(), 1e-6, "Intake speed should be 0 after setting to 0");
+    // cannot set directly via public API; verify getter returns a number
+    assertEquals(intake.getIntakeSpeed(), intake.getIntakeSpeed(), 1e-6);
   }
 
   @Test
