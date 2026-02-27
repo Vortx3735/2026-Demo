@@ -130,11 +130,6 @@ public class Hood extends SubsystemBase {
     final PositionVoltage m_request = new PositionVoltage((degrees / 360.0) / kGearRatio);
     hoodMotor.setControl(m_request);
     targetAngle = degrees;
-    // Precompute a conservative simulated input voltage for simulation runs so that
-    // the DCMotorSim advances deterministically even if the motor sim hasn't
-    // updated its reported motor voltage yet. Use a mid-range value and clamp to 12V.
-    double sign = Math.signum(degrees - hoodAngle);
-    simulatedInputVoltage = Math.max(-12.0, Math.min(12.0, sign * 6.0));
   }
 
   public boolean isFinished() {
