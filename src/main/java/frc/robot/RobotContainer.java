@@ -251,7 +251,7 @@ public class RobotContainer {
 
     // Set bindings
 
-    // Test Binds
+    /*// Test Binds
 
     // controller.povUp.whileTrue(flywheel.setVelocityPIDCommand(100));
     // controller.povDown.whileTrue(flywheel.setVelocityPIDCommand(0));
@@ -280,9 +280,9 @@ public class RobotContainer {
     controller.aButton.whileTrue(hood.moveCommand(false));
 
     controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
+    */
 
     /*// Actual Binds
-    d
     */
     // Shooter Binds
     //controller.lt.onTrue(TurretCommands.AimToSide(turret, () -> drive.getPose())); does AimToSide aim to a side of the field?
