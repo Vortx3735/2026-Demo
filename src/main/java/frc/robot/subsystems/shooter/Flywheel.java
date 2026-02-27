@@ -113,12 +113,10 @@ public class Flywheel extends SubsystemBase {
   // For testing purposes, allows setting flywheel speed directly from Network
   // Tables
   public Command shootCommand() {
-    System.out.println(
-        "Flywheel shoot command: speed from Network Tables = "
-            + flywheelSpeedEntry.get() * kMaxSpeed
-            + " RPS");
+    double speedRps = flywheelSpeedEntry.get() * kMaxSpeed;
+    Logger.recordOutput("Flywheel/ShootCommandSpeedRPS", speedRps);
 
-    return this.shootCommand(flywheelSpeedEntry.get() * kMaxSpeed);
+    return this.shootCommand(speedRps);
   }
 
   public Command shootCommand(double speed) {
