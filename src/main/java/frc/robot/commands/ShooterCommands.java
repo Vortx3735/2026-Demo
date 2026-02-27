@@ -126,10 +126,12 @@ public class ShooterCommands {
     }
   }
 
-  /** Returns a Command that aims the turret at the hub using the provided pose suppliers. */
+  /**
+   * Returns a Command that continuously aims the turret at the hub using the provided pose
+   * suppliers.
+   */
   private static Command turretAimCommand(
       Turret turret, Supplier<Pose2d> robotPoseSupplier, Supplier<Pose2d> hubPoseSupplier) {
-    // Run the aiming loop but finish when the turret reports it isFinished()
     return Commands.run(
             () -> {
               Pose2d rp = robotPoseSupplier.get();
@@ -139,8 +141,7 @@ public class ShooterCommands {
               turret.setPositionPID(rotations);
             },
             turret)
-        .until(turret::isFinished)
-        .withName("turret aim until finished");
+        .withName("turret aim");
   }
 
   public static Command AimToHub(
@@ -157,7 +158,8 @@ public class ShooterCommands {
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
 
     // While shooting, continuously aim the turret and hold the hood at the desired angle.
-    // The flywheel shoot command acts as the deadline: when it finishes, aiming/hood are interrupted.
+    // The flywheel shoot command acts as the deadline: when it finishes, aiming/hood are
+    // interrupted.
     return Commands.deadline(
             flywheel.shootCommand(targetRpsSupplier),
             Commands.run(
