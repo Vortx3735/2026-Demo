@@ -22,6 +22,24 @@ public class CommandFactory {
         .withName("intake command group");
   }
 
+  private static Command outtakeSetSpeed(Intake intake, Hopper hopper) {
+    return Commands.parallel(
+    Commands.run(() -> intake.setSpeed(-(intake.getSpeed()))),
+    Commands.run(() -> hopper.setHopperSpeed(-(hopper.getHopperSpeed())))
+  );
+  }
+
+  public static Command outtakeCommand(Intake intake, Hopper hopper) {
+    // Reverse intake and hopper speeds
+    intake.setSpeed(-(intake.getSpeed()));
+    hopper.setHopperSpeed(-(hopper.getHopperSpeed()));
+
+    return Commands.sequence(
+      Commands.parallel(intake.intakeCommand(), hopper.runHopperCommand(false))
+        .withName("intake command group"),
+      outtakeSetSpeed(intake, hopper));
+  }
+
   public static Command clearJamsCommand(Tunnel tunnel, Hopper hopper) {
     return Commands.parallel(tunnel.runTunnelCommand(true), hopper.runHopperCommand(true))
         .withName("clear jams");
