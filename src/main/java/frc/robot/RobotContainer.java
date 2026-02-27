@@ -68,11 +68,7 @@ public class RobotContainer {
   // new Turret(Constants.TurretConstants.TURRET_MOTOR_ID,
   // Constants.TurretConstants.TURRET_CANCODER_ID, Constants.currentMode);
 
-  public final Hood hood =
-      new Hood(
-          Constants.HoodConstants.HOOD_MOTOR_ID,
-          Constants.HoodConstants.HOOD_CANCODER_ID,
-          Constants.currentMode);
+  public final Hood hood = new Hood(Constants.HoodConstants.HOOD_MOTOR_ID, Constants.currentMode);
   public final Flywheel flywheel =
       new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID, Constants.currentMode);
   public final Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);

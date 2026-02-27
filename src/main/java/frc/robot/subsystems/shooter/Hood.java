@@ -49,7 +49,7 @@ public class Hood extends SubsystemBase {
   // This avoids races where the Talon sim may not have propagated motor voltages yet.
   private double simulatedInputVoltage = 0.0;
 
-  public Hood(int motorId, int canCoderId, Mode state) {
+  public Hood(int motorId, Mode state) {
     hoodMotor = new TalonFX(motorId);
     isSim = state == Mode.SIM;
     var talonFXConfigs = new TalonFXConfiguration();

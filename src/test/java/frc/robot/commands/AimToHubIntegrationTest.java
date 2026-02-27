@@ -25,11 +25,7 @@ public class AimToHubIntegrationTest {
   public void testAimToHubMovesAllSubsystems() {
     // instantiate subsystems in SIM mode
     Turret turret = new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Mode.SIM);
-    Hood hood =
-        new Hood(
-            Constants.HoodConstants.HOOD_MOTOR_ID,
-            Constants.HoodConstants.HOOD_CANCODER_ID,
-            Mode.SIM);
+    Hood hood = new Hood(Constants.HoodConstants.HOOD_MOTOR_ID, Mode.SIM);
     Flywheel flywheel = new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID, Mode.SIM);
 
     // Choose a robot pose that gives a non-zero angle to the hub
