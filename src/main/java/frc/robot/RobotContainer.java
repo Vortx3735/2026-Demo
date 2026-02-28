@@ -32,15 +32,15 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.TurretCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.shooter.Flywheel;
-import frc.robot.subsystems.shooter.Hood;
-import frc.robot.subsystems.shooter.Turret;
+import frc.robot.subsystems.intake.*;
+import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.*;
 import org.ironmaple.simulation.SimulatedArena;
@@ -59,23 +59,24 @@ public class RobotContainer {
   // Subsystems
   public final Vision vision;
   public final Drive drive;
-  public final Climber climber = new Climber(Constants.ClimberConstants.CLIMBER_MOTOR_ID);
+  public final Climber climber =
+      new Climber(
+          Constants.ClimberConstants.CLIMBER_MOTOR_ID_LEFT,
+          Constants.ClimberConstants.CLIMBER_MOTOR_ID_RIGHT);
   public final Turret turret =
-        new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Constants.currentMode);
-        //new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Constants.TurretConstants.TURRET_CANCODER_ID, Constants.currentMode);
+      new Turret(Constants.TurretConstants.TURRET_MOTOR_ID, Constants.currentMode);
+  // new Turret(Constants.TurretConstants.TURRET_MOTOR_ID,
+  // Constants.TurretConstants.TURRET_CANCODER_ID, Constants.currentMode);
 
-  public final Hood hood =
-      new Hood(
-          Constants.HoodConstants.HOOD_MOTOR_ID,
-          Constants.HoodConstants.HOOD_CANCODER_ID,
-          Constants.currentMode);
+  public final Hood hood = new Hood(Constants.HoodConstants.HOOD_MOTOR_ID, Constants.currentMode);
   public final Flywheel flywheel =
       new Flywheel(Constants.FlywheelConstants.FLYWHEEL_MOTOR_ID, Constants.currentMode);
   public final Intake intake = new Intake(Constants.IntakeConstants.INTAKE_MOTOR_ID);
-  public final Indexer indexer =
-      new Indexer(
-          Constants.IndexerConstants.INDEXER_MOTOR_ID,
-          Constants.IndexerConstants.INDEXER_ROLLER_MOTOR_ID);
+  public final Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
+  public final Tunnel tunnel =
+      new Tunnel(
+          Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
+          Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
 
   private SwerveDriveSimulation driveSimulation = null;
 
@@ -89,6 +90,7 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -218,19 +220,26 @@ public class RobotContainer {
     // do not move the defaultcommands
     intake.setDefaultCommand(intake.stopCommand().withName("stop intake"));
     climber.setDefaultCommand(climber.stopCommand().withName("stop climber"));
-    indexer.setDefaultCommand(indexer.stopCommand().withName("stop indexer"));
-    hood.setDefaultCommand(hood.hold().withName("hold hood"));
-    flywheel.setDefaultCommand(flywheel.stopCommand().withName("hold flywheel velocity"));
-    turret.setDefaultCommand(
-        TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to hub"));
+    hopper.setDefaultCommand(hopper.stopCommand().withName("stop hopper"));
+    // hood.setDefaultCommand(hood.hold().withName("hold hood"));
+    // flywheel.setDefaultCommand(flywheel.stopCommand().withName("hold flywheel
+    // velocity"));
+    // turret.setDefaultCommand(
+    // TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to
+    // hub"));
+    hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
+    flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
+    tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
+    turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX())
+            .withName("joystick drive"));
 
     // Reset gyro / odometry
     final Runnable resetOdometry =
@@ -241,16 +250,73 @@ public class RobotContainer {
     controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
     // Set bindings
-    controller.povUp.whileTrue(flywheel.setVelocityPIDCommand(100));
-    controller.povDown.whileTrue(flywheel.setVelocityPIDCommand(0));
-    controller.povRight.whileTrue(turret.moveCommand(0.5));
-    controller.povLeft.whileTrue(turret.moveCommand(-0.5));
-    controller.yButton.whileTrue(hood.setPositionPIDCommand(-45));
-    controller.bButton.whileTrue(hood.setPositionPIDCommand(0));
-    controller.rt.whileTrue(indexer.runIndexerCommand(true));
-    controller.lt.whileTrue(intake.intakeCommand());
-    controller.aButton.whileTrue(indexer.runIndexerCommand(true));
-    controller.xButton.whileTrue(TurretCommands.AimToSide(turret, () -> drive.getPose()));
+
+    /*
+     * // Test Binds
+     *
+     * // controller.povUp.whileTrue(flywheel.setVelocityPIDCommand(100));
+     * // controller.povDown.whileTrue(flywheel.setVelocityPIDCommand(0));
+     * // controller.povRight.whileTrue(turret.moveCommand(0.5));
+     * // controller.povLeft.whileTrue(turret.moveCommand(-0.5));
+     * // controller.yButton.whileTrue(hood.setPositionPIDCommand(-45));
+     * // controller.bButton.whileTrue(hood.setPositionPIDCommand(0));
+     * // controller.rt.whileTrue(hopper.runHopperCommand(true));
+     * controller.lt.whileTrue(intake.intakeCommand());
+     * // controller.aButton.whileTrue(hopper.runHopperCommand(true));
+     * // controller.xButton.whileTrue(TurretCommands.AimToSide(turret, () ->
+     * drive.getPose()));
+     *
+     * controller.povUp.whileTrue(climber.upCommand());
+     * // controller.povRight.whileTrue(hopper.runHopperCommand(true));
+     * controller.povLeft.whileTrue(turret.setPositionPIDCommandManualSetpoint());
+     * // controller.povRight.whileTrue(TurretCommands.AimToSide(turret, () ->
+     * drive.getPose()));
+     * controller.povDown.whileTrue(climber.downCommand());
+     * controller.lb.whileTrue(hopper.runHopperCommand(true));
+     * // controller.rt.whileTrue(flywheel.setVelocityPIDCommand());
+     * controller.rt.whileTrue(CommandFactory.shootCommand(flywheel, tunnel));
+     * controller.rb.whileTrue(hopper.runHopperCommand(false));
+     *
+     * controller.yButton.whileTrue(hood.moveCommand(true));
+     * controller.xButton.whileTrue(turret.moveCommand(true));
+     * controller.bButton.whileTrue(turret.moveCommand(false));
+     * controller.aButton.whileTrue(hood.moveCommand(false));
+     *
+     * controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
+     */
+
+    /*
+     * // Actual Binds
+     */
+    // Shooter Binds
+    // controller.lt.onTrue(TurretCommands.AimToSide(turret, () ->
+    // drive.getPose())); does AimToSide
+    // aim to a side of the field?
+    controller.lb.whileTrue(turret.moveCommand(true));
+    controller.rb.whileTrue(turret.moveCommand(false));
+    controller.rt.whileTrue(CommandFactory.manualShootCommand(flywheel, hopper, tunnel));
+    controller.povLeft.whileTrue(hood.moveCommand(true));
+    controller.povRight.whileTrue(hood.moveCommand(false));
+    // controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
+    // controller.aButton.whileTrue(
+    // ShooterCommands.AimToHub(turret, flywheel, hood, () -> drive.getPose(), 65));
+    // controller.yButton.whileTrue(hood.moveCommand(true));
+    // controller.aButton.whileTrue(hood.moveCommand(false));
+
+    // Climber Binds
+    // controller.povUp.whileTrue(climber.upCommand());
+    // controller.povDown.whileTrue(climber.downCommand());
+
+    // Intake Binds
+    controller.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
+    controller.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
+
+    controller.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
+
+    controller.povUp.whileTrue(turret.setPositionPIDCommand(0.1));
+
+    controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
+    // controller.menu.onTrue(drive.runOnce(() -> drive.))
   }
 
   /**
@@ -287,7 +353,7 @@ public class RobotContainer {
                     .getSimulatedDriveTrainPose()
                     .plus(
                         new Transform2d(
-                            0.13, -0.2, new Rotation2d(turret.turretPosition * 2 * Math.PI))))
+                            0.13, -0.2, new Rotation2d(turret.currentPosition * 2 * Math.PI))))
             .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
     Logger.recordOutput(
         "Hood/simulatedPose",
@@ -296,7 +362,7 @@ public class RobotContainer {
                     .getSimulatedDriveTrainPose()
                     .plus(
                         new Transform2d(
-                            0.13, -0.2, new Rotation2d(turret.turretPosition * 2 * Math.PI))))
+                            0.13, -0.2, new Rotation2d(turret.currentPosition * 2 * Math.PI))))
             .plus(
                 new Transform3d(0, 0, 0.3, new Rotation3d(0, hood.hoodAngle * Math.PI / 180, 0))));
     Logger.recordOutput(
@@ -306,7 +372,7 @@ public class RobotContainer {
                     .getSimulatedDriveTrainPose()
                     .plus(
                         new Transform2d(
-                            0.13, -0.2, new Rotation2d(turret.targetRotations * 2 * Math.PI))))
+                            0.13, -0.2, new Rotation2d(turret.targetPosition * 2 * Math.PI))))
             .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
   }
 }
