@@ -115,11 +115,11 @@ public class RobotContainer {
                 drive,
                 new VisionIOPhotonVision(
                     VisionConstants.frontCameraName, VisionConstants.frontCameraTransform),
-                    new VisionIOPhotonVision(
+                new VisionIOPhotonVision(
                     VisionConstants.backCameraName, VisionConstants.backCameraTransform),
-                    new VisionIOPhotonVision(
+                new VisionIOPhotonVision(
                     VisionConstants.leftCameraName, VisionConstants.leftCameraTransform),
-                    new VisionIOPhotonVision(
+                new VisionIOPhotonVision(
                     VisionConstants.rightCameraName, VisionConstants.rightCameraTransform));
         break;
 
@@ -139,15 +139,24 @@ public class RobotContainer {
 
         VisionIO visionIO;
         try {
-          visionIO =new VisionIOPhotonVision(
-              new VisionIOPhotonVisionSim(
-                    VisionConstants.frontCameraName, VisionConstants.frontCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
-                    new VisionIOPhotonVisionSim(
-                    VisionConstants.backCameraName, VisionConstants.backCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
-                    new VisionIOPhotonVisionSim(
-                    VisionConstants.leftCameraName, VisionConstants.leftCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
-                    new VisionIOPhotonVisionSim(
-                    VisionConstants.rightCameraName, VisionConstants.rightCameraTransform, driveSimulation::getSimulatedDriveTrainPose));
+        //   visionIO =
+            //   new VisionIO(
+                //   new VisionIOPhotonVisionSim(
+                //       VisionConstants.frontCameraName,
+                //       VisionConstants.frontCameraTransform,
+                //       driveSimulation::getSimulatedDriveTrainPose),
+                //   new VisionIOPhotonVisionSim(
+                //       VisionConstants.backCameraName,
+                //       VisionConstants.backCameraTransform,
+                //       driveSimulation::getSimulatedDriveTrainPose),
+                //   new VisionIOPhotonVisionSim(
+                //       VisionConstants.leftCameraName,
+                //       VisionConstants.leftCameraTransform,
+                //       driveSimulation::getSimulatedDriveTrainPose),
+                //   new VisionIOPhotonVisionSim(
+                //       VisionConstants.rightCameraName,
+                //       VisionConstants.rightCameraTransform,
+                //       driveSimulation::getSimulatedDriveTrainPose));
         } catch (UnsatisfiedLinkError e) {
           // If the JNI library (like PhotonVision) fails to load (e.g. in CI environment),
           // fallback to a dummy implementation to allow the robot code to start up.
@@ -156,7 +165,23 @@ public class RobotContainer {
               "Warning: Failed to load VisionIOPhotonVisionSim, falling back to dummy implementation. Error: "
                   + e.getMessage());
         }
-        vision = new Vision(drive, visionIO);
+        // vision = new Vision(drive, visionIO);
+        vision = new Vision(drive,  new VisionIOPhotonVisionSim(
+                      VisionConstants.frontCameraName,
+                      VisionConstants.frontCameraTransform,
+                      driveSimulation::getSimulatedDriveTrainPose),
+                  new VisionIOPhotonVisionSim(
+                      VisionConstants.backCameraName,
+                      VisionConstants.backCameraTransform,
+                      driveSimulation::getSimulatedDriveTrainPose),
+                  new VisionIOPhotonVisionSim(
+                      VisionConstants.leftCameraName,
+                      VisionConstants.leftCameraTransform,
+                      driveSimulation::getSimulatedDriveTrainPose),
+                  new VisionIOPhotonVisionSim(
+                      VisionConstants.rightCameraName,
+                      VisionConstants.rightCameraTransform,
+                      driveSimulation::getSimulatedDriveTrainPose));
         break;
 
       default:

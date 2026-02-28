@@ -55,8 +55,7 @@ public class TurretTest {
     assertNotNull(turret.moveCommand(false), "moveCommand(false) should not be null");
     assertNotNull(turret.moveCommand(true), "moveCommand(true) should not be null");
     assertNotNull(turret.stopCommand(), "stopCommand should not be null");
-    assertNotNull(
-        turret.setPositionPIDCommand(0.0), "setPositionPIDCommand should not be null");
+    assertNotNull(turret.setPositionPIDCommand(0.0), "setPositionPIDCommand should not be null");
     assertNotNull(
         turret.setPositionPIDCommandManualSetpoint(),
         "setPositionPIDCommandManualSetpoint should not be null");

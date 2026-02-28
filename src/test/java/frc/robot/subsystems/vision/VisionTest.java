@@ -30,10 +30,7 @@ public class VisionTest {
   @Test
   public void testInitializationWithMultipleEmptyIO() {
     Vision vision =
-        new Vision(
-            (pose, timestamp, stdDevs) -> {},
-            new VisionIO() {},
-            new VisionIO() {});
+        new Vision((pose, timestamp, stdDevs) -> {}, new VisionIO() {}, new VisionIO() {});
     assertNotNull(vision, "Vision should be instantiated with multiple empty VisionIO instances");
   }
 
@@ -47,8 +44,7 @@ public class VisionTest {
   @Test
   public void testVisionConsumerAcceptsPose() {
     Pose2d[] captured = {null};
-    Vision.VisionConsumer consumer =
-        (pose, timestamp, stdDevs) -> captured[0] = pose;
+    Vision.VisionConsumer consumer = (pose, timestamp, stdDevs) -> captured[0] = pose;
     Pose2d testPose = new Pose2d();
     consumer.accept(testPose, 0.0, null);
     assertNotNull(captured[0], "VisionConsumer should have received the pose");
