@@ -18,18 +18,22 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "usbcLeft";
-  public static String camera1Name = "usbcRight";
-  public static String camera2Name = "usb2.0top";
-  public static String camera3Name = "usb3.0bottom";
-
-  // note: zero z component is 0.5 meters above the ground
+  public static String frontCameraName = "usbcLeft";
+  public static String backCameraName = "usbcRight";
+  public static String rightCameraName = "usb2.0top";
+  public static String leftCameraName = "usb3.0bottom";
+  
+  //note: zero z component might be 0.5 meters above the ground
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
-  public static Transform3d robotToCamera0 =
-      new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
-  public static Transform3d robotToCamera1 =
-      new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
+  public static Transform3d frontCameraTransform =
+      new Transform3d(12.671076, -0.499150, 15.651053, new Rotation3d(0.0, -18.0*Math.PI/180, 0.0));
+  public static Transform3d backCameraTransform =
+      new Transform3d(-9.646, -3.844, 18.190, new Rotation3d(0.0,-30.0*Math.PI/180,0.0).rotateBy(new Rotation3d(0.0,0.0,Math.PI)));
+  public static Transform3d rightCameraTransform =
+      new Transform3d(-2.458, -14.702, 21.460, new Rotation3d(0.0,-30.0*Math.PI/180,0.0).rotateBy(new Rotation3d(0.0,0.0,Math.PI*3.0/2.0)));
+  public static Transform3d leftCameraTransform =
+      new Transform3d(-2.594, 13.962, 19.468, new Rotation3d(0.0,-30.0*Math.PI/180,0.0).rotateBy(new Rotation3d(0.0,0.0,Math.PI/2.0)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;

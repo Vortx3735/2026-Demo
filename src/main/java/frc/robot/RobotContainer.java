@@ -109,7 +109,13 @@ public class RobotContainer {
             new Vision(
                 drive,
                 new VisionIOPhotonVision(
-                    VisionConstants.camera0Name, VisionConstants.robotToCamera0));
+                    VisionConstants.frontCameraName, VisionConstants.frontCameraTransform),
+                    new VisionIOPhotonVision(
+                    VisionConstants.backCameraName, VisionConstants.backCameraTransform),
+                    new VisionIOPhotonVision(
+                    VisionConstants.leftCameraName, VisionConstants.leftCameraTransform),
+                    new VisionIOPhotonVision(
+                    VisionConstants.rightCameraName, VisionConstants.rightCameraTransform));
         break;
 
       case SIM:
@@ -126,21 +132,17 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[3]),
                 driveSimulation::setSimulationWorldPose);
 
-        VisionIO visionIO;
-        try {
-          visionIO =
-              new VisionIOPhotonVisionSim(
-                  camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose);
-        } catch (UnsatisfiedLinkError e) {
-          // If the JNI library (like PhotonVision) fails to load (e.g. in CI
-          // environment),
-          // fallback to a dummy implementation to allow the robot code to start up.
-          visionIO = new VisionIO() {};
-          System.err.println(
-              "Warning: Failed to load VisionIOPhotonVisionSim, falling back to dummy implementation. Error: "
-                  + e.getMessage());
-        }
-        vision = new Vision(drive, visionIO);
+        vision =
+            new Vision(
+                drive,
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.frontCameraName, VisionConstants.frontCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
+                    new VisionIOPhotonVisionSim(
+                    VisionConstants.backCameraName, VisionConstants.backCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
+                    new VisionIOPhotonVisionSim(
+                    VisionConstants.leftCameraName, VisionConstants.leftCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
+                    new VisionIOPhotonVisionSim(
+                    VisionConstants.rightCameraName, VisionConstants.rightCameraTransform, driveSimulation::getSimulatedDriveTrainPose));
         break;
 
       default:
