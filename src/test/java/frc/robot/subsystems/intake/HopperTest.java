@@ -1,6 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,7 +20,7 @@ public class HopperTest {
     Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
     assertNotNull(hopper, "Hopper should be instantiated successfully");
   }
-  
+
   @Test
   public void testGetHopperSpeedAfterMultipleSets() {
     Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
