@@ -8,9 +8,10 @@ import frc.robot.subsystems.shooter.*;
 
 public class CommandFactory {
 
-  public static Command manualShootCommand(Flywheel flywheel, Tunnel tunnel) {
+  public static Command manualShootCommand(Flywheel flywheel, Hopper hopper, Tunnel tunnel) {
     return Commands.parallel(
             flywheel.shootCommand(),
+            hopper.intakeCommand(),
             Commands.sequence(
                 new WaitUntilCommand(() -> flywheel.isAtSpeed()), tunnel.intakeCommand()))
         .withName("manual shoot command group");

@@ -72,7 +72,7 @@ public class Flywheel extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable flywheelTable = inst.getTable("Subsystems/Flywheel");
     flywheelSpeedEntry = flywheelTable.getDoubleTopic("flywheelSpeed").getEntry(1);
-    flywheelSpeedEntry.set(0.9);
+    flywheelSpeedEntry.set(0.45);
     if (state == Mode.SIM) {
       var talonFXSim = flywheelMotor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -141,6 +141,7 @@ public class Flywheel extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // Prefer simulated value in simulation; fall back to Talon getter in hardware
+
     if (isSim) {
       currentRPS = simulatedVelocity;
     } else {

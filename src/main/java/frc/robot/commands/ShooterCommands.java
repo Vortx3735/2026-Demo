@@ -171,8 +171,8 @@ public class ShooterCommands {
                   double rotations = angleRelative / (2 * Math.PI);
                   turret.setPositionPID(rotations);
                 },
-                turret),
-            hood.setPositionPIDCommand(theta))
+                turret))
+        // hood.setPositionPIDCommand(theta))
         .withName("AimToHub");
   }
 

@@ -32,10 +32,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.drive.*;
@@ -291,21 +291,30 @@ public class RobotContainer {
     // drive.getPose())); does AimToSide
     // aim to a side of the field?
     controller.lb.whileTrue(turret.moveCommand(true));
-    // controller.rb.whileTrue(turret.moveCommand(false));
-    controller.rb.whileTrue(CommandFactory.manualShootCommand(flywheel, tunnel));
+    controller.rb.whileTrue(turret.moveCommand(false));
+    controller.rt.whileTrue(CommandFactory.manualShootCommand(flywheel, hopper, tunnel));
     controller.povLeft.whileTrue(hood.moveCommand(true));
     controller.povRight.whileTrue(hood.moveCommand(false));
-    controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
-    controller.aButton.whileTrue(
-        ShooterCommands.AimToHub(turret, flywheel, hood, () -> drive.getPose(), 65));
+    // controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
+    // controller.aButton.whileTrue(
+    // ShooterCommands.AimToHub(turret, flywheel, hood, () -> drive.getPose(), 65));
+    // controller.yButton.whileTrue(hood.moveCommand(true));
+    // controller.aButton.whileTrue(hood.moveCommand(false));
 
     // Climber Binds
-    controller.povUp.whileTrue(climber.upCommand());
-    controller.povDown.whileTrue(climber.downCommand());
+    // controller.povUp.whileTrue(climber.upCommand());
+    // controller.povDown.whileTrue(climber.downCommand());
 
     // Intake Binds
     controller.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
     controller.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
+
+    controller.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
+
+    controller.povUp.whileTrue(turret.setPositionPIDCommand(0.1));
+
+    controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
+    // controller.menu.onTrue(drive.runOnce(() -> drive.))
   }
 
   /**
