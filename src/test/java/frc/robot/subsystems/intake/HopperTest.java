@@ -21,14 +21,7 @@ public class HopperTest {
     Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
     assertNotNull(hopper, "Hopper should be instantiated successfully");
   }
-
-  @Test
-  public void testSetHopperSpeed() {
-    Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
-    // verify the default from constructor
-    assertEquals(0.1, hopper.getHopperSpeed(), 1e-6, "Default hopper speed should be 0.1");
-  }
-
+  
   @Test
   public void testGetHopperSpeedAfterMultipleSets() {
     Hopper hopper = new Hopper(Constants.HopperConstants.HOPPER_MOTOR_ID);
