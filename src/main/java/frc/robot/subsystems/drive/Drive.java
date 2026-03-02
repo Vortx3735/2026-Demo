@@ -389,6 +389,11 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
+  public void zeroDriveTrain() {
+    Pose2d zeroedPose = new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(0));
+    resetOdometry(zeroedPose);
+  }
+
   public void followPath(SwerveSample sample) {
     var pose = getPose();
 
