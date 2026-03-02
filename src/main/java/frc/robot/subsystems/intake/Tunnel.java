@@ -65,11 +65,11 @@ public class Tunnel extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return new RunCommand(() -> run(false)).withName("intake tunnel");
+    return new RunCommand(() -> run(false), this).withName("intake tunnel");
   }
 
   public Command outtakeCommand() {
-    return new RunCommand(() -> run(true)).withName("outtake tunnel");
+    return new RunCommand(() -> run(true), this).withName("outtake tunnel");
   }
 
   public Command stopCommand() {

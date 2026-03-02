@@ -128,7 +128,7 @@ public class Flywheel extends SubsystemBase {
     // the command is scheduled to avoid a race where simulationPeriodic runs
     // before the first execute() call.
     return Commands.sequence(
-            Commands.runOnce(() -> this.shoot(speedSupplier.get())),
+            Commands.runOnce(() -> this.shoot(speedSupplier.get()), this),
             Commands.run(() -> this.shoot(speedSupplier.get()), this))
         .withName("dynamic shoot flywheel");
   }
