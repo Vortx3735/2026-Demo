@@ -24,6 +24,8 @@ public class VisionConstants {
   public static String leftCameraName = "usb3.0bottom";
 
   // note: zero z component might be 0.5 meters above the ground
+
+  // note: zero z component might be 0.5 meters above the ground
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d frontCameraTransform =
@@ -51,7 +53,7 @@ public class VisionConstants {
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0)));
 
-  // Basic filtering thresholds
+  // Basic filtering threshold
   public static double maxAmbiguity = 0.3;
   public static double maxZError = 0.75;
 

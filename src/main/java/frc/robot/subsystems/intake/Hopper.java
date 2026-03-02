@@ -46,11 +46,11 @@ public class Hopper extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return new RunCommand(() -> run(false)).withName("intake hopper");
+    return new RunCommand(() -> run(false), this).withName("intake hopper");
   }
 
   public Command outtakeCommand() {
-    return new RunCommand(() -> run(true)).withName("outtake hopper");
+    return new RunCommand(() -> run(true), this).withName("outtake hopper");
   }
 
   public Command stopCommand() {
@@ -64,5 +64,6 @@ public class Hopper extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
     Logger.recordOutput("Hopper/simulatedVoltage1", hopperMotor.getSimState().getMotorVoltage());
+    Logger.recordOutput("Hopper/speed", hopperSpeedEntry.get());
   }
 }
