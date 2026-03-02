@@ -39,14 +39,17 @@ public class Climber extends SubsystemBase {
 
   public void up() {
     climberMotor1.set(speed);
+    climberMotor2.set(speed);
   }
 
   public void down() {
     climberMotor1.set(-speed);
+    climberMotor2.set(-speed);
   }
 
   public void stop() {
     climberMotor1.set(0);
+    climberMotor2.set(0);
   }
 
   public Command upCommand() {
@@ -69,7 +72,7 @@ public class Climber extends SubsystemBase {
     return this.run(
             () -> {
               // setSpeed(flywheelMotorSpeedEntry.getAsDouble());
-              this.down();
+              this.stop();
             })
         .withName("run intake");
   }

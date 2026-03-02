@@ -110,11 +110,11 @@ public class RobotContainer {
                 drive,
                 new VisionIOPhotonVision(
                     VisionConstants.frontCameraName, VisionConstants.frontCameraTransform),
-                    new VisionIOPhotonVision(
+                new VisionIOPhotonVision(
                     VisionConstants.backCameraName, VisionConstants.backCameraTransform),
-                    new VisionIOPhotonVision(
+                new VisionIOPhotonVision(
                     VisionConstants.leftCameraName, VisionConstants.leftCameraTransform),
-                    new VisionIOPhotonVision(
+                new VisionIOPhotonVision(
                     VisionConstants.rightCameraName, VisionConstants.rightCameraTransform));
         break;
 
@@ -136,13 +136,21 @@ public class RobotContainer {
             new Vision(
                 drive,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.frontCameraName, VisionConstants.frontCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
-                    new VisionIOPhotonVisionSim(
-                    VisionConstants.backCameraName, VisionConstants.backCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
-                    new VisionIOPhotonVisionSim(
-                    VisionConstants.leftCameraName, VisionConstants.leftCameraTransform, driveSimulation::getSimulatedDriveTrainPose),
-                    new VisionIOPhotonVisionSim(
-                    VisionConstants.rightCameraName, VisionConstants.rightCameraTransform, driveSimulation::getSimulatedDriveTrainPose));
+                    VisionConstants.frontCameraName,
+                    VisionConstants.frontCameraTransform,
+                    driveSimulation::getSimulatedDriveTrainPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.backCameraName,
+                    VisionConstants.backCameraTransform,
+                    driveSimulation::getSimulatedDriveTrainPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.leftCameraName,
+                    VisionConstants.leftCameraTransform,
+                    driveSimulation::getSimulatedDriveTrainPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.rightCameraName,
+                    VisionConstants.rightCameraTransform,
+                    driveSimulation::getSimulatedDriveTrainPose));
         break;
 
       default:
@@ -304,8 +312,8 @@ public class RobotContainer {
     // controller.aButton.whileTrue(hood.moveCommand(false));
 
     // Climber Binds
-    // controller.povUp.whileTrue(climber.upCommand());
-    // controller.povDown.whileTrue(climber.downCommand());
+    controller.povUp.whileTrue(climber.upCommand());
+    controller.povDown.whileTrue(climber.downCommand());
 
     // Intake Binds
     controller.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
