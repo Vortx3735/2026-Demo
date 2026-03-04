@@ -23,7 +23,7 @@ public class Hopper extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable hopperTable = inst.getTable("Subsystems/Hopper");
     hopperSpeedEntry = hopperTable.getDoubleTopic("hopperSpeed").getEntry(0);
-    hopperSpeedEntry.set(0.8);
+    hopperSpeedEntry.set(0.3);
   }
 
   public double getHopperSpeed() {
