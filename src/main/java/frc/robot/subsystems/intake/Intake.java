@@ -39,6 +39,7 @@ public class Intake extends SubsystemBase {
   public double getIntakeSpeed() {
     return intakeSpeedEntry.get();
   }
+
   public double getIntakeCurrentRPS() {
     return intakeMotor.getRotorVelocity().getValueAsDouble();
   }

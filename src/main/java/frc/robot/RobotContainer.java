@@ -167,7 +167,8 @@ public class RobotContainer {
 
         vision = new Vision(drive, new VisionIO() {});
     }
-    telemetry = new Telemetry(drive, vision, flywheel, hood, turret, hopper, intake, tunnel, climber);
+    telemetry =
+        new Telemetry(drive, vision, flywheel, hood, turret, hopper, intake, tunnel, climber);
     // Init auton objects
     autoFactory = drive.createAutoFactory();
     autoRoutines = new AutoRoutines(autoFactory, this);
