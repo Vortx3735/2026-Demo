@@ -49,6 +49,13 @@ public class Tunnel extends SubsystemBase {
     return bottomTunnelSpeedEntry.get();
   }
 
+  public double getTopTunnelCurrentRPS() {
+    return topTunnelMotor.getRotorVelocity().getValueAsDouble();
+  }
+  public double getBottomTunnelCurrentRPS() {
+    return bottomTunnelMotor.getRotorVelocity().getValueAsDouble();
+  }
+
   public void run(Boolean inverted) {
     if (inverted) {
       bottomTunnelMotor.set(-getBottomTunnelSpeed());

@@ -29,6 +29,9 @@ public class Hopper extends SubsystemBase {
   public double getHopperSpeed() {
     return hopperSpeedEntry.get();
   }
+  public double getHopperCurrentRPS() {
+    return hopperMotor.getRotorVelocity().getValueAsDouble();
+  }
 
   // Invert true is outtake. false is intake
   public void run(Boolean inverted) {

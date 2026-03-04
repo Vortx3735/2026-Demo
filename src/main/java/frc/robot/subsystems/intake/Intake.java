@@ -39,7 +39,9 @@ public class Intake extends SubsystemBase {
   public double getIntakeSpeed() {
     return intakeSpeedEntry.get();
   }
-
+  public double getIntakeCurrentRPS() {
+    return intakeMotor.getRotorVelocity().getValueAsDouble();
+  }
   // Invert true is outtake. false is intake
   public void run(Boolean inverted) {
     if (inverted) {
