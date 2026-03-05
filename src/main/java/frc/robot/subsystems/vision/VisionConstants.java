@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -30,26 +32,26 @@ public class VisionConstants {
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d frontCameraTransform =
       new Transform3d(
-          12.671076, -0.499150, 15.651053, new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0));
+          Inches.of(12.671076), Inches.of(-0.499150), Inches.of(15.651053), new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0));
   public static Transform3d backCameraTransform =
       new Transform3d(
-          -9.646,
-          -3.844,
-          18.190,
+          Inches.of(-9.646),
+          Inches.of(-3.844),
+          Inches.of(18.190),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI)));
   public static Transform3d rightCameraTransform =
       new Transform3d(
-          -2.458,
-          -14.702,
-          21.460,
+          Inches.of(-2.458),
+          Inches.of(-14.702),
+          Inches.of(21.460),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI * 3.0 / 2.0)));
   public static Transform3d leftCameraTransform =
       new Transform3d(
-          -2.594,
-          13.962,
-          19.468,
+          Inches.of(-2.594),
+          Inches.of(13.962),
+          Inches.of(19.468),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0)));
 
