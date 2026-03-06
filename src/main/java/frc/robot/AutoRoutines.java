@@ -13,6 +13,15 @@ public class AutoRoutines {
   public AutoRoutines(AutoFactory factory, RobotContainer container) {
     m_factory = factory;
     m_container = container;
+
+    // Bind commands to event markers
+    m_factory
+        .bind("intake", CommandFactory.intakeCommand(m_container.intake, m_container.hopper))
+        .bind("outtake", CommandFactory.outtakeCommand(m_container.intake, m_container.hopper))
+        .bind(
+            "shoot",
+            CommandFactory.manualShootCommand(
+                m_container.flywheel, m_container.hopper, m_container.tunnel));
   }
 
   public AutoRoutine exampleRoutine() {
@@ -45,6 +54,54 @@ public class AutoRoutines {
     // Stop intake and indexer
     // m_container.intake.stopCommand(),
     // m_container.hopper.stopCommand();
+
+    return routine;
+  }
+
+  public AutoRoutine centerContestLeft() {
+    final AutoRoutine routine = m_factory.newRoutine("centerContestLeft");
+    final AutoTrajectory trajectory = routine.trajectory("CenterContestLeft");
+
+    routine.active().onTrue(
+      Commands.sequence(
+        trajectory.resetOdometry(),
+        trajectory.cmd()));
+
+    return routine;
+  }
+
+  public AutoRoutine centerContestRight() {
+    final AutoRoutine routine = m_factory.newRoutine("centerContestRight");
+    final AutoTrajectory trajectory = routine.trajectory("CenterContestRight");
+
+    routine.active().onTrue(
+      Commands.sequence(
+        trajectory.resetOdometry(),
+        trajectory.cmd()));
+
+    return routine;
+  }
+
+  public AutoRoutine depotLeft() {
+    final AutoRoutine routine = m_factory.newRoutine("depotLeft");
+    final AutoTrajectory trajectory = routine.trajectory("DepotLeft");
+
+    routine.active().onTrue(
+      Commands.sequence(
+        trajectory.resetOdometry(),
+        trajectory.cmd()));
+
+    return routine;
+  }
+
+  public AutoRoutine hpRight() {
+    final AutoRoutine routine = m_factory.newRoutine("hpRight");
+    final AutoTrajectory trajectory = routine.trajectory("HPRight");
+
+    routine.active().onTrue(
+      Commands.sequence(
+        trajectory.resetOdometry(),
+        trajectory.cmd()));
 
     return routine;
   }

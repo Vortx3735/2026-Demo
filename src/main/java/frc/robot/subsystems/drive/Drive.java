@@ -392,13 +392,19 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   public void followPath(SwerveSample sample) {
     var pose = getPose();
 
-    var targetSpeeds = sample.getChassisSpeeds();
-    targetSpeeds.vxMetersPerSecond += m_pathXController.calculate(pose.getX(), sample.x);
-    targetSpeeds.vyMetersPerSecond += m_pathYController.calculate(pose.getY(), sample.y);
-    targetSpeeds.omegaRadiansPerSecond +=
+    /*ChassisSpeeds speeds = new ChassisSpeeds(
+      sample.vx + m_pathXController.calculate(pose.getX(), sample.x),
+      sample.vy + m_pathYController.calculate(pose.getY(), sample.y),
+      sample.omega + m_pathThetaController.calculate(pose.getRotation().getRadians(), sample.heading)
+    ); */
+
+    var speeds = sample.getChassisSpeeds();
+    speeds.vxMetersPerSecond += m_pathXController.calculate(pose.getX(), sample.x);
+    speeds.vyMetersPerSecond += m_pathYController.calculate(pose.getY(), sample.y);
+    speeds.omegaRadiansPerSecond +=
         m_pathThetaController.calculate(pose.getRotation().getRadians(), sample.heading);
 
-    runVelocity(targetSpeeds);
+    runVelocity(speeds);
   }
 
   /** Adds a new timestamped vision measurement. */

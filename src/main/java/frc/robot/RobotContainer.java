@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
@@ -169,13 +170,18 @@ public class RobotContainer {
     // Init auton objects
     autoFactory = drive.createAutoFactory();
     autoRoutines = new AutoRoutines(autoFactory, this);
+
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    autonChooser.addRoutine(
-        "Example Auton",
-        autoRoutines
-            ::exampleRoutine); // Logged dashboard chooser no support Choreo AutoRoutine objects
+    autonChooser.addRoutine("Center Contest Left", autoRoutines::centerContestLeft);
+    autonChooser.addRoutine("Center Contest Right", autoRoutines::centerContestRight);
+    autonChooser.addRoutine("Depot (Left)", autoRoutines::depotLeft);
+    autonChooser.addRoutine("Human Player (Right)", autoRoutines::hpRight);
+
     SmartDashboard.putData("Auton Chooser", autonChooser);
+
+    RobotModeTriggers.autonomous().whileTrue(autonChooser.selectedCommandScheduler());
+    // Init SysId object
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -309,7 +315,7 @@ public class RobotContainer {
     // controller.aButton.whileTrue(
     // ShooterCommands.AimToHub(turret, flywheel, hood, () -> drive.getPose(), 65));
     // controller.yButton.whileTrue(hood.moveCommand(true));
-    // controller.aButton.whileTrue(hood.moveCommand(false));
+    // controller.aButton.whileTrue(hood.moveCommand(false)
 
     // Climber Binds
     controller.povUp.whileTrue(climber.upCommand());

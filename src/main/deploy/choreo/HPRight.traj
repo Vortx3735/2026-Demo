@@ -1,5 +1,5 @@
 {
- "name":"HPRightBlue",
+ "name":"HPRight",
  "version":3,
  "snapshot":{
   "waypoints":[
@@ -141,5 +141,5 @@
  },
  "events":[
    {"name":"shoot", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"shootAgain", "from":{"target":1, "targetTimestamp":3.37882, "offset":{"exp":"1 s", "val":1.0}}, "event":null}]
+   {"name":"shoot", "from":{"target":1, "targetTimestamp":3.37882, "offset":{"exp":"1 s", "val":1.0}}, "event":null}]
 }
