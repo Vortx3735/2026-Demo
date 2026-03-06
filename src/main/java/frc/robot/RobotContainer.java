@@ -91,7 +91,7 @@ public class RobotContainer {
   final AutoChooser autonChooser = new AutoChooser();
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedDashboardChooser<Command> sysIdChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -184,22 +184,22 @@ public class RobotContainer {
 
     RobotModeTriggers.autonomous().whileTrue(autonChooser.selectedCommandScheduler());
     // Init SysId object
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    sysIdChooser = new LoggedDashboardChooser<>("SysId Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Quasistatic Reverse)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     // Create the SysId routine
     var sysIdRoutine =
@@ -213,15 +213,15 @@ public class RobotContainer {
                 (voltage) -> turret.setVoltage(voltage.in(Volts)),
                 null, // No log consumer, since data is recorded by AdvantageKit
                 turret));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Quasistatic Forward)",
         sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Quasistatic Reverse)",
         sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Dynamic Forward)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Dynamic Reverse)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
     // Configure the button bindings
     configureButtonBindings();

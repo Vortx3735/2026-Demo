@@ -62,10 +62,7 @@ public class AutoRoutines {
     final AutoRoutine routine = m_factory.newRoutine("centerContestLeft");
     final AutoTrajectory trajectory = routine.trajectory("CenterContestLeft");
 
-    routine.active().onTrue(
-      Commands.sequence(
-        trajectory.resetOdometry(),
-        trajectory.cmd()));
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
   }
@@ -74,10 +71,7 @@ public class AutoRoutines {
     final AutoRoutine routine = m_factory.newRoutine("centerContestRight");
     final AutoTrajectory trajectory = routine.trajectory("CenterContestRight");
 
-    routine.active().onTrue(
-      Commands.sequence(
-        trajectory.resetOdometry(),
-        trajectory.cmd()));
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
   }
@@ -86,10 +80,7 @@ public class AutoRoutines {
     final AutoRoutine routine = m_factory.newRoutine("depotLeft");
     final AutoTrajectory trajectory = routine.trajectory("DepotLeft");
 
-    routine.active().onTrue(
-      Commands.sequence(
-        trajectory.resetOdometry(),
-        trajectory.cmd()));
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
   }
@@ -98,10 +89,7 @@ public class AutoRoutines {
     final AutoRoutine routine = m_factory.newRoutine("hpRight");
     final AutoTrajectory trajectory = routine.trajectory("HPRight");
 
-    routine.active().onTrue(
-      Commands.sequence(
-        trajectory.resetOdometry(),
-        trajectory.cmd()));
+    routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
     return routine;
   }
