@@ -11,9 +11,9 @@ public class CommandFactory {
   public static Command manualShootCommand(Flywheel flywheel, Hopper hopper, Tunnel tunnel) {
     return Commands.parallel(
             flywheel.shootCommand(),
-            hopper.intakeCommand(),
             Commands.sequence(
-                new WaitUntilCommand(() -> flywheel.isAtSpeed()), tunnel.intakeCommand()))
+                new WaitUntilCommand(() -> flywheel.isAtSpeed()),
+                Commands.parallel(hopper.intakeCommand(), tunnel.intakeCommand())))
         .withName("manual shoot command group");
   }
 

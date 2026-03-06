@@ -78,6 +78,7 @@ public class RobotContainer {
       new Tunnel(
           Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
           Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
+  public final Telemetry telemetry;
 
   private SwerveDriveSimulation driveSimulation = null;
 
@@ -167,6 +168,8 @@ public class RobotContainer {
 
         vision = new Vision(drive, new VisionIO() {});
     }
+    telemetry =
+        new Telemetry(drive, vision, flywheel, hood, turret, hopper, intake, tunnel, climber);
     // Init auton objects
     autoFactory = drive.createAutoFactory();
     autoRoutines = new AutoRoutines(autoFactory, this);
@@ -264,51 +267,10 @@ public class RobotContainer {
     controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
     // Set bindings
-
-    /*
-     * // Test Binds
-     *
-     * // controller.povUp.whileTrue(flywheel.setVelocityPIDCommand(100));
-     * // controller.povDown.whileTrue(flywheel.setVelocityPIDCommand(0));
-     * // controller.povRight.whileTrue(turret.moveCommand(0.5));
-     * // controller.povLeft.whileTrue(turret.moveCommand(-0.5));
-     * // controller.yButton.whileTrue(hood.setPositionPIDCommand(-45));
-     * // controller.bButton.whileTrue(hood.setPositionPIDCommand(0));
-     * // controller.rt.whileTrue(hopper.runHopperCommand(true));
-     * controller.lt.whileTrue(intake.intakeCommand());
-     * // controller.aButton.whileTrue(hopper.runHopperCommand(true));
-     * // controller.xButton.whileTrue(TurretCommands.AimToSide(turret, () ->
-     * drive.getPose()));
-     *
-     * controller.povUp.whileTrue(climber.upCommand());
-     * // controller.povRight.whileTrue(hopper.runHopperCommand(true));
-     * controller.povLeft.whileTrue(turret.setPositionPIDCommandManualSetpoint());
-     * // controller.povRight.whileTrue(TurretCommands.AimToSide(turret, () ->
-     * drive.getPose()));
-     * controller.povDown.whileTrue(climber.downCommand());
-     * controller.lb.whileTrue(hopper.runHopperCommand(true));
-     * // controller.rt.whileTrue(flywheel.setVelocityPIDCommand());
-     * controller.rt.whileTrue(CommandFactory.shootCommand(flywheel, tunnel));
-     * controller.rb.whileTrue(hopper.runHopperCommand(false));
-     *
-     * controller.yButton.whileTrue(hood.moveCommand(true));
-     * controller.xButton.whileTrue(turret.moveCommand(true));
-     * controller.bButton.whileTrue(turret.moveCommand(false));
-     * controller.aButton.whileTrue(hood.moveCommand(false));
-     *
-     * controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
-     */
-
-    /*
-     * // Actual Binds
-     */
-    // Shooter Binds
-    // controller.lt.onTrue(TurretCommands.AimToSide(turret, () ->
-    // drive.getPose())); does AimToSide
-    // aim to a side of the field?
     controller.lb.whileTrue(turret.moveCommand(true));
     controller.rb.whileTrue(turret.moveCommand(false));
     controller.rt.whileTrue(CommandFactory.manualShootCommand(flywheel, hopper, tunnel));
+    // controller.rt.whileTrue(flywheel.shootCommand());
     controller.povLeft.whileTrue(hood.moveCommand(true));
     controller.povRight.whileTrue(hood.moveCommand(false));
     // controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
