@@ -43,6 +43,7 @@ public class Telemetry extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // hood -75.828
     // Drive logging
     Logger.recordOutput("Drive/pose", drive.getPose());
     // Vision Logging

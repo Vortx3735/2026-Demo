@@ -266,8 +266,11 @@ public class RobotContainer {
     // Shooter Binds
     controller.lb.whileTrue(turret.moveCommand(true));
     controller.rb.whileTrue(turret.moveCommand(false));
+    // controller.rt.whileTrue(
+    //     ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 80));
     controller.rt.whileTrue(
-        ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 80));
+        CommandFactory.shootCommand(
+            flywheel, tunnel, hopper, () -> flywheel.flywheelSpeedEntry.getAsDouble() * 90));
     controller.povLeft.whileTrue(hood.moveCommand(true));
     controller.povRight.whileTrue(hood.moveCommand(false));
     controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));

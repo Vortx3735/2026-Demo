@@ -83,7 +83,7 @@ public class ShooterCommands {
 
     // 4. Recovery/Efficiency Factor (Adjust based on testing)
     // Most FRC shooters lose ~10-15% to slip/compression
-    double efficiencyFactor = 0.9;
+    double efficiencyFactor = 0.98;
     Logger.recordOutput("Shooter/calculatedShooterRPS", rps * efficiencyFactor);
     return rps * efficiencyFactor;
   }
@@ -135,6 +135,7 @@ public class ShooterCommands {
    */
   private static Command turretAimCommand(
       Turret turret, Supplier<Pose2d> robotPoseSupplier, Supplier<Pose2d> hubPoseSupplier) {
+
     return Commands.run(
             () -> {
               Pose2d rp = robotPoseSupplier.get();
