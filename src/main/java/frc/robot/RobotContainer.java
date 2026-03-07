@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.drive.*;
@@ -283,7 +284,7 @@ public class RobotContainer {
 
     controller.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
 
-    controller.povUp.whileTrue(turret.setPositionPIDCommand(0.1));
+    controller.povUp.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
 
     controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
     // controller.menu.onTrue(drive.runOnce(() -> drive.))

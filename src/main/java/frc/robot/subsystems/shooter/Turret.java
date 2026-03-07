@@ -38,8 +38,8 @@ public class Turret extends SubsystemBase {
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, 1 / kGearRatio),
           DCMotor.getKrakenX44(1));
 
-  private double currentPosition; // rotations
-  private double targetPosition = 0;
+  public double currentPosition; // rotations
+  public double targetPosition = 0;
   public double turretVelocity = 0.0; // rotations per second (mechanism)
   private static final double kTurretPositionTolerance = 0.05; // rotations
   private static final double kTurretVelocityToleranceRps = 0.5; // rps
@@ -131,8 +131,8 @@ public class Turret extends SubsystemBase {
     // }
     targetPosition = rotations;
     // Precompute a conservative simulated input to drive the DCMotorSim when running tests.
-    double sign = Math.signum(rotations - currentPosition);
-    simulatedInputVoltage = Math.max(-12.0, Math.min(12.0, sign * 6.0));
+    // double sign = Math.signum(rotations - currentPosition);
+    // simulatedInputVoltage = Math.max(-12.0, Math.min(12.0, sign * 6.0));
   }
 
   public boolean isFinished() {
@@ -253,7 +253,7 @@ public class Turret extends SubsystemBase {
   public void periodic() {
     // When not sim, read from the motor; otherwise simulationPeriodic handles currentPosition
     if (!isSim) {
-      currentPosition = turretMotor.getRotorPosition().getValueAsDouble() * kGearRatio;
+      currentPosition = (turretMotor.getRotorPosition().getValueAsDouble()) * kGearRatio;
       try {
         turretVelocity = turretMotor.getRotorVelocity().getValueAsDouble() * kGearRatio;
       } catch (Exception e) {

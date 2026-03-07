@@ -121,9 +121,9 @@ public class ShooterCommands {
   public static Pose2d chooseSideHubPose(Pose2d robotPose) {
     if (DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().get() == Alliance.Red) {
-      return robotPose.getY() > 4.05 ? RED_LEFT_POSE2D : RED_RIGHT_POSE2D;
+      return RED_HUB_POSE2D;
     } else {
-      return robotPose.getY() > 4.05 ? BLUE_RIGHT_POSE2D : BLUE_LEFT_POSE2D;
+      return BLUE_HUB_POSE2D;
     }
   }
 
@@ -145,7 +145,7 @@ public class ShooterCommands {
         .withName("turret aim");
   }
 
-  public static Command AimToHub(
+  public static Command AimEverythingToHub(
       Turret turret, Flywheel flywheel, Hood hood, Supplier<Pose2d> poseSupplier, double theta) {
     // create a supplier that computes target RPS from the live robot pose
     Supplier<Double> targetRpsSupplier =
