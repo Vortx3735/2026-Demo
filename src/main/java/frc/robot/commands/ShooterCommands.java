@@ -10,7 +10,6 @@ import frc.robot.Constants;
 import frc.robot.subsystems.intake.Hopper;
 import frc.robot.subsystems.intake.Tunnel;
 import frc.robot.subsystems.shooter.Flywheel;
-import frc.robot.subsystems.shooter.Hood;
 import frc.robot.subsystems.shooter.Turret;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;

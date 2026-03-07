@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
@@ -267,7 +266,8 @@ public class RobotContainer {
     // Shooter Binds
     controller.lb.whileTrue(turret.moveCommand(true));
     controller.rb.whileTrue(turret.moveCommand(false));
-    controller.rt.whileTrue(ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 65));
+    controller.rt.whileTrue(
+        ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 80));
     controller.povLeft.whileTrue(hood.moveCommand(true));
     controller.povRight.whileTrue(hood.moveCommand(false));
     controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
@@ -286,8 +286,9 @@ public class RobotContainer {
     // controller.povUp.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
     // controller.povDown.whileTrue(new RunCommand(() -> turret.setVoltageNetworkTable(), turret));
 
-    controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
+    controller.view.onTrue(new InstantCommand(() -> turret.zero()));
     // controller.menu.onTrue(drive.runOnce(() -> drive.))
+    controller.menu.onTrue(new InstantCommand(() -> drive.zeroDriveTrain()));
   }
 
   /**
