@@ -152,7 +152,6 @@ public class ShooterCommands {
   public static Command AimEverythingToHub(
       Turret turret,
       Flywheel flywheel,
-      Hood hood,
       Hopper hopper,
       Tunnel tunnel,
       Supplier<Pose2d> poseSupplier,
@@ -185,6 +184,28 @@ public class ShooterCommands {
                 turret))
         // hood.setPositionPIDCommand(theta))
         .withName("AimToHub");
+  }
+
+  // Shoots while adjusting flywheel speed based on distance
+  public static Command ShootFromDistance(
+      Flywheel flywheel,
+      Hopper hopper,
+      Tunnel tunnel,
+      Supplier<Pose2d> poseSupplier,
+      double theta) {
+    // create a supplier that computes target RPS from the live robot pose
+    Supplier<Double> targetRpsSupplier =
+        () -> {
+          Pose2d rp = poseSupplier.get();
+          Pose2d hp = getAllianceHubPose();
+          double liveXs = getHorizontalDistanceToHub(rp, hp);
+          Logger.recordOutput("Shooter/Distance", liveXs);
+          return calculateShooterRPS(liveXs, theta);
+        };
+
+    return Commands.deadline(
+            CommandFactory.shootCommand(flywheel, tunnel, hopper, targetRpsSupplier))
+        .withName("ShootFromDistance");
   }
 
   public static Command AimToSide(Turret turret, Supplier<Pose2d> poseSupplier) {

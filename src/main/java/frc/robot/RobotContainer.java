@@ -263,21 +263,18 @@ public class RobotContainer {
     controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
     // Set bindings
+
+    // Shooter Binds
     controller.lb.whileTrue(turret.moveCommand(true));
     controller.rb.whileTrue(turret.moveCommand(false));
-    controller.rt.whileTrue(CommandFactory.manualShootCommand(flywheel, hopper, tunnel));
-    // controller.rt.whileTrue(flywheel.shootCommand());
+    controller.rt.whileTrue(ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 65));
     controller.povLeft.whileTrue(hood.moveCommand(true));
     controller.povRight.whileTrue(hood.moveCommand(false));
-    // controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
-    // controller.aButton.whileTrue(
-    // ShooterCommands.AimToHub(turret, flywheel, hood, () -> drive.getPose(), 65));
-    // controller.yButton.whileTrue(hood.moveCommand(true));
-    // controller.aButton.whileTrue(hood.moveCommand(false));
+    controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
 
     // Climber Binds
-    // controller.povUp.whileTrue(climber.upCommand());
-    // controller.povDown.whileTrue(climber.downCommand());
+    controller.povUp.whileTrue(climber.upCommand());
+    controller.povDown.whileTrue(climber.downCommand());
 
     // Intake Binds
     controller.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
@@ -285,11 +282,9 @@ public class RobotContainer {
 
     controller.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
 
-    controller.povUp.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
-    controller.yButton.whileTrue(
-        ShooterCommands.AimEverythingToHub(
-            turret, flywheel, hood, hopper, tunnel, () -> drive.getPose(), 80));
-    controller.povDown.whileTrue(new RunCommand(() -> turret.setVoltageNetworkTable(), turret));
+    // Test/Misc Binds
+    // controller.povUp.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
+    // controller.povDown.whileTrue(new RunCommand(() -> turret.setVoltageNetworkTable(), turret));
 
     controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
     // controller.menu.onTrue(drive.runOnce(() -> drive.))
