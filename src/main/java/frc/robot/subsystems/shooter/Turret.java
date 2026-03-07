@@ -55,7 +55,7 @@ public class Turret extends SubsystemBase {
     var talonFXConfigs = new TalonFXConfiguration();
 
     var slot0Configs = talonFXConfigs.Slot0;
-    slot0Configs.kS = 0.36;
+    // slot0Configs.kS = 0.78;
     // slot0Configs.kV = 0.11931;
     // slot0Configs.kS = 0.0060924;
     // slot0Configs.kA =
@@ -74,7 +74,7 @@ public class Turret extends SubsystemBase {
     //         * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
     slot0Configs.kP = 9; // A position error of 2.5 rotations results in 12 V output
     slot0Configs.kI = 0; // no output for integrated error
-    slot0Configs.kD = 0.01; // A velocity error of 1 rps results in 0.1 V output
+    slot0Configs.kD = 0; // A velocity error of 1 rps results in 0.1 V output
 
     // Slow values for testing
     // slot0Configs.kP = 1.15;
@@ -90,7 +90,7 @@ public class Turret extends SubsystemBase {
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.5 / kGearRatio;
     talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -1.5 / kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0 / kGearRatio;
 
     turretMotor.getConfigurator().apply(talonFXConfigs);
     turretMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -119,6 +119,11 @@ public class Turret extends SubsystemBase {
 
   public void setVoltage(double voltage) {
     VoltageOut request = new VoltageOut(voltage);
+    turretMotor.setControl(request);
+  }
+
+  public void setVoltageNetworkTable() {
+    VoltageOut request = new VoltageOut(turretPositionEntry.getAsDouble());
     turretMotor.setControl(request);
   }
 
@@ -155,7 +160,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void zero() {
-    turretMotor.setPosition(0);
+    turretMotor.setPosition(0.25 / kGearRatio);
   }
 
   // command factories / command helpers

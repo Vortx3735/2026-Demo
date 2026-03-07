@@ -20,10 +20,10 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String frontCameraName = "usbcLeft";
-  public static String backCameraName = "usbcRight";
-  public static String rightCameraName = "usb2.0top";
-  public static String leftCameraName = "usb3.0bottom";
+  public static String frontCameraName = "front";
+  public static String backCameraName = "back";
+  public static String rightCameraName = "right";
+  public static String leftCameraName = "left";
 
   // note: zero z component might be 0.5 meters above the ground
 

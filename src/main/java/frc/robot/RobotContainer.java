@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
@@ -275,8 +276,8 @@ public class RobotContainer {
     // controller.aButton.whileTrue(hood.moveCommand(false));
 
     // Climber Binds
-    controller.povUp.whileTrue(climber.upCommand());
-    controller.povDown.whileTrue(climber.downCommand());
+    // controller.povUp.whileTrue(climber.upCommand());
+    // controller.povDown.whileTrue(climber.downCommand());
 
     // Intake Binds
     controller.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
@@ -285,6 +286,10 @@ public class RobotContainer {
     controller.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
 
     controller.povUp.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
+    controller.yButton.whileTrue(
+        ShooterCommands.AimEverythingToHub(
+            turret, flywheel, hood, hopper, tunnel, () -> drive.getPose(), 80));
+    controller.povDown.whileTrue(new RunCommand(() -> turret.setVoltageNetworkTable(), turret));
 
     controller.menu.onTrue(new InstantCommand(() -> turret.zero()));
     // controller.menu.onTrue(drive.runOnce(() -> drive.))

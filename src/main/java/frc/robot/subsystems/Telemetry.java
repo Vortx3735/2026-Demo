@@ -59,7 +59,8 @@ public class Telemetry extends SubsystemBase {
         "Shooter/Turret/targetPosition(rotations)", turret.getTurretTargetPosition());
     Logger.recordOutput("Shooter/Hood/currentPosition", hood.getHoodAngle());
     Logger.recordOutput("Shooter/Hood/targetPosition", hood.getHoodTargetAngle());
-    Logger.recordOutput("Shooter/Flywheel/currentRPS", flywheel.getFlywheelTargetRPS());
+    Logger.recordOutput("Shooter/Flywheel/currentRPS", flywheel.getFlywheelCurrentRPS());
     Logger.recordOutput("Shooter/Flywheel/targetRPS", flywheel.getFlywheelTargetRPS());
+    Logger.recordOutput("Shooter/isAtSpeed", flywheel.isAtSpeed());
   }
 }

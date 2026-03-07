@@ -137,7 +137,7 @@ public class Vision extends SubsystemBase {
         }
 
         // Send vision observation
-        Logger.recordOutput("VisionTest/hasTag", hasTag);
+        // Logger.recordOutput("VisionTest/hasTag", hasTag);
         consumer.accept(
             observation.pose().toPose2d(),
             observation.timestamp(),
@@ -145,18 +145,18 @@ public class Vision extends SubsystemBase {
       }
 
       // Log camera metadata
-      // Logger.recordOutput(
-      //     "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
-      //     tagPoses.toArray(new Pose3d[0]));
-      // Logger.recordOutput(
-      //     "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPoses",
-      //     robotPoses.toArray(new Pose3d[0]));
-      // Logger.recordOutput(
-      //     "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
-      //     robotPosesAccepted.toArray(new Pose3d[0]));
-      // Logger.recordOutput(
-      // "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
-      // robotPosesRejected.toArray(new Pose3d[0]));
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
+          tagPoses.toArray(new Pose3d[0]));
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPoses",
+          robotPoses.toArray(new Pose3d[0]));
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
+          robotPosesAccepted.toArray(new Pose3d[0]));
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
+          robotPosesRejected.toArray(new Pose3d[0]));
       allTagPoses.addAll(tagPoses);
       allRobotPoses.addAll(robotPoses);
       allRobotPosesAccepted.addAll(robotPosesAccepted);
