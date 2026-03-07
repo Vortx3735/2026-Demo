@@ -84,7 +84,7 @@ public class Flywheel extends SubsystemBase {
   public double getDashboardSpeed() {
     return flywheelSpeedEntry.get();
   }
-  
+
   public double getFlywheelCurrentRPS() {
     return currentRPS;
   }
