@@ -176,10 +176,17 @@ public class RobotContainer {
     autoRoutines = new AutoRoutines(autoFactory, this);
 
     // Set up auto routines
-    autonChooser.addRoutine("Left Short Center Contest", autoRoutines::leftShortCenterContest);
-    autonChooser.addRoutine("Left Long Center Contest", autoRoutines::leftLongCenterContest);
-    autonChooser.addRoutine("Right Short Center Contest", autoRoutines::rightShortCenterContest);
-    autonChooser.addRoutine("Right Long Center Contest", autoRoutines::rightLongCenterContest);
+    autonChooser.addRoutine("Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
+    autonChooser.addRoutine("Left ShortLong Center Contest", autoRoutines::leftShortLongCenterContest);
+    autonChooser.addRoutine("Left ShortDepot Center Contest", autoRoutines::leftShortDepotCenterContest);
+    autonChooser.addRoutine("Left DblLong Center Contest", autoRoutines::leftDblLongCenterContest);
+    autonChooser.addRoutine("Left LongDepot Center Contest", autoRoutines::leftLongDepotCenterContest);
+
+    autonChooser.addRoutine("Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+    autonChooser.addRoutine("Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
+    autonChooser.addRoutine("Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
+    autonChooser.addRoutine("Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
+    autonChooser.addRoutine("Right LongHP Center Contest", autoRoutines::rightLongHPCenterContest);
 
     autonChooser.addRoutine("Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
     autonChooser.addRoutine("Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
