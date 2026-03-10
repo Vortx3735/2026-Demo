@@ -47,7 +47,7 @@ public class Telemetry extends SubsystemBase {
     // Drive logging
     Logger.recordOutput("Drive/pose", drive.getPose());
     // Vision Logging
-    // Logger.recordOutput("VisionTest/hasTag", vision.hasTag);
+    Logger.recordOutput("VisionTest/hasTag", vision.hasTag());
     // Intake logging
     Logger.recordOutput("Tunnel/topCurrentRPS", tunnel.getTopTunnelCurrentRPS());
     Logger.recordOutput("Tunnel/bottomCurrentRPS", tunnel.getBottomTunnelCurrentRPS());

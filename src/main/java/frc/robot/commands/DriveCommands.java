@@ -62,7 +62,21 @@ public class DriveCommands {
         .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
         .getTranslation();
   }
-
+  // public static BooleanSupplier isNearBump(Supplier<Pose2d> poseSupplier){
+  //   Translation2d translation = poseSupplier.get().getTranslation();
+  //   Double x = translation.getX();
+  //   Double y = translation.getY();
+  //   if(x>3.3 && x<5.7){
+  
+      // }
+  // }
+  // public static Command joystickDriveWithBumpAutoalign(Drive drive,
+  //     DoubleSupplier xSupplier,
+  //     DoubleSupplier ySupplier,
+  //     DoubleSupplier omegaSupplier){
+  //       return Commands.either(joystickDriveAtAngle(drive, xSupplier, ySupplier,
+  // null),joystickDrive(drive, xSupplier, ySupplier, omegaSupplier),isNearBump());
+  // }
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
