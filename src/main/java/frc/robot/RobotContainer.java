@@ -175,10 +175,21 @@ public class RobotContainer {
     autoRoutines = new AutoRoutines(autoFactory, this);
 
     // Set up auto routines
-    autonChooser.addRoutine("Center Contest Left", autoRoutines::centerContestLeft);
-    autonChooser.addRoutine("Center Contest Right", autoRoutines::centerContestRight);
-    autonChooser.addRoutine("Depot (Left)", autoRoutines::depotLeft);
-    autonChooser.addRoutine("Human Player (Right)", autoRoutines::hpRight);
+    autonChooser.addRoutine("Left Short Center Contest", autoRoutines::leftShortCenterContest);
+    autonChooser.addRoutine("Left Long Center Contest", autoRoutines::leftLongCenterContest);
+    autonChooser.addRoutine("Right Short Center Contest", autoRoutines::rightShortCenterContest);
+    autonChooser.addRoutine("Right Long Center Contest", autoRoutines::rightLongCenterContest);
+
+    autonChooser.addRoutine("Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
+    autonChooser.addRoutine("Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
+    autonChooser.addRoutine("Right Short Climb Center Contest", autoRoutines::rightShortClimbCenterContest);
+    autonChooser.addRoutine("Right Long Climb Center Contest", autoRoutines::rightLongClimbCenterContest);
+
+    autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
+    autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
+
+    autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
+    autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
 
     SmartDashboard.putData("Auton Chooser", autonChooser);
 
