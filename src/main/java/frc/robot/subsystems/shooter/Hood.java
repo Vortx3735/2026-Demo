@@ -29,6 +29,7 @@ import org.littletonrobotics.junction.Logger;
 public class Hood extends SubsystemBase {
   private static final double kGearRatio = (9.0 * 15.0 * 10.0) / (48.0 * 30.0 * 15.0);
   private static final double kMOI = 0.001; // kg*m^2
+  // bottom hood angle: 27.8 deg
 
   private final TalonFX hoodMotor;
 
@@ -39,8 +40,8 @@ public class Hood extends SubsystemBase {
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
           DCMotor.getKrakenX44(1));
 
-  private double hoodAngle = 0;
-  private double targetAngle = 0;
+  public double hoodAngle = 0;
+  public double targetAngle = 0;
   public double hoodVelocity = 0.0; // degrees per second (mechanism)
   private static final double kPositionToleranceDeg = 1.0; // degrees
   private static final double kVelocityToleranceDegPerSec = 10.0; // deg/s

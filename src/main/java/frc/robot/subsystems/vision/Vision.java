@@ -29,7 +29,11 @@ public class Vision extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
-  public int hasTag = 0;
+  boolean tagFound = false;
+
+  public boolean hasTag() {
+    return tagFound;
+  }
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -93,9 +97,6 @@ public class Vision extends SubsystemBase {
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
         // Check whether to reject pose
-        if (observation.tagCount() > 0) {
-          hasTag++;
-        }
         boolean rejectPose =
             observation.tagCount() == 0 // Must have at least one tag
                 || (observation.tagCount() == 1
@@ -137,7 +138,7 @@ public class Vision extends SubsystemBase {
         }
 
         // Send vision observation
-        Logger.recordOutput("VisionTest/hasTag", hasTag);
+        // Logger.recordOutput("VisionTest/hasTag", hasTag);
         consumer.accept(
             observation.pose().toPose2d(),
             observation.timestamp(),
@@ -162,7 +163,7 @@ public class Vision extends SubsystemBase {
       allRobotPosesAccepted.addAll(robotPosesAccepted);
       allRobotPosesRejected.addAll(robotPosesRejected);
     }
-
+    tagFound = allRobotPoses.size() > 0;
     // Log summary data
     Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
     Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[0]));
