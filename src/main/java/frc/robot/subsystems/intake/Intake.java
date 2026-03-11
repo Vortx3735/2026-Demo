@@ -29,7 +29,7 @@ public class Intake extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Subsystems/Intake");
     intakeSpeedEntry = intakeTable.getDoubleTopic("intakeSpeed").getEntry(0);
-    intakeSpeedEntry.set(0.5);
+    intakeSpeedEntry.set(0.3);
 
     TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
     intakeConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -40,6 +40,9 @@ public class Intake extends SubsystemBase {
     return intakeSpeedEntry.get();
   }
 
+  public double getIntakeCurrentRPS() {
+    return intakeMotor.getRotorVelocity().getValueAsDouble();
+  }
   // Invert true is outtake. false is intake
   public void run(Boolean inverted) {
     if (inverted) {

@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -18,35 +20,41 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String frontCameraName = "usbcLeft";
-  public static String backCameraName = "usbcRight";
-  public static String rightCameraName = "usb2.0top";
-  public static String leftCameraName = "usb3.0bottom";
+  public static String frontCameraName = "front";
+  public static String backCameraName = "back";
+  public static String rightCameraName = "right";
+  public static String leftCameraName = "left";
+
+  // note: zero z component might be 0.5 meters above the ground
 
   // note: zero z component might be 0.5 meters above the ground
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d frontCameraTransform =
-      new Transform3d(12.662, 0.239, 15.938, new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0));
+      new Transform3d(
+          Inches.of(12.671076),
+          Inches.of(-0.499150),
+          Inches.of(15.651053),
+          new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0));
   public static Transform3d backCameraTransform =
       new Transform3d(
-          -9.516,
-          -2.978,
-          20.607,
+          Inches.of(-9.646),
+          Inches.of(-3.844),
+          Inches.of(18.190),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI)));
   public static Transform3d rightCameraTransform =
       new Transform3d(
-          1.985,
-          -14.155,
-          21.940,
+          Inches.of(-2.458),
+          Inches.of(-14.702),
+          Inches.of(21.460),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI * 3.0 / 2.0)));
   public static Transform3d leftCameraTransform =
       new Transform3d(
-          1.542,
-          14.192,
-          18.44,
+          Inches.of(-2.594),
+          Inches.of(13.962),
+          Inches.of(19.468),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0)));
 
