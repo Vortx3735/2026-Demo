@@ -33,6 +33,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -62,21 +63,22 @@ public class DriveCommands {
         .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
         .getTranslation();
   }
-  // public static BooleanSupplier isNearBump(Supplier<Pose2d> poseSupplier){
-  //   Translation2d translation = poseSupplier.get().getTranslation();
-  //   Double x = translation.getX();
-  //   Double y = translation.getY();
-  //   if(x>3.3 && x<5.7){
-  
-      // }
-  // }
-  // public static Command joystickDriveWithBumpAutoalign(Drive drive,
-  //     DoubleSupplier xSupplier,
-  //     DoubleSupplier ySupplier,
-  //     DoubleSupplier omegaSupplier){
-  //       return Commands.either(joystickDriveAtAngle(drive, xSupplier, ySupplier,
-  // null),joystickDrive(drive, xSupplier, ySupplier, omegaSupplier),isNearBump());
-  // }
+
+  public static BooleanSupplier isNearBump(Supplier<Pose2d> poseSupplier) {
+    return (() -> !(poseSupplier.get().getX() > 3.3 && poseSupplier.get().getX() < 5.7));
+  }
+
+  public static Command joystickDriveWithBumpAutoalign(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+    return Commands.either(
+        joystickDrive(drive, xSupplier, ySupplier, omegaSupplier).withName("joystick drive"),
+        joystickDriveAtAngle(drive, xSupplier, ySupplier, () -> new Rotation2d())
+            .withName("angled drive"),
+        isNearBump(() -> drive.getPose()));
+  }
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */

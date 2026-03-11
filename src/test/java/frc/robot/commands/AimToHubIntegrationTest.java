@@ -35,7 +35,7 @@ public class AimToHubIntegrationTest {
 
     // Compute expected values
     Pose2d hubPose = ShooterCommands.getAllianceHubPose();
-    double expectedXs = ShooterCommands.getHorizontalDistanceToHub(robotPose, hubPose);
+    double expectedXs = ShooterCommands.getDistanceToHub(robotPose, hubPose);
     double expectedRps = ShooterCommands.calculateShooterRPS(expectedXs, theta);
     double expectedAngleRelative = ShooterCommands.getAngleRelativeToHub(robotPose, hubPose);
     double expectedRotations = expectedAngleRelative / (2 * Math.PI);

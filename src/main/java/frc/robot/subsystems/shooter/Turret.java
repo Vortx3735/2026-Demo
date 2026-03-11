@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Mode;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
@@ -79,18 +80,17 @@ public class Turret extends SubsystemBase {
     // Slow values for testing
     // slot0Configs.kP = 1.15;
 
+    // max mechanism rps: 2.651 rps
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity =
-        3 * kGearRatio; // target cruise velocity of 3 rps after gearing
-    motionMagicConfigs.MotionMagicAcceleration =
-        200; // Target acceleration of 160 rps/s (0.5 seconds)
-    motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
+    motionMagicConfigs.MotionMagicCruiseVelocity = 1 / kGearRatio;
+    motionMagicConfigs.MotionMagicAcceleration = 2 / kGearRatio;
+    // motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.5 / kGearRatio;
     talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.06 / kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0 / kGearRatio;
 
     turretMotor.getConfigurator().apply(talonFXConfigs);
     turretMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -127,28 +127,23 @@ public class Turret extends SubsystemBase {
     turretMotor.setControl(request);
   }
 
-  public void setPositionPID(double rotations) {
+  public boolean setPositionPID(double rotations) {
     // create a Motion Magic request, voltage output
     // if (Math.abs(turretPosition - rotations) > error) {
-    // final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations / kGearRatio);
-    final PositionVoltage m_request = new PositionVoltage(rotations / kGearRatio);
+    final MotionMagicVoltage m_request = new MotionMagicVoltage(rotations / kGearRatio);
+    // final PositionVoltage m_request = new PositionVoltage(rotations / kGearRatio);
     turretMotor.setControl(m_request);
     // }
     targetPosition = rotations;
     // Precompute a conservative simulated input to drive the DCMotorSim when running tests.
     // double sign = Math.signum(rotations - currentPosition);
     // simulatedInputVoltage = Math.max(-12.0, Math.min(12.0, sign * 6.0));
+    double posErr = Math.abs(targetPosition - currentPosition);
+    return !(posErr > kTurretPositionTolerance);
   }
 
-  public boolean isFinished() {
-    double posErr = Math.abs(targetPosition - currentPosition);
-    if (posErr > kTurretPositionTolerance) {
-      return false;
-    }
-    if (isSim) {
-      return Math.abs(turretVelocity) < kTurretVelocityToleranceRps;
-    }
-    return true;
+  public BooleanSupplier isFinished() {
+    return () -> Math.abs(targetPosition - currentPosition) < kTurretPositionTolerance;
   }
 
   public void set(double s) {
@@ -160,7 +155,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void zero() {
-    turretMotor.setPosition(0.25 / kGearRatio);
+    turretMotor.setPosition(0.26 / kGearRatio);
   }
 
   // command factories / command helpers
@@ -190,7 +185,7 @@ public class Turret extends SubsystemBase {
                       false);
                 });
     return Commands.sequence(
-            runOnce(() -> setPositionPID(rotations)), Commands.waitUntil(this::isFinished))
+            runOnce(() -> setPositionPID(rotations)), Commands.waitUntil(isFinished()))
         .raceWith(timeoutNotifier)
         .withName("Set Turret Position PID");
   }
