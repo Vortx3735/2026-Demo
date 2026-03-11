@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
@@ -92,7 +93,7 @@ public class RobotContainer {
   final AutoChooser autonChooser = new AutoChooser();
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedDashboardChooser<Command> sysIdChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -174,28 +175,63 @@ public class RobotContainer {
     // Init auton objects
     autoFactory = drive.createAutoFactory();
     autoRoutines = new AutoRoutines(autoFactory, this);
+
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     autonChooser.addRoutine(
-        "Example Auton",
-        autoRoutines
-            ::exampleRoutine); // Logged dashboard chooser no support Choreo AutoRoutine objects
+        "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
+    autonChooser.addRoutine(
+        "Left ShortLong Center Contest", autoRoutines::leftShortLongCenterContest);
+    autonChooser.addRoutine(
+        "Left ShortDepot Center Contest", autoRoutines::leftShortDepotCenterContest);
+    autonChooser.addRoutine("Left DblLong Center Contest", autoRoutines::leftDblLongCenterContest);
+    autonChooser.addRoutine(
+        "Left LongDepot Center Contest", autoRoutines::leftLongDepotCenterContest);
+
+    autonChooser.addRoutine(
+        "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+    autonChooser.addRoutine(
+        "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
+    autonChooser.addRoutine(
+        "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
+    autonChooser.addRoutine(
+        "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
+    autonChooser.addRoutine("Right LongHP Center Contest", autoRoutines::rightLongHPCenterContest);
+
+    autonChooser.addRoutine(
+        "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
+    autonChooser.addRoutine(
+        "Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
+    autonChooser.addRoutine(
+        "Right Short Climb Center Contest", autoRoutines::rightShortClimbCenterContest);
+    autonChooser.addRoutine(
+        "Right Long Climb Center Contest", autoRoutines::rightLongClimbCenterContest);
+
+    autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
+    autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
+
+    autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
+    autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
+
     SmartDashboard.putData("Auton Chooser", autonChooser);
 
+    RobotModeTriggers.autonomous().whileTrue(autonChooser.selectedCommandScheduler());
+    // Init SysId object
+    sysIdChooser = new LoggedDashboardChooser<>("SysId Choices", AutoBuilder.buildAutoChooser());
+
     // Set up SysId routines
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Quasistatic Reverse)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     // Create the SysId routine
     var sysIdRoutine =
@@ -209,15 +245,15 @@ public class RobotContainer {
                 (voltage) -> turret.setVoltage(voltage.in(Volts)),
                 null, // No log consumer, since data is recorded by AdvantageKit
                 turret));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Quasistatic Forward)",
         sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Quasistatic Reverse)",
         sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Dynamic Forward)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Dynamic Reverse)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
     // Configure the button bindings
     configureButtonBindings();
@@ -331,7 +367,9 @@ public class RobotContainer {
                     .getSimulatedDriveTrainPose()
                     .plus(
                         new Transform2d(
-                            0.13, -0.2, new Rotation2d(turret.currentPosition * 2 * Math.PI))))
+                            0.13,
+                            -0.2,
+                            new Rotation2d(turret.getTurretCurrentPosition() * 2 * Math.PI))))
             .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
     Logger.recordOutput(
         "Hood/simulatedPose",
@@ -340,9 +378,12 @@ public class RobotContainer {
                     .getSimulatedDriveTrainPose()
                     .plus(
                         new Transform2d(
-                            0.13, -0.2, new Rotation2d(turret.currentPosition * 2 * Math.PI))))
+                            0.13,
+                            -0.2,
+                            new Rotation2d(turret.getTurretCurrentPosition() * 2 * Math.PI))))
             .plus(
-                new Transform3d(0, 0, 0.3, new Rotation3d(0, hood.hoodAngle * Math.PI / 180, 0))));
+                new Transform3d(
+                    0, 0, 0.3, new Rotation3d(0, hood.getHoodAngle() * Math.PI / 180, 0))));
     Logger.recordOutput(
         "Turret/targetPose",
         new Pose3d(
@@ -350,7 +391,9 @@ public class RobotContainer {
                     .getSimulatedDriveTrainPose()
                     .plus(
                         new Transform2d(
-                            0.13, -0.2, new Rotation2d(turret.targetPosition * 2 * Math.PI))))
+                            0.13,
+                            -0.2,
+                            new Rotation2d(turret.getTurretTargetPosition() * 2 * Math.PI))))
             .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
   }
 }
