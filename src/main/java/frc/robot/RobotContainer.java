@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
@@ -246,7 +247,7 @@ public class RobotContainer {
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
+        DriveCommands.joystickDriveWithBumpAutoalign(
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
@@ -266,15 +267,17 @@ public class RobotContainer {
     // Shooter Binds
     controller.lb.whileTrue(turret.moveCommand(true));
     controller.rb.whileTrue(turret.moveCommand(false));
-    // controller.rt.whileTrue(
-    //     ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 80));
     controller.rt.whileTrue(
-        CommandFactory.shootCommand(
-            flywheel, tunnel, hopper, () -> flywheel.flywheelSpeedEntry.getAsDouble() * 90));
+        ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 60));
+    // controller.rt.whileTrue(
+    //     CommandFactory.shootCommand(
+    //         flywheel, tunnel, hopper, () -> flywheel.flywheelSpeedEntry.getAsDouble() * 90));
     controller.povLeft.whileTrue(hood.moveCommand(true));
     controller.povRight.whileTrue(hood.moveCommand(false));
-    controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
-
+    controller.yButton.whileTrue(
+        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getPose(), 60));
+    // controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
+    controller.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
     // Climber Binds
     controller.povUp.whileTrue(climber.upCommand());
     controller.povDown.whileTrue(climber.downCommand());

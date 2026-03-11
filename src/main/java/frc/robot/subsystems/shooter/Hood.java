@@ -27,10 +27,9 @@ import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Hood extends SubsystemBase {
-  private static final double kGearRatio = (9.0 * 15.0 * 10.0) / (48.0 * 30.0 * 15.0);
+  private static final double kGearRatio = (9.0 * 15.0 * 10.0) / (48.0 * 30.0 * 162.767577);
   private static final double kMOI = 0.001; // kg*m^2
   // bottom hood angle: 27.8 deg
-
   private final TalonFX hoodMotor;
 
   final DoubleEntry hoodSpeedEntry;
@@ -39,8 +38,9 @@ public class Hood extends SubsystemBase {
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
           DCMotor.getKrakenX44(1));
-
+  public final double startingHoodAngle = 65;
   public double hoodAngle = 0;
+  public double hoodAngleOffset = startingHoodAngle;
   public double targetAngle = 0;
   public double hoodVelocity = 0.0; // degrees per second (mechanism)
   private static final double kPositionToleranceDeg = 1.0; // degrees
@@ -53,6 +53,8 @@ public class Hood extends SubsystemBase {
   public Hood(int motorId, Mode state) {
     hoodMotor = new TalonFX(motorId);
     isSim = state == Mode.SIM;
+    hoodMotor.setPosition(0);
+
     var talonFXConfigs = new TalonFXConfiguration();
 
     var slot0Configs = talonFXConfigs.Slot0;
@@ -88,12 +90,19 @@ public class Hood extends SubsystemBase {
 
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
+    hoodAngleOffset =
+        startingHoodAngle - hoodMotor.getRotorPosition().getValue().in(Units.Degrees) * kGearRatio;
+
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -10;
     hoodMotor.getConfigurator().apply(talonFXConfigs);
+
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Subsystems/Hood");
     hoodSpeedEntry = intakeTable.getDoubleTopic("hoodSpeed").getEntry(0);
     hoodSpeedEntry.set(0.1);
-
     if (state == Mode.SIM) {
       var talonFXSim = hoodMotor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -103,6 +112,11 @@ public class Hood extends SubsystemBase {
 
   public double getHoodAngle() {
     return hoodAngle;
+  }
+
+  public void zeroHood() {
+    hoodAngleOffset =
+        startingHoodAngle - hoodMotor.getRotorPosition().getValue().in(Units.Degrees) * kGearRatio;
   }
 
   public double getHoodTargetAngle() {
@@ -125,6 +139,7 @@ public class Hood extends SubsystemBase {
     // Convert desired mechanism position (degrees) to motor rotor rotations.
     // mechanism rotations = degrees / 360
     // motor rotations = mechanism rotations / kGearRatio
+    degrees = degrees - startingHoodAngle;
     final PositionVoltage m_request = new PositionVoltage((degrees / 360.0) / kGearRatio);
     hoodMotor.setControl(m_request);
     targetAngle = degrees;
@@ -185,7 +200,8 @@ public class Hood extends SubsystemBase {
     // not sim
     if (!isSim) {
       // Convert motor (rotor) position to hood (mechanism) angle using kGearRatio (mechanism/rotor)
-      hoodAngle = hoodMotor.getRotorPosition().getValue().in(Units.Degrees) * kGearRatio;
+      hoodAngle =
+          hoodAngleOffset + hoodMotor.getRotorPosition().getValue().in(Units.Degrees) * kGearRatio;
       try {
         // Convert motor (rotor) velocity (rotations per second) to hood angular velocity in deg/s
         hoodVelocity = hoodMotor.getRotorVelocity().getValueAsDouble() * 360.0 * kGearRatio;
@@ -193,8 +209,7 @@ public class Hood extends SubsystemBase {
         // ignore if not available
       }
     }
-    Logger.recordOutput("Hood/currentAngle", hoodAngle);
-    Logger.recordOutput("Hood/targetAngle", targetAngle);
+    Logger.recordOutput("Hood/currentAngle", targetAngle);
   }
 
   @Override
