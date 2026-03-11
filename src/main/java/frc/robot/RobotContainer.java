@@ -85,7 +85,8 @@ public class RobotContainer {
   private SwerveDriveSimulation driveSimulation = null;
 
   // Controller
-  private final VorTXControllerXbox controller = new VorTXControllerXbox(0);
+  private final VorTXControllerXbox driverController = new VorTXControllerXbox(0);
+  private final VorTXControllerXbox operatorController = new VorTXControllerXbox(1);
 
   // Auton
   private final AutoFactory autoFactory;
@@ -285,9 +286,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDriveWithBumpAutoalign(
                 drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> -controller.getRightX())
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX())
             .withName("joystick drive"));
 
     // Reset gyro / odometry
@@ -296,41 +297,42 @@ public class RobotContainer {
             ? () -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())
             : () ->
                 drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
-    controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
+    driverController.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
     // Set bindings
 
     // Shooter Binds
-    controller.lb.whileTrue(turret.moveCommand(true));
-    controller.rb.whileTrue(turret.moveCommand(false));
-    controller.rt.whileTrue(
+    driverController.lb.whileTrue(turret.moveCommand(true));
+    driverController.rb.whileTrue(turret.moveCommand(false));
+    driverController.rt.whileTrue(
         ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 60));
     // controller.rt.whileTrue(
     //     CommandFactory.shootCommand(
     //         flywheel, tunnel, hopper, () -> flywheel.flywheelSpeedEntry.getAsDouble() * 90));
-    controller.povLeft.whileTrue(hood.moveCommand(true));
-    controller.povRight.whileTrue(hood.moveCommand(false));
-    controller.yButton.whileTrue(
+    driverController.povLeft.whileTrue(hood.moveCommand(true));
+    driverController.povRight.whileTrue(hood.moveCommand(false));
+    driverController.yButton.whileTrue(
         ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getPose(), 60));
-    // controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
-    controller.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
+
+    // Operator Shooter Binds
+    operatorController.lb.whileTrue(turret.moveCommand(true));
+    operatorController.rb.whileTrue(turret.moveCommand(false));
+    operatorController.povLeft.whileTrue(hood.moveCommand(true));
+    operatorController.povRight.whileTrue(hood.moveCommand(false));
+
     // Climber Binds
-    controller.povUp.whileTrue(climber.upCommand());
-    controller.povDown.whileTrue(climber.downCommand());
+    driverController.povUp.whileTrue(climber.upCommand());
+    driverController.povDown.whileTrue(climber.downCommand());
 
     // Intake Binds
-    controller.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
-    controller.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
-
-    controller.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
+    driverController.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
+    driverController.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
+    driverController.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
 
     // Test/Misc Binds
-    // controller.povUp.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
-    // controller.povDown.whileTrue(new RunCommand(() -> turret.setVoltageNetworkTable(), turret));
-
-    controller.view.onTrue(new InstantCommand(() -> turret.zero()));
-    // controller.menu.onTrue(drive.runOnce(() -> drive.))
-    controller.menu.onTrue(new InstantCommand(() -> drive.zeroDriveTrain()));
+    driverController.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
+    driverController.view.onTrue(new InstantCommand(() -> turret.zero()));
+    driverController.menu.onTrue(new InstantCommand(() -> drive.zeroDriveTrain()));
   }
 
   /**

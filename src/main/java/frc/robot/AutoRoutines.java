@@ -21,8 +21,12 @@ public class AutoRoutines {
         .bind("outtake", CommandFactory.outtakeCommand(m_container.intake, m_container.hopper))
         .bind(
             "shoot",
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
   }
 
   public AutoRoutine exampleRoutine() {
@@ -84,12 +88,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -133,12 +143,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBackShort
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBackShort
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBackShort.doneDelayed(3.5).onTrue(reset.cmd());
@@ -159,12 +175,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBackLong
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBackLong
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     return routine;
   }
@@ -197,12 +219,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -219,12 +247,18 @@ public class AutoRoutines {
 
     shootAfterDepot
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     shootAfterDepot
         .doneFor(5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     return routine;
   }
@@ -252,12 +286,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -296,12 +336,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -318,12 +364,18 @@ public class AutoRoutines {
 
     shootAfterDepot
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     shootAfterDepot
         .doneFor(5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     return routine;
   }
@@ -351,12 +403,18 @@ public class AutoRoutines {
     // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
     driveBack.doneDelayed(5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -387,12 +445,18 @@ public class AutoRoutines {
     // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
     driveBack.doneDelayed(5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -424,12 +488,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -473,12 +543,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBackShort
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBackShort
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBackShort.doneDelayed(3.5).onTrue(reset.cmd());
@@ -499,12 +575,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBackLong
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBackLong
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     return routine;
   }
@@ -536,12 +618,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -553,12 +641,18 @@ public class AutoRoutines {
 
     shootAfterHP
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     shootAfterHP
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     return routine;
   }
@@ -586,12 +680,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -629,12 +729,18 @@ public class AutoRoutines {
     // i hope this works! supposed to shoot 5 seconds after robot drives back
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -646,12 +752,18 @@ public class AutoRoutines {
 
     shootAfterHP
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     shootAfterHP
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     return routine;
   }
@@ -679,12 +791,18 @@ public class AutoRoutines {
     // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
     driveBack.doneDelayed(5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -715,12 +833,18 @@ public class AutoRoutines {
     // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
     driveBack
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     driveBack
         .doneFor(5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
     driveBack.doneDelayed(5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -746,12 +870,18 @@ public class AutoRoutines {
 
     shootAfterDepot
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     shootAfterDepot
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     return routine;
   }
@@ -775,12 +905,18 @@ public class AutoRoutines {
 
     shootAfterDepot
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     shootAfterDepot
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
     shootAfterDepot.doneDelayed(3.5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -800,12 +936,18 @@ public class AutoRoutines {
 
     shootAfterHP
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     shootAfterHP
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
 
     return routine;
   }
@@ -823,12 +965,18 @@ public class AutoRoutines {
 
     shootAfterHP
         .done()
-        .onTrue(ShooterCommands.AimToHub(m_container.turret, () -> m_container.drive.getPose()));
+        .onTrue(
+            ShooterCommands.AimEverythingToHub(
+                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
     shootAfterHP
         .doneFor(3.5)
         .whileTrue(
-            CommandFactory.manualShootCommand(
-                m_container.flywheel, m_container.hopper, m_container.tunnel));
+            ShooterCommands.ShootFromDistance(
+                m_container.flywheel,
+                m_container.hopper,
+                m_container.tunnel,
+                () -> m_container.drive.getPose(),
+                60));
     shootAfterHP.doneDelayed(3.5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
