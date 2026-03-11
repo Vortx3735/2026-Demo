@@ -383,7 +383,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   @AutoLogOutput(key = "Shooter/turretPose")
-  public Pose3d getHoodPose() {
+  public Pose3d getTurretPose() {
     Pose2d drivePose = poseEstimator.getEstimatedPosition();
     // robot to hood transform  x:-10.135-0.51 y:13.866-2.885 z:18.126 (inches)
     return new Pose3d(drivePose)
