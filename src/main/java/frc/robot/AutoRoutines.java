@@ -1009,4 +1009,25 @@ public class AutoRoutines {
     climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
     return routine;
   }
+
+  public AutoRoutine standstill() {
+    final AutoRoutine routine = m_factory.newRoutine("standstill");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.parallel(
+                ShooterCommands.AimEverythingToHub(
+                    m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 70),
+                Commands.sequence(
+                    new WaitCommand(3),
+                    ShooterCommands.ShootFromDistance(
+                        m_container.flywheel,
+                        m_container.hopper,
+                        m_container.tunnel,
+                        () -> m_container.drive.getTurretPose(),
+                        70))));
+
+    return routine;
+  }
 }

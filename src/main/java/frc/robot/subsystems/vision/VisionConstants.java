@@ -45,16 +45,16 @@ public class VisionConstants {
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI)));
   public static Transform3d rightCameraTransform =
       new Transform3d(
-          Inches.of(-((1.829+3.115)/2)),
-          Inches.of((13.591+14.943)/2),
-          Inches.of(18.16+3.57),
+          Inches.of(-((1.829 + 3.115) / 2)),
+          Inches.of((13.591 + 14.943) / 2),
+          Inches.of(18.16 + 3.57),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI * 3.0 / 2.0)));
   public static Transform3d leftCameraTransform =
       new Transform3d(
-          Inches.of((1.881+3.269)/2),
-          Inches.of((13.662+15.152)/2),
-          Inches.of(10.332+3.57),
+          Inches.of((1.881 + 3.269) / 2),
+          Inches.of((13.662 + 15.152) / 2),
+          Inches.of(10.332 + 3.57),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0)));
 
