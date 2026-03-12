@@ -38,7 +38,7 @@ public class Hood extends SubsystemBase {
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
           DCMotor.getKrakenX44(1));
-  public final double startingHoodAngle = 65;
+  public final double startingHoodAngle = 70;
   public double hoodAngle = 0;
   public double hoodAngleOffset = startingHoodAngle;
   public double targetAngle = 0;

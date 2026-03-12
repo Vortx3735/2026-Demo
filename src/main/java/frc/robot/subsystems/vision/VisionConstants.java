@@ -32,29 +32,29 @@ public class VisionConstants {
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d frontCameraTransform =
       new Transform3d(
-          Inches.of(((10.592370+12.090440)/2)),
+          Inches.of(((10.592370 + 12.090440) / 2)),
           Inches.of(0.4),
           Inches.of(15.651053),
           new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0));
   public static Transform3d backCameraTransform =
       new Transform3d(
-          Inches.of(-((11.3+12.77)/2)),
-          Inches.of(-((6.21+4.9)/2)),
-          Inches.of(16.052+3.57),
-          new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
+          Inches.of(-((11.3 + 12.77) / 2)),
+          Inches.of(-((6.21 + 4.9) / 2)),
+          Inches.of(16.052 + 3.57),
+          new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI)));
   public static Transform3d rightCameraTransform =
       new Transform3d(
-          Inches.of(-2.458),
-          Inches.of(-14.702),
-          Inches.of(21.460),
+          Inches.of(-((1.829+3.115)/2)),
+          Inches.of((13.591+14.943)/2),
+          Inches.of(18.16+3.57),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI * 3.0 / 2.0)));
   public static Transform3d leftCameraTransform =
       new Transform3d(
-          Inches.of(-2.594),
-          Inches.of(13.962),
-          Inches.of(19.468),
+          Inches.of((1.881+3.269)/2),
+          Inches.of((13.662+15.152)/2),
+          Inches.of(10.332+3.57),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0)));
 

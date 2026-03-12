@@ -18,6 +18,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -98,6 +99,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    SignalLogger.start();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -213,6 +216,8 @@ public class RobotContainer {
     autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
     autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
 
+    autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
+
     SmartDashboard.putData("Auton Chooser", autonChooser);
 
     RobotModeTriggers.autonomous().whileTrue(autonChooser.selectedCommandScheduler());
@@ -256,6 +261,7 @@ public class RobotContainer {
         "turret SysId (Dynamic Forward)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
     sysIdChooser.addOption(
         "turret SysId (Dynamic Reverse)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -284,7 +290,7 @@ public class RobotContainer {
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDriveWithBumpAutoalign(
+        DriveCommands.joystickDrive(
                 drive,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
@@ -305,29 +311,34 @@ public class RobotContainer {
     driverController.lb.whileTrue(turret.moveCommand(true));
     driverController.rb.whileTrue(turret.moveCommand(false));
     driverController.rt.whileTrue(
-        ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 60));
+        ShooterCommands.ShootFromDistance(
+            flywheel, hopper, tunnel, () -> drive.getTurretPose(), 65));
     // controller.rt.whileTrue(
     //     CommandFactory.shootCommand(
     //         flywheel, tunnel, hopper, () -> flywheel.flywheelSpeedEntry.getAsDouble() * 90));
     driverController.povLeft.whileTrue(hood.moveCommand(true));
     driverController.povRight.whileTrue(hood.moveCommand(false));
     driverController.yButton.whileTrue(
-        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getPose(), 60));
+        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), 65));
 
     // Operator Shooter Binds
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povLeft.whileTrue(hood.moveCommand(true));
     operatorController.povRight.whileTrue(hood.moveCommand(false));
-    
-    operatorController.aButton.toggleOnTrue(DriveCommands.joystickDriveAtAngle(drive, () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),()->new Rotation2d(0)));
+
+    operatorController.aButton.toggleOnTrue(
+        DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> new Rotation2d(0)));
     // Climber Binds
     driverController.povUp.whileTrue(climber.upCommand());
     driverController.povDown.whileTrue(climber.downCommand());
 
     // Intake Binds
-    driverController.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
+    driverController.xButton.toggleOnTrue(CommandFactory.intakeCommand(intake, hopper));
     driverController.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
     driverController.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
 

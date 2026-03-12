@@ -4,6 +4,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.ShooterCommands;
 
@@ -948,6 +949,31 @@ public class AutoRoutines {
                 m_container.tunnel,
                 () -> m_container.drive.getPose(),
                 60));
+
+    return routine;
+  }
+
+  public AutoRoutine hpSimple() {
+    final AutoRoutine routine = m_factory.newRoutine("hpRight");
+    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
+
+    routine.active().onTrue(Commands.sequence(moveToHP.resetOdometry(), moveToHP.cmd()));
+
+    // move to shooting position 2s after it gets there. gives human player some time
+    moveToHP
+        .done()
+        .onTrue(
+            Commands.parallel(
+                ShooterCommands.AimEverythingToHub(
+                    m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 70),
+                Commands.sequence(
+                    new WaitCommand(3),
+                    ShooterCommands.ShootFromDistance(
+                        m_container.flywheel,
+                        m_container.hopper,
+                        m_container.tunnel,
+                        () -> m_container.drive.getTurretPose(),
+                        70))));
 
     return routine;
   }

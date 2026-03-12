@@ -84,7 +84,10 @@ public class ShooterCommands {
 
     // 4. Recovery/Efficiency Factor (Adjust based on testing)
     // Most FRC shooters lose ~10-15% to slip/compression
-    double efficiencyFactor = 1;
+    double efficiencyFactor = 1.0;
+    if (xs > 10) {
+      efficiencyFactor += 0.1;
+    }
     Logger.recordOutput("Shooter/calculatedShooterRPS", rps * efficiencyFactor);
     return rps * efficiencyFactor;
   }

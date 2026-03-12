@@ -49,6 +49,7 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
   private DriveCommands() {}
+
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
     double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
