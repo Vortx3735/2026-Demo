@@ -350,9 +350,9 @@ public class RobotContainer {
 
     // Intake Binds
     driverController.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
-    driverController.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
+    driverController.bButton.whileTrue(intake.outtakeCommand());
     driverController.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
-
+    
     // Test/Misc Binds
     driverController.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
     driverController.view.onTrue(new InstantCommand(() -> turret.zero()));
