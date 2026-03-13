@@ -349,7 +349,7 @@ public class RobotContainer {
     driverController.povDown.whileTrue(climber.downCommand());
 
     // Intake Binds
-    driverController.xButton.toggleOnTrue(CommandFactory.intakeCommand(intake, hopper));
+    driverController.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
     driverController.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
     driverController.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
 
