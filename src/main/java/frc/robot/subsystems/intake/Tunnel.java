@@ -28,6 +28,21 @@ public class Tunnel extends SubsystemBase {
     TalonFXConfiguration topMotorConfig = new TalonFXConfiguration();
     bottomMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     topMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    // var bottomCurrentLimits = bottomMotorConfig.CurrentLimits;
+
+    // bottomCurrentLimits.SupplyCurrentLimitEnable = true;
+    // bottomCurrentLimits.SupplyCurrentLimit = 300;
+    // bottomCurrentLimits.StatorCurrentLimitEnable = true;
+    // bottomCurrentLimits.StatorCurrentLimit = 300;
+
+    // var topCurrentLimit = bottomMotorConfig.CurrentLimits;
+
+    // topCurrentLimits.SupplyCurrentLimitEnable = true;
+    // topCurrentLimits.SupplyCurrentLimit = 300;
+    // topCurrentLimits.StatorCurrentLimitEnable = true;
+    // topCurrentLimits.StatorCurrentLimit = 300;
+
     bottomTunnelMotor.getConfigurator().apply(bottomMotorConfig);
     topTunnelMotor.getConfigurator().apply(topMotorConfig);
 
@@ -85,7 +100,12 @@ public class Tunnel extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    // Logger.recordOutput("Tunnel/bottomStatorCurrent",
+    // bottomTunnelMotorMotor.getStatorCurrent().getValueAsDouble());
+    // Logger.recordOutput("Tunnel/supplyCurrent",
+    // topTunnelMotor.getStatorCurrent().getValueAsDouble());
+  }
 
   @Override
   public void simulationPeriodic() {

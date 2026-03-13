@@ -29,10 +29,18 @@ public class Intake extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable intakeTable = inst.getTable("Subsystems/Intake");
     intakeSpeedEntry = intakeTable.getDoubleTopic("intakeSpeed").getEntry(0);
-    intakeSpeedEntry.set(0.3);
+    intakeSpeedEntry.set(1);
 
     TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
     intakeConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    // var currentLimits = intakeConfig.CurrentLimits;
+
+    // currentLimits.SupplyCurrentLimitEnable = true;
+    // currentLimits.SupplyCurrentLimit = 300;
+    // currentLimits.StatorCurrentLimitEnable = true;
+    // currentLimits.StatorCurrentLimit = 300;
+
     intakeMotor.getConfigurator().apply(intakeConfig);
   }
 
@@ -54,6 +62,10 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  public void setSpeed(double speed) {
+    intakeMotor.set(speed);
+  }
+
   public void stop() {
     intakeMotor.set(0);
   }
@@ -71,7 +83,12 @@ public class Intake extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    // Logger.recordOutput("Intake/statorCurrent",
+    // intakeMotor.getStatorCurrent().getValueAsDouble());
+    // Logger.recordOutput("Intake/supplyCurrent",
+    // intakeMotor.getStatorCurrent().getValueAsDouble());
+  }
 
   @Override
   public void simulationPeriodic() {

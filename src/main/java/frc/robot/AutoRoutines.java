@@ -4,6 +4,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.ShooterCommands;
@@ -24,10 +25,11 @@ public class AutoRoutines {
             "shoot",
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
   }
 
   public AutoRoutine exampleRoutine() {
@@ -56,8 +58,13 @@ public class AutoRoutines {
                 m_container.drive.stopCommand(),
                 CommandFactory.intakeCommand(m_container.intake, m_container.hopper),
                 // Run flywheel then stop
-                CommandFactory.shootCommand(
-                    m_container.flywheel, m_container.tunnel, m_container.hopper, () -> 40.0)));
+                ShooterCommands.ShootFromDistance(
+                    m_container.flywheel,
+                    m_container.tunnel,
+                    m_container.hopper,
+                    m_container.intake,
+                    () -> m_container.drive.getTurretPose(),
+                    65)));
     // Stop intake and indexer
     // m_container.intake.stopCommand(),
     // m_container.hopper.stopCommand();
@@ -97,10 +104,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -152,10 +160,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBackShort.doneDelayed(3.5).onTrue(reset.cmd());
@@ -184,10 +193,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     return routine;
   }
@@ -228,10 +238,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -256,10 +267,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     return routine;
   }
@@ -295,10 +307,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -345,10 +358,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -373,10 +387,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     return routine;
   }
@@ -412,10 +427,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
     driveBack.doneDelayed(5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -454,10 +470,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
     driveBack.doneDelayed(5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -497,10 +514,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -552,10 +570,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBackShort.doneDelayed(3.5).onTrue(reset.cmd());
@@ -584,10 +603,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     return routine;
   }
@@ -627,10 +647,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -650,10 +671,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     return routine;
   }
@@ -689,10 +711,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -738,10 +761,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     // reset
     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
@@ -761,10 +785,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     return routine;
   }
@@ -800,10 +825,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
     driveBack.doneDelayed(5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -842,10 +868,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
     driveBack.doneDelayed(5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -879,10 +906,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     return routine;
   }
@@ -914,10 +942,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
     shootAfterDepot.doneDelayed(3.5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
@@ -945,10 +974,11 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
 
     return routine;
   }
@@ -970,10 +1000,11 @@ public class AutoRoutines {
                     new WaitCommand(3),
                     ShooterCommands.ShootFromDistance(
                         m_container.flywheel,
-                        m_container.hopper,
                         m_container.tunnel,
+                        m_container.hopper,
+                        m_container.intake,
                         () -> m_container.drive.getTurretPose(),
-                        70))));
+                        65))));
 
     return routine;
   }
@@ -999,14 +1030,98 @@ public class AutoRoutines {
         .whileTrue(
             ShooterCommands.ShootFromDistance(
                 m_container.flywheel,
-                m_container.hopper,
                 m_container.tunnel,
-                () -> m_container.drive.getPose(),
-                60));
+                m_container.hopper,
+                m_container.intake,
+                () -> m_container.drive.getTurretPose(),
+                65));
     shootAfterHP.doneDelayed(3.5).onTrue(climb.cmd());
 
     // 7s delay bc im not tryna climb too early yk
     climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
+    return routine;
+  }
+
+  public AutoRoutine standstill() {
+    final AutoRoutine routine = m_factory.newRoutine("standstill");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.race(
+                    new InstantCommand(() -> m_container.turret.zero()), new WaitCommand(0.1)),
+                Commands.race(
+                    new InstantCommand(() -> m_container.hood.zeroHood()), new WaitCommand(0.1)),
+                Commands.parallel(
+                    ShooterCommands.AimEverythingToHub(
+                        m_container.turret,
+                        m_container.hood,
+                        () -> m_container.drive.getPose(),
+                        65),
+                    Commands.sequence(
+                        new WaitCommand(1),
+                        ShooterCommands.ShootFromDistance(
+                            m_container.flywheel,
+                            m_container.tunnel,
+                            m_container.hopper,
+                            m_container.intake,
+                            () -> m_container.drive.getTurretPose(),
+                            65)))));
+
+    return routine;
+  }
+
+  public AutoRoutine standstillunjam() {
+    final AutoRoutine routine = m_factory.newRoutine("standstill");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.race(
+                    new InstantCommand(() -> m_container.turret.zero()), new WaitCommand(0.1)),
+                Commands.race(
+                    new InstantCommand(() -> m_container.hood.zeroHood()), new WaitCommand(0.1)),
+                Commands.parallel(
+                    ShooterCommands.AimEverythingToHub(
+                        m_container.turret,
+                        m_container.hood,
+                        () -> m_container.drive.getPose(),
+                        65),
+                    Commands.sequence(
+                        new WaitCommand(1),
+                        ShooterCommands.ShootFromDistance(
+                                m_container.flywheel,
+                                m_container.tunnel,
+                                m_container.hopper,
+                                m_container.intake,
+                                () -> m_container.drive.getTurretPose(),
+                                65)
+                            .withTimeout(4),
+                        CommandFactory.clearJamsCommand(m_container.tunnel, m_container.hopper)
+                            .withTimeout(1),
+                        ShooterCommands.ShootFromDistance(
+                                m_container.flywheel,
+                                m_container.tunnel,
+                                m_container.hopper,
+                                m_container.intake,
+                                () -> m_container.drive.getTurretPose(),
+                                65)
+                            .withTimeout(4),
+                        CommandFactory.clearJamsCommand(m_container.tunnel, m_container.hopper)
+                            .withTimeout(1),
+                        ShooterCommands.ShootFromDistance(
+                                m_container.flywheel,
+                                m_container.tunnel,
+                                m_container.hopper,
+                                m_container.intake,
+                                () -> m_container.drive.getTurretPose(),
+                                65)
+                            .withTimeout(4),
+                        CommandFactory.clearJamsCommand(m_container.tunnel, m_container.hopper)
+                            .withTimeout(1)))));
+
     return routine;
   }
 }

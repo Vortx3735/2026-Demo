@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.intake.*;
 import frc.robot.subsystems.shooter.*;
@@ -21,12 +22,22 @@ public class CommandFactory {
         .withName("manual shoot command group");
   }
 
+  public static Command manualShootCommandAtSpeed(
+      Flywheel flywheel, Hopper hopper, Tunnel tunnel, Supplier<Double> speed) {
+    return Commands.parallel(
+            flywheel.shootCommand(speed.get()),
+            Commands.sequence(
+                new WaitUntilCommand(flywheel.isAtSpeed()),
+                Commands.parallel(hopper.intakeCommand(), tunnel.intakeCommand())))
+        .withName("manual shoot command group");
+  }
+
   public static Command shootCommand(
-      Flywheel flywheel, Tunnel tunnel, Hopper hopper, Supplier<Double> targetRPS) {
+      Flywheel flywheel, Tunnel tunnel, Hopper hopper, Intake intake, Supplier<Double> targetRPS) {
     return Commands.parallel(
             flywheel.shootCommand(targetRPS),
             hopper.intakeCommand(),
-            // Commands.either(tunnel.intakeCommand(), tunnel.stopCommand(), flywheel.isAtSpeed()))
+            new RunCommand(() -> intake.setSpeed(1), intake),
             Commands.sequence(new WaitUntilCommand(flywheel.isAtSpeed()), tunnel.intakeCommand()))
         .withName("shoot command group");
   }

@@ -146,6 +146,13 @@ public class Turret extends SubsystemBase {
     return () -> Math.abs(targetPosition - currentPosition) < kTurretPositionTolerance;
   }
 
+  public BooleanSupplier hitLimit() {
+    return () ->
+        !(targetPosition < 0.5 && targetPosition > 0.0)
+            && (Math.abs(0.5 - currentPosition) < kTurretPositionTolerance
+                || Math.abs(0.0 - currentPosition) < kTurretPositionTolerance);
+  }
+
   public void set(double s) {
     turretMotor.set(s);
   }
