@@ -317,6 +317,7 @@ public class RobotContainer {
     driverController.rt.whileTrue(
         ShooterCommands.ShootFromDistance(
             flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), 65));
+    driverController.lt.whileTrue(CommandFactory.runTunnelWithoutHopper(tunnel, hopper));
     // controller.rt.whileTrue(
     //     CommandFactory.shootCommand(
     //         flywheel, tunnel, hopper, () -> flywheel.flywheelSpeedEntry.getAsDouble() * 90));
@@ -326,10 +327,12 @@ public class RobotContainer {
         ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), 65));
 
     // Operator Shooter Binds
-    operatorController.bButton.onTrue(new InstantCommand(()->ShooterCommands.offset+=0.01));
-    operatorController.xButton.onTrue(new InstantCommand(()->ShooterCommands.offset-=0.01));
-    operatorController.yButton.onTrue(new InstantCommand(()->ShooterCommands.efficiencyFactor+=0.01));
-    operatorController.aButton.onTrue(new InstantCommand(()->ShooterCommands.efficiencyFactor-=0.01));
+    operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
+    operatorController.xButton.onTrue(new InstantCommand(() -> ShooterCommands.offset -= 0.01));
+    operatorController.yButton.onTrue(
+        new InstantCommand(() -> ShooterCommands.efficiencyFactor += 0.01));
+    operatorController.aButton.onTrue(
+        new InstantCommand(() -> ShooterCommands.efficiencyFactor -= 0.01));
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povDown.whileTrue(hood.moveCommand(false));
@@ -352,7 +355,7 @@ public class RobotContainer {
     driverController.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
     driverController.bButton.whileTrue(intake.outtakeCommand());
     driverController.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
-    
+
     // Test/Misc Binds
     driverController.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
     driverController.view.onTrue(new InstantCommand(() -> turret.zero()));

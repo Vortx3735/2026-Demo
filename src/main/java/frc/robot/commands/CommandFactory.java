@@ -56,4 +56,9 @@ public class CommandFactory {
     return Commands.parallel(tunnel.outtakeCommand(), hopper.outtakeCommand())
         .withName("clear jams");
   }
+
+  public static Command runTunnelWithoutHopper(Tunnel tunnel, Hopper hopper) {
+    return Commands.parallel(tunnel.intakeCommand(), hopper.outtakeCommand())
+        .withName("clear jams");
+  }
 }
