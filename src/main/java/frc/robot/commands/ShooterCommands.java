@@ -207,6 +207,29 @@ public class ShooterCommands {
         .withName("ShootFromDistance");
   }
 
+  public static Command ShootFromDistanceBackwardsHopper(
+      Flywheel flywheel,
+      Tunnel tunnel,
+      Hopper hopper,
+      Intake intake,
+      Supplier<Pose2d> poseSupplier,
+      double theta) {
+    // create a supplier that computes target RPS from the live robot pose
+    Supplier<Double> targetRpsSupplier =
+        () -> {
+          Pose2d rp = poseSupplier.get();
+          Pose2d hp = getAllianceHubPose();
+          double liveXs = getDistanceToHub(rp, hp);
+          Logger.recordOutput("Shooter/Distance", liveXs);
+          return calculateShooterRPS(liveXs, theta);
+        };
+
+    return Commands.deadline(
+            CommandFactory.shootCommandBackwardsHopper(
+                flywheel, tunnel, hopper, intake, targetRpsSupplier))
+        .withName("ShootFromDistance");
+  }
+
   public static Command AimToSide(Turret turret, Supplier<Pose2d> poseSupplier) {
     Supplier<Pose2d> hubPoseSupplier = () -> chooseSideHubPose(poseSupplier.get());
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier);
