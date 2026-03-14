@@ -339,10 +339,10 @@ public class RobotContainer {
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povDown.whileTrue(hood.moveCommand(false));
     operatorController.povUp.whileTrue(hood.moveCommand(true));
+    operatorController.lt.whileTrue(
+        CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     operatorController.rt.whileTrue(
-        CommandFactory.manualShootCommandAtSpeed(
-            flywheel, hopper, tunnel, () -> -operatorController.getTrueLeftY()));
-    operatorController.lt.whileTrue(CommandFactory.manualShootCommand(flywheel, hopper, tunnel));
+        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), 65));
     operatorController.aButton.toggleOnTrue(
         DriveCommands.joystickDriveAtAngle(
             drive,
