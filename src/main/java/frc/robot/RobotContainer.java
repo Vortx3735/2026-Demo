@@ -204,7 +204,25 @@ public class RobotContainer {
     //     "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
     // autonChooser.addRoutine("Right LongHP Center Contest",
     // autoRoutines::rightLongHPCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
+    // autonChooser.addRoutine("Right LongHP Center Contest",
+    // autoRoutines::rightLongHPCenterContest);
 
+    // autonChooser.addRoutine(
+    //     "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right Short Climb Center Contest", autoRoutines::rightShortClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right Long Climb Center Contest", autoRoutines::rightLongClimbCenterContest);
     // autonChooser.addRoutine(
     //     "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
     // autonChooser.addRoutine(
@@ -216,10 +234,15 @@ public class RobotContainer {
 
     // autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
     // autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
+    // autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
+    // autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
 
     // autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
     // autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
+    // autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
+    // autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
 
+    // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
     // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
 
     SmartDashboard.putData("Auton Chooser", autonChooser);
