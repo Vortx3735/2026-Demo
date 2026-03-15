@@ -158,6 +158,29 @@ public class ShooterCommands {
         .withName("turret aim");
   }
 
+  public static Command AimEverything(Turret turret, Hood hood, Supplier<Pose2d> poseSupplier) {
+    // create a supplier that computes target RPS from the live robot pose
+
+    Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
+
+    // While shooting, continuously aim the turret and hold the hood at the desired angle.
+    // The flywheel shoot command acts as the deadline: when it finishes, aiming/hood are
+    // interrupted.
+    return Commands.run(
+            () -> {
+              Pose2d rp = poseSupplier.get();
+              Pose2d hp = hubPoseSupplier.get();
+              double angleRelative = getAngleRelativeToHub(rp, hp);
+              double rotations = angleRelative / (2 * Math.PI);
+              turret.setPositionPID(rotations);
+            },
+            turret)
+        // .until(turret.isFinished())
+
+        // hood.setPositionPIDCommand(theta))
+        .withName("AimEverythingNoHood");
+  }
+
   public static Command AimEverythingToHub(
       Turret turret, Hood hood, Supplier<Pose2d> poseSupplier, double theta) {
     // create a supplier that computes target RPS from the live robot pose

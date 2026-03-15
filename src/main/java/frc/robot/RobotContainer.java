@@ -317,17 +317,18 @@ public class RobotContainer {
     driverController.rt.whileTrue(
         ShooterCommands.ShootFromDistance(
             flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), 65));
-    driverController.lt.whileTrue(
-        ShooterCommands.ShootFromDistanceBackwardsHopper(
-            flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), 65));
+    // driverController.lt.whileTrue(
+    // ShooterCommands.ShootFromDistanceBackwardsHopper(
+    //     flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), 65));
     // controller.rt.whileTrue(
     //     CommandFactory.shootCommand(
     //         flywheel, tunnel, hopper, () -> flywheel.flywheelSpeedEntry.getAsDouble() * 90));
     driverController.povLeft.whileTrue(hood.moveCommand(true));
     driverController.povRight.whileTrue(hood.moveCommand(false));
-    driverController.yButton.whileTrue(
+    driverController.lt.whileTrue(
         ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), 65));
-
+    driverController.yButton.whileTrue(
+        ShooterCommands.AimEverything(turret, hood, () -> drive.getTurretPose()));
     // Operator Shooter Binds
     operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
     operatorController.xButton.onTrue(new InstantCommand(() -> ShooterCommands.offset -= 0.01));
