@@ -25,6 +25,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -58,7 +61,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
+  final DoubleEntry targetHoodAngleEntry;
+  final DoubleEntry softwareHoodAngleEntry;
+  final DoubleEntry efficiencyFactorEntry;
   // Subsystems
   public final Vision vision;
   public final Drive drive;
@@ -180,7 +185,6 @@ public class RobotContainer {
     autoRoutines = new AutoRoutines(autoFactory, this);
 
     // Set up auto routines
-    autonChooser.addRoutine("Standstill Shoot", autoRoutines::standstill);
     autonChooser.addRoutine("Standstill Shoot Unjam", autoRoutines::standstillunjam);
 
     // autonChooser.addRoutine(
@@ -289,6 +293,18 @@ public class RobotContainer {
     sysIdChooser.addOption(
         "turret SysId (Dynamic Reverse)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
 
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable shooterTable = inst.getTable("Subystems/Shooter");
+    targetHoodAngleEntry = shooterTable.getDoubleTopic("targetHoodAngleEntry").getEntry(65);
+    targetHoodAngleEntry.set(65);
+    softwareHoodAngleEntry = shooterTable.getDoubleTopic("softwareHoodAngleEntry").getEntry(65);
+    softwareHoodAngleEntry.set(65);
+    efficiencyFactorEntry = shooterTable.getDoubleTopic("efficiencyFactorEntry").getEntry(1.03);
+    efficiencyFactorEntry.set(1.03);
+    
+
+
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -339,7 +355,7 @@ public class RobotContainer {
     driverController.rb.whileTrue(turret.moveCommand(false));
     driverController.rt.whileTrue(
         ShooterCommands.ShootFromDistance(
-            flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), 65));
+            flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), softwareHoodAngleEntry.getAsDouble()));
     // driverController.lt.whileTrue(
     // ShooterCommands.ShootFromDistanceBackwardsHopper(
     //     flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), 65));
@@ -349,16 +365,14 @@ public class RobotContainer {
     driverController.povLeft.whileTrue(hood.moveCommand(true));
     driverController.povRight.whileTrue(hood.moveCommand(false));
     driverController.lt.whileTrue(
-        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), 65));
+        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
     driverController.yButton.whileTrue(
         ShooterCommands.AimEverything(turret, hood, () -> drive.getTurretPose()));
     // Operator Shooter Binds
     operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
     operatorController.xButton.onTrue(new InstantCommand(() -> ShooterCommands.offset -= 0.01));
     operatorController.yButton.onTrue(
-        new InstantCommand(() -> ShooterCommands.efficiencyFactor += 0.01));
-    operatorController.aButton.onTrue(
-        new InstantCommand(() -> ShooterCommands.efficiencyFactor -= 0.01));
+        new InstantCommand(() -> ShooterCommands.efficiencyFactor = efficiencyFactorEntry.getAsDouble()));
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povDown.whileTrue(hood.moveCommand(false));
@@ -366,7 +380,7 @@ public class RobotContainer {
     operatorController.lt.whileTrue(
         CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     operatorController.rt.whileTrue(
-        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), 65));
+        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
     operatorController.aButton.toggleOnTrue(
         DriveCommands.joystickDriveAtAngle(
             drive,
