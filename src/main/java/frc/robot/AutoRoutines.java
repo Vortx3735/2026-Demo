@@ -3,6 +3,7 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -61,741 +62,741 @@ public class AutoRoutines {
         Commands.race(new InstantCommand(() -> m_container.hood.zeroHood()), new WaitCommand(0.1)));
   }
 
-  public AutoRoutine exampleRoutine() {
-    // Creates a routine called "example" and loads a trajectory. The trajectory is essentially the
-    // path the robot will take during auton. Look at
-    // https://choreo.autos/usage/editing-paths/#generating for an example.
-    final AutoRoutine routine = m_factory.newRoutine("example");
-    final AutoTrajectory exampleTraj = routine.trajectory("ExampleTraj");
-
-    // If a routine was a method, you could think of this as its body.
-    // The "routine.active())" trigger is essentially the "entrance" to a routine.
-    // Here, you can sequence commands for the routine.
-    routine
-        .active()
-        .onTrue(
-            // Since onTrue only has one parameter, you need to use Commands.sequence to schedule
-            // more than one command.
-            Commands.sequence(
-                // No semicolons! Since you are passing arguments, it is only one statement. A
-                // semicolon only comes at the end of a statement. Also, since you are passing
-                // multiple arguments, you need commas.
-                exampleTraj.resetOdometry(),
-                exampleTraj
-                    .cmd(), // Schedule the trajectory (make the robot move on the trajectory)
-                // Run commands in parallel (at the same time)
-                m_container.drive.stopCommand(),
-                CommandFactory.intakeCommand(m_container.intake, m_container.hopper),
-                // Run flywheel then stop
-                ShooterCommands.ShootFromDistance(
-                    m_container.flywheel,
-                    m_container.tunnel,
-                    m_container.hopper,
-                    m_container.intake,
-                    () -> m_container.drive.getTurretPose(),
-                    65)));
-    // Stop intake and indexer
-    // m_container.intake.stopCommand(),
-    // m_container.hopper.stopCommand();
-
-    return routine;
-  }
-
-  // Contests half of neutral zone then shoots, then does it again
-  public AutoRoutine leftDblShortCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftDblShortCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftShortDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetLeft");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack
-        .done()
-        .onTrue(
-            ShooterCommands.AimEverythingToHub(
-                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
-    driveBack.doneFor(3.5).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(driveToMiddle.cmd());
-
-    // short bindings will call again
-
-    return routine;
-  }
-
-  // Contests half of neutral zone then shoots, then does it again but passes through full neutral
-  // zone
-  public AutoRoutine leftShortLongCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftShortLongCenterContest");
-    final AutoTrajectory driveToMiddleShort = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddleShort =
-        routine.trajectory("LeftShortDriveThroughMiddle");
-    final AutoTrajectory driveBackShort = routine.trajectory("LeftShortDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetLeft");
-
-    // 2 drive to middles for diff binds
-    final AutoTrajectory driveToMiddleLong = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddleLong = routine.trajectory("LeftLongDriveThroughMiddle");
-    final AutoTrajectory driveBackLong = routine.trajectory("LeftLongDriveBack");
-
-    routine
-        .active()
-        .onTrue(Commands.sequence(driveToMiddleShort.resetOdometry(), driveToMiddleShort.cmd()));
-
-    // short
-    driveToMiddleShort
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddleShort.done().onTrue(driveThroughMiddleShort.cmd());
-
-    driveThroughMiddleShort
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddleShort.done().onTrue(driveBackShort.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBackShort.done().onTrue();
-    driveBackShort.doneFor(3.5).whileTrue(shoot());
-
-    // reset
-    driveBackShort.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(driveToMiddleLong.cmd());
-
-    // long
-
-    driveToMiddleLong
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddleLong.done().onTrue(driveThroughMiddleLong.cmd());
-
-    driveThroughMiddleLong
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddleLong.done().onTrue(driveBackLong.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBackLong.done().onTrue();
-    driveBackLong.doneFor(3.5).whileTrue(shoot());
-
-    return routine;
-  }
-
-  // Contests half of neutral zone then shoots, then intakes from HP, then shoots
-  public AutoRoutine leftShortDepotCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftShortDepotCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftShortDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetLeft");
-
-    final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
-    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
-    final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.done().onTrue();
-    driveBack.doneFor(3.5).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(moveToDepot.cmd());
-
-    // depot
-
-    moveToDepot.done().onTrue(moveThroughDepot.cmd());
-
-    moveThroughDepot
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
-
-    shootAfterDepot
-        .done()
-        .onTrue(
-            ShooterCommands.AimEverythingToHub(
-                m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
-    shootAfterDepot.doneFor(5).whileTrue(shoot());
-
-    return routine;
-  }
-
-  // Contests all of neutral zone then shoots
-  public AutoRoutine leftDblLongCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftDblLongCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetLeft");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.done().onTrue();
-    driveBack.doneFor(5).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(driveToMiddle.cmd());
-
-    // long bindings will call again
-
-    return routine;
-  }
-
-  // Contests all of neutral zone then shoots, then then intakes from depot, then shoots
-  public AutoRoutine leftLongDepotCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftShortDepotCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetLeft");
-
-    final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
-    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
-    final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.done().onTrue();
-    driveBack.doneFor(3.5).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(moveToDepot.cmd());
-
-    // depot
-
-    moveToDepot.done().onTrue(moveThroughDepot.cmd());
-
-    moveThroughDepot
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
-
-    shootAfterDepot.done().onTrue();
-    shootAfterDepot.doneFor(5).whileTrue(shoot());
-
-    return routine;
-  }
-
-  // Contests half of neutral zone, shoots, then climbs
-  public AutoRoutine leftShortClimbCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftShortClimbCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftShortDriveBack");
-    final AutoTrajectory climb = routine.trajectory("LeftsideClimb");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
-    driveBack.done().onTrue();
-    driveBack.doneFor(5).whileTrue(shoot());
-    driveBack.doneDelayed(5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).onTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
-  // Contests all of neutral zone, shoots, then climbs
-  public AutoRoutine leftLongClimbCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftLongClimbCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
-    final AutoTrajectory climb = routine.trajectory("LeftsideClimb");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
-    driveBack.done().onTrue();
-    driveBack.doneFor(5).whileTrue(shoot());
-    driveBack.doneDelayed(5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
-  // Contests half of neutral zone then shoots, then does it again
-  public AutoRoutine rightDblShortCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightDblShortCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightShortDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetRight");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.done().onTrue();
-    driveBack.doneFor(3.5).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(driveToMiddle.cmd());
-
-    // short bindings will call again
-
-    return routine;
-  }
-
-  // Contests half of neutral zone then shoots, then does it again but passes through full neutral
-  // zone
-  public AutoRoutine rightShortLongCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightShortLongCenterContest");
-    final AutoTrajectory driveToMiddleShort = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddleShort =
-        routine.trajectory("RightShortDriveThroughMiddle");
-    final AutoTrajectory driveBackShort = routine.trajectory("RightShortDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetLeft");
-
-    // 2 drive to middles for diff binds
-    final AutoTrajectory driveToMiddleLong = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddleLong = routine.trajectory("RightLongDriveThroughMiddle");
-    final AutoTrajectory driveBackLong = routine.trajectory("RightLongDriveBack");
-
-    routine
-        .active()
-        .onTrue(Commands.sequence(driveToMiddleShort.resetOdometry(), driveToMiddleShort.cmd()));
-
-    // short
-    driveToMiddleShort
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddleShort.done().onTrue(driveThroughMiddleShort.cmd());
-
-    driveThroughMiddleShort
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddleShort.done().onTrue(driveBackShort.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBackShort.done().onTrue();
-    driveBackShort.doneFor(3.5).whileTrue(shoot());
-
-    // reset
-    driveBackShort.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(driveToMiddleLong.cmd());
-
-    // long
-
-    driveToMiddleLong
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddleLong.done().onTrue(driveThroughMiddleLong.cmd());
-
-    driveThroughMiddleLong
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddleLong.done().onTrue(driveBackLong.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBackLong.done().onTrue();
-    driveBackLong.doneFor(3.5).whileTrue(shoot());
-
-    return routine;
-  }
-
-  // Contests half of neutral zone then shoots, then then intakes from HP, then shoots
-  public AutoRoutine rightShortHPCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightShortHPCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightShortDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetRight");
-
-    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
-    final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.done().onTrue();
-    driveBack.doneFor(3.5).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(moveToHP.cmd());
-
-    // hp
-
-    moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
-
-    shootAfterHP.done().onTrue();
-    shootAfterHP.doneFor(3.5).whileTrue(shoot());
-
-    return routine;
-  }
-
-  // Contests all of neutral zone then shoots, then does it again
-  public AutoRoutine rightDblLongCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightDblLongCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightLongDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetRight");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.done().onTrue();
-    driveBack.doneFor(5).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(driveToMiddle.cmd());
-
-    // long bindings will call again
-
-    return routine;
-  }
-
-  // Contests all of neutral zone then shoots, then intakes from HP, then shoots
-  public AutoRoutine rightLongHPCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightShortHPCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightLongDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetRight");
-
-    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
-    final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.done().onTrue();
-    driveBack.doneFor(3.5).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(3.5).onTrue(reset.cmd());
-    reset.done().onTrue(moveToHP.cmd());
-
-    // hp
-
-    moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
-
-    shootAfterHP.done().onTrue();
-    shootAfterHP.doneFor(3.5).whileTrue(shoot());
-
-    return routine;
-  }
-
-  // Contests half of neutral zone, shoots, then climbs
-  public AutoRoutine rightShortClimbCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightShortClimbCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightShortDriveBack");
-    final AutoTrajectory climb = routine.trajectory("RightsideClimb");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
-    driveBack.done().onTrue();
-    driveBack.doneFor(5).whileTrue(shoot());
-    driveBack.doneDelayed(5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
-  // Contests all of neutral zone, shoots, then climbs
-  public AutoRoutine rightLongClimbCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightLongClimbCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightLongDriveBack");
-    final AutoTrajectory climb = routine.trajectory("RightsideClimb");
-
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    driveToMiddle
-        .active()
-        .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
-    driveBack.done().onTrue();
-    driveBack.doneFor(5).whileTrue(shoot());
-    driveBack.doneDelayed(5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
-  public AutoRoutine depot() {
-    final AutoRoutine routine = m_factory.newRoutine("depotLeft");
-    final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
-    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
-    final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
-
-    routine.active().onTrue(Commands.sequence(moveToDepot.resetOdometry(), moveToDepot.cmd()));
-
-    // hi if ur reading this
-    moveToDepot.done().onTrue(moveThroughDepot.cmd());
-
-    moveThroughDepot
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
-
-    shootAfterDepot.done().onTrue();
-    shootAfterDepot.doneFor(3.5).whileTrue(shoot());
-
-    return routine;
-  }
-
-  public AutoRoutine climbDepot() {
-    final AutoRoutine routine = m_factory.newRoutine("climbDepotLeft");
-    final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
-    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
-    final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
-    final AutoTrajectory climb = routine.trajectory("LeftsideClimb");
-
-    routine.active().onTrue(Commands.sequence(moveToDepot.resetOdometry(), moveToDepot.cmd()));
-
-    // hi if ur reading this
-    moveToDepot.done().onTrue(moveThroughDepot.cmd());
-
-    moveThroughDepot
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
-
-    shootAfterDepot.done().onTrue();
-    shootAfterDepot.doneFor(3.5).whileTrue(shoot());
-    shootAfterDepot.doneDelayed(3.5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
-  public AutoRoutine hp() {
-    final AutoRoutine routine = m_factory.newRoutine("hpRight");
-    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
-    final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
-
-    routine.active().onTrue(Commands.sequence(moveToHP.resetOdometry(), moveToHP.cmd()));
-
-    // move to shooting position 2s after it gets there. gives human player some time
-    moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
-
-    shootAfterHP.done().onTrue();
-    shootAfterHP.doneFor(3.5).whileTrue(shoot());
-
-    return routine;
-  }
-
-  public AutoRoutine hpSimple() {
-    final AutoRoutine routine = m_factory.newRoutine("hpRight");
-    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
-
-    routine.active().onTrue(Commands.sequence(moveToHP.resetOdometry(), moveToHP.cmd()));
-
-    // move to shooting position 2s after it gets there. gives human player some time
-    moveToHP
-        .done()
-        .onTrue(
-            Commands.parallel(
-                ShooterCommands.AimEverythingToHub(
-                    m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 70),
-                Commands.sequence(
-                    new WaitCommand(3),
-                    ShooterCommands.ShootFromDistance(
-                        m_container.flywheel,
-                        m_container.tunnel,
-                        m_container.hopper,
-                        m_container.intake,
-                        () -> m_container.drive.getTurretPose(),
-                        65))));
-
-    return routine;
-  }
-
-  public AutoRoutine climbhp() {
-    final AutoRoutine routine = m_factory.newRoutine("climbhpRight");
-    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
-    final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
-    final AutoTrajectory climb = routine.trajectory("RightsideClimb");
-
-    routine.active().onTrue(Commands.sequence(moveToHP.resetOdometry(), moveToHP.cmd()));
-
-    // move to shooting position 2s after it gets there. gives human player some time
-    moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
-
-    shootAfterHP.done().onTrue();
-    shootAfterHP.doneFor(3.5).whileTrue(shoot());
-    shootAfterHP.doneDelayed(3.5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
-  public AutoRoutine standstill() {
-    final AutoRoutine routine = m_factory.newRoutine("standstill");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                Commands.race(
-                    new InstantCommand(() -> m_container.turret.zero()), new WaitCommand(0.1)),
-                Commands.race(
-                    new InstantCommand(() -> m_container.hood.zeroHood()), new WaitCommand(0.1)),
-                Commands.parallel(
-                    ShooterCommands.AimEverythingToHub(
-                        m_container.turret,
-                        m_container.hood,
-                        () -> m_container.drive.getPose(),
-                        65),
-                    Commands.sequence(
-                        new WaitCommand(1),
-                        ShooterCommands.ShootFromDistance(
-                            m_container.flywheel,
-                            m_container.tunnel,
-                            m_container.hopper,
-                            m_container.intake,
-                            () -> m_container.drive.getTurretPose(),
-                            65)))));
-
-    return routine;
-  }
+//   public AutoRoutine exampleRoutine() {
+//     // Creates a routine called "example" and loads a trajectory. The trajectory is essentially the
+//     // path the robot will take during auton. Look at
+//     // https://choreo.autos/usage/editing-paths/#generating for an example.
+//     final AutoRoutine routine = m_factory.newRoutine("example");
+//     final AutoTrajectory exampleTraj = routine.trajectory("ExampleTraj");
+
+//     // If a routine was a method, you could think of this as its body.
+//     // The "routine.active())" trigger is essentially the "entrance" to a routine.
+//     // Here, you can sequence commands for the routine.
+//     routine
+//         .active()
+//         .onTrue(
+//             // Since onTrue only has one parameter, you need to use Commands.sequence to schedule
+//             // more than one command.
+//             Commands.sequence(
+//                 // No semicolons! Since you are passing arguments, it is only one statement. A
+//                 // semicolon only comes at the end of a statement. Also, since you are passing
+//                 // multiple arguments, you need commas.
+//                 exampleTraj.resetOdometry(),
+//                 exampleTraj
+//                     .cmd(), // Schedule the trajectory (make the robot move on the trajectory)
+//                 // Run commands in parallel (at the same time)
+//                 m_container.drive.stopCommand(),
+//                 CommandFactory.intakeCommand(m_container.intake, m_container.hopper),
+//                 // Run flywheel then stop
+//                 ShooterCommands.ShootFromDistance(
+//                     m_container.flywheel,
+//                     m_container.tunnel,
+//                     m_container.hopper,
+//                     m_container.intake,
+//                     () -> m_container.drive.getTurretPose(),
+//                     65)));
+//     // Stop intake and indexer
+//     // m_container.intake.stopCommand(),
+//     // m_container.hopper.stopCommand();
+
+//     return routine;
+//   }
+
+//   // Contests half of neutral zone then shoots, then does it again
+//   public AutoRoutine leftDblShortCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("leftDblShortCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftShortDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("LeftShortDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetLeft");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     // short
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBack
+//         .done()
+//         .onTrue(
+//             ShooterCommands.AimEverythingToHub(
+//                 m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
+//     driveBack.doneFor(3.5).whileTrue(shoot());
+
+//     // reset
+//     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(driveToMiddle.cmd());
+
+//     // short bindings will call again
+
+//     return routine;
+//   }
+
+//   // Contests half of neutral zone then shoots, then does it again but passes through full neutral
+//   // zone
+//   public AutoRoutine leftShortLongCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("leftShortLongCenterContest");
+//     final AutoTrajectory driveToMiddleShort = routine.trajectory("LeftDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddleShort =
+//         routine.trajectory("LeftShortDriveThroughMiddle");
+//     final AutoTrajectory driveBackShort = routine.trajectory("LeftShortDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetLeft");
+
+//     // 2 drive to middles for diff binds
+//     final AutoTrajectory driveToMiddleLong = routine.trajectory("LeftDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddleLong = routine.trajectory("LeftLongDriveThroughMiddle");
+//     final AutoTrajectory driveBackLong = routine.trajectory("LeftLongDriveBack");
+
+//     routine
+//         .active()
+//         .onTrue(Commands.sequence(driveToMiddleShort.resetOdometry(), driveToMiddleShort.cmd()));
+
+//     // short
+//     driveToMiddleShort
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddleShort.done().onTrue(driveThroughMiddleShort.cmd());
+
+//     driveThroughMiddleShort
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddleShort.done().onTrue(driveBackShort.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBackShort.done().onTrue();
+//     driveBackShort.doneFor(3.5).whileTrue(shoot());
+
+//     // reset
+//     driveBackShort.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(driveToMiddleLong.cmd());
+
+//     // long
+
+//     driveToMiddleLong
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddleLong.done().onTrue(driveThroughMiddleLong.cmd());
+
+//     driveThroughMiddleLong
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddleLong.done().onTrue(driveBackLong.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBackLong.done().onTrue();
+//     driveBackLong.doneFor(3.5).whileTrue(shoot());
+
+//     return routine;
+//   }
+
+//   // Contests half of neutral zone then shoots, then intakes from HP, then shoots
+//   public AutoRoutine leftShortDepotCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("leftShortDepotCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftShortDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("LeftShortDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetLeft");
+
+//     final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
+//     final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
+//     final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     // short
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(3.5).whileTrue(shoot());
+
+//     // reset
+//     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(moveToDepot.cmd());
+
+//     // depot
+
+//     moveToDepot.done().onTrue(moveThroughDepot.cmd());
+
+//     moveThroughDepot
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
+
+//     shootAfterDepot
+//         .done()
+//         .onTrue(
+//             ShooterCommands.AimEverythingToHub(
+//                 m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 60));
+//     shootAfterDepot.doneFor(5).whileTrue(shoot());
+
+//     return routine;
+//   }
+
+//   // Contests all of neutral zone then shoots
+//   public AutoRoutine leftDblLongCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("leftDblLongCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetLeft");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(5).whileTrue(shoot());
+
+//     // reset
+//     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(driveToMiddle.cmd());
+
+//     // long bindings will call again
+
+//     return routine;
+//   }
+
+//   // Contests all of neutral zone then shoots, then then intakes from depot, then shoots
+//   public AutoRoutine leftLongDepotCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("leftShortDepotCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetLeft");
+
+//     final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
+//     final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
+//     final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     // short
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(3.5).whileTrue(shoot());
+
+//     // reset
+//     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(moveToDepot.cmd());
+
+//     // depot
+
+//     moveToDepot.done().onTrue(moveThroughDepot.cmd());
+
+//     moveThroughDepot
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
+
+//     shootAfterDepot.done().onTrue();
+//     shootAfterDepot.doneFor(5).whileTrue(shoot());
+
+//     return routine;
+//   }
+
+//   // Contests half of neutral zone, shoots, then climbs
+//   public AutoRoutine leftShortClimbCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("leftShortClimbCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftShortDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("LeftShortDriveBack");
+//     final AutoTrajectory climb = routine.trajectory("LeftsideClimb");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(5).whileTrue(shoot());
+//     driveBack.doneDelayed(5).onTrue(climb.cmd());
+
+//     // 7s delay bc im not tryna climb too early yk
+//     climb.doneDelayed(7).onTrue(m_container.climber.downCommand());
+//     return routine;
+//   }
+
+//   // Contests all of neutral zone, shoots, then climbs
+//   public AutoRoutine leftLongClimbCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("leftLongClimbCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
+//     final AutoTrajectory climb = routine.trajectory("LeftsideClimb");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(5).whileTrue(shoot());
+//     driveBack.doneDelayed(5).onTrue(climb.cmd());
+
+//     // 7s delay bc im not tryna climb too early yk
+//     climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
+//     return routine;
+//   }
+
+//   // Contests half of neutral zone then shoots, then does it again
+//   public AutoRoutine rightDblShortCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("rightDblShortCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightShortDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("RightShortDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetRight");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     // short
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(3.5).whileTrue(shoot());
+
+//     // reset
+//     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(driveToMiddle.cmd());
+
+//     // short bindings will call again
+
+//     return routine;
+//   }
+
+//   // Contests half of neutral zone then shoots, then does it again but passes through full neutral
+//   // zone
+//   public AutoRoutine rightShortLongCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("rightShortLongCenterContest");
+//     final AutoTrajectory driveToMiddleShort = routine.trajectory("RightDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddleShort =
+//         routine.trajectory("RightShortDriveThroughMiddle");
+//     final AutoTrajectory driveBackShort = routine.trajectory("RightShortDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetLeft");
+
+//     // 2 drive to middles for diff binds
+//     final AutoTrajectory driveToMiddleLong = routine.trajectory("RightDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddleLong = routine.trajectory("RightLongDriveThroughMiddle");
+//     final AutoTrajectory driveBackLong = routine.trajectory("RightLongDriveBack");
+
+//     routine
+//         .active()
+//         .onTrue(Commands.sequence(driveToMiddleShort.resetOdometry(), driveToMiddleShort.cmd()));
+
+//     // short
+//     driveToMiddleShort
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddleShort.done().onTrue(driveThroughMiddleShort.cmd());
+
+//     driveThroughMiddleShort
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddleShort.done().onTrue(driveBackShort.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBackShort.done().onTrue();
+//     driveBackShort.doneFor(3.5).whileTrue(shoot());
+
+//     // reset
+//     driveBackShort.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(driveToMiddleLong.cmd());
+
+//     // long
+
+//     driveToMiddleLong
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddleLong.done().onTrue(driveThroughMiddleLong.cmd());
+
+//     driveThroughMiddleLong
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddleLong.done().onTrue(driveBackLong.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBackLong.done().onTrue();
+//     driveBackLong.doneFor(3.5).whileTrue(shoot());
+
+//     return routine;
+//   }
+
+//   // Contests half of neutral zone then shoots, then then intakes from HP, then shoots
+//   public AutoRoutine rightShortHPCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("rightShortHPCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightShortDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("RightShortDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetRight");
+
+//     final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
+//     final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     // short
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(3.5).whileTrue(shoot());
+
+//     // reset
+//     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(moveToHP.cmd());
+
+//     // hp
+
+//     moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
+
+//     shootAfterHP.done().onTrue();
+//     shootAfterHP.doneFor(3.5).whileTrue(shoot());
+
+//     return routine;
+//   }
+
+//   // Contests all of neutral zone then shoots, then does it again
+//   public AutoRoutine rightDblLongCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("rightDblLongCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightLongDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("RightLongDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetRight");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(5).whileTrue(shoot());
+
+//     // reset
+//     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(driveToMiddle.cmd());
+
+//     // long bindings will call again
+
+//     return routine;
+//   }
+
+//   // Contests all of neutral zone then shoots, then intakes from HP, then shoots
+//   public AutoRoutine rightLongHPCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("rightShortHPCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightLongDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("RightLongDriveBack");
+//     final AutoTrajectory reset = routine.trajectory("ResetRight");
+
+//     final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
+//     final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     // short
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! supposed to shoot 5 seconds after robot drives back
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(3.5).whileTrue(shoot());
+
+//     // reset
+//     driveBack.doneDelayed(3.5).onTrue(reset.cmd());
+//     reset.done().onTrue(moveToHP.cmd());
+
+//     // hp
+
+//     moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
+
+//     shootAfterHP.done().onTrue();
+//     shootAfterHP.doneFor(3.5).whileTrue(shoot());
+
+//     return routine;
+//   }
+
+//   // Contests half of neutral zone, shoots, then climbs
+//   public AutoRoutine rightShortClimbCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("rightShortClimbCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightShortDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("RightShortDriveBack");
+//     final AutoTrajectory climb = routine.trajectory("RightsideClimb");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(5).whileTrue(shoot());
+//     driveBack.doneDelayed(5).onTrue(climb.cmd());
+
+//     // 7s delay bc im not tryna climb too early yk
+//     climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
+//     return routine;
+//   }
+
+//   // Contests all of neutral zone, shoots, then climbs
+//   public AutoRoutine rightLongClimbCenterContest() {
+//     final AutoRoutine routine = m_factory.newRoutine("rightLongClimbCenterContest");
+//     final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
+//     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightLongDriveThroughMiddle");
+//     final AutoTrajectory driveBack = routine.trajectory("RightLongDriveBack");
+//     final AutoTrajectory climb = routine.trajectory("RightsideClimb");
+
+//     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+//     driveToMiddle
+//         .active()
+//         .whileTrue(CommandFactory.outtakeCommand(m_container.intake, m_container.hopper));
+//     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+//     driveThroughMiddle
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+//     // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
+//     driveBack.done().onTrue();
+//     driveBack.doneFor(5).whileTrue(shoot());
+//     driveBack.doneDelayed(5).onTrue(climb.cmd());
+
+//     // 7s delay bc im not tryna climb too early yk
+//     climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
+//     return routine;
+//   }
+
+//   public AutoRoutine depot() {
+//     final AutoRoutine routine = m_factory.newRoutine("depotLeft");
+//     final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
+//     final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
+//     final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
+
+//     routine.active().onTrue(Commands.sequence(moveToDepot.resetOdometry(), moveToDepot.cmd()));
+
+//     // hi if ur reading this
+//     moveToDepot.done().onTrue(moveThroughDepot.cmd());
+
+//     moveThroughDepot
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
+
+//     shootAfterDepot.done().onTrue();
+//     shootAfterDepot.doneFor(3.5).whileTrue(shoot());
+
+//     return routine;
+//   }
+
+//   public AutoRoutine climbDepot() {
+//     final AutoRoutine routine = m_factory.newRoutine("climbDepotLeft");
+//     final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
+//     final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
+//     final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
+//     final AutoTrajectory climb = routine.trajectory("LeftsideClimb");
+
+//     routine.active().onTrue(Commands.sequence(moveToDepot.resetOdometry(), moveToDepot.cmd()));
+
+//     // hi if ur reading this
+//     moveToDepot.done().onTrue(moveThroughDepot.cmd());
+
+//     moveThroughDepot
+//         .active()
+//         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+//     moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
+
+//     shootAfterDepot.done().onTrue();
+//     shootAfterDepot.doneFor(3.5).whileTrue(shoot());
+//     shootAfterDepot.doneDelayed(3.5).onTrue(climb.cmd());
+
+//     // 7s delay bc im not tryna climb too early yk
+//     climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
+//     return routine;
+//   }
+
+//   public AutoRoutine hp() {
+//     final AutoRoutine routine = m_factory.newRoutine("hpRight");
+//     final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
+//     final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
+
+//     routine.active().onTrue(Commands.sequence(moveToHP.resetOdometry(), moveToHP.cmd()));
+
+//     // move to shooting position 2s after it gets there. gives human player some time
+//     moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
+
+//     shootAfterHP.done().onTrue();
+//     shootAfterHP.doneFor(3.5).whileTrue(shoot());
+
+//     return routine;
+//   }
+
+//   public AutoRoutine hpSimple() {
+//     final AutoRoutine routine = m_factory.newRoutine("hpRight");
+//     final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
+
+//     routine.active().onTrue(Commands.sequence(moveToHP.resetOdometry(), moveToHP.cmd()));
+
+//     // move to shooting position 2s after it gets there. gives human player some time
+//     moveToHP
+//         .done()
+//         .onTrue(
+//             Commands.parallel(
+//                 ShooterCommands.AimEverythingToHub(
+//                     m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 70),
+//                 Commands.sequence(
+//                     new WaitCommand(3),
+//                     ShooterCommands.ShootFromDistance(
+//                         m_container.flywheel,
+//                         m_container.tunnel,
+//                         m_container.hopper,
+//                         m_container.intake,
+//                         () -> m_container.drive.getTurretPose(),
+//                         65))));
+
+//     return routine;
+//   }
+
+//   public AutoRoutine climbhp() {
+//     final AutoRoutine routine = m_factory.newRoutine("climbhpRight");
+//     final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
+//     final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
+//     final AutoTrajectory climb = routine.trajectory("RightsideClimb");
+
+//     routine.active().onTrue(Commands.sequence(moveToHP.resetOdometry(), moveToHP.cmd()));
+
+//     // move to shooting position 2s after it gets there. gives human player some time
+//     moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
+
+//     shootAfterHP.done().onTrue();
+//     shootAfterHP.doneFor(3.5).whileTrue(shoot());
+//     shootAfterHP.doneDelayed(3.5).onTrue(climb.cmd());
+
+//     // 7s delay bc im not tryna climb too early yk
+//     climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
+//     return routine;
+//   }
+
+//   public AutoRoutine standstill() {
+//     final AutoRoutine routine = m_factory.newRoutine("standstill");
+
+//     routine
+//         .active()
+//         .onTrue(
+//             Commands.sequence(
+//                 Commands.race(
+//                     new InstantCommand(() -> m_container.turret.zero()), new WaitCommand(0.1)),
+//                 Commands.race(
+//                     new InstantCommand(() -> m_container.hood.zeroHood()), new WaitCommand(0.1)),
+//                 Commands.parallel(
+//                     ShooterCommands.AimEverythingToHub(
+//                         m_container.turret,
+//                         m_container.hood,
+//                         () -> m_container.drive.getPose(),
+//                         65),
+//                     Commands.sequence(
+//                         new WaitCommand(1),
+//                         ShooterCommands.ShootFromDistance(
+//                             m_container.flywheel,
+//                             m_container.tunnel,
+//                             m_container.hopper,
+//                             m_container.intake,
+//                             () -> m_container.drive.getTurretPose(),
+//                             65)))));
+
+//     return routine;
+//   }
 
   public AutoRoutine standstillunjam() {
     final AutoRoutine routine = m_factory.newRoutine("standstill");
