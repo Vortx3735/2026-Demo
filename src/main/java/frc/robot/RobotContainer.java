@@ -301,9 +301,6 @@ public class RobotContainer {
     softwareHoodAngleEntry.set(65);
     efficiencyFactorEntry = shooterTable.getDoubleTopic("efficiencyFactorEntry").getEntry(1.03);
     efficiencyFactorEntry.set(1.03);
-    
-
-
 
     // Configure the button bindings
     configureButtonBindings();
@@ -355,7 +352,12 @@ public class RobotContainer {
     driverController.rb.whileTrue(turret.moveCommand(false));
     driverController.rt.whileTrue(
         ShooterCommands.ShootFromDistance(
-            flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), softwareHoodAngleEntry.getAsDouble()));
+            flywheel,
+            tunnel,
+            hopper,
+            intake,
+            () -> drive.getTurretPose(),
+            softwareHoodAngleEntry.getAsDouble()));
     // driverController.lt.whileTrue(
     // ShooterCommands.ShootFromDistanceBackwardsHopper(
     //     flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), 65));
@@ -365,14 +367,16 @@ public class RobotContainer {
     driverController.povLeft.whileTrue(hood.moveCommand(true));
     driverController.povRight.whileTrue(hood.moveCommand(false));
     driverController.lt.whileTrue(
-        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
+        ShooterCommands.AimEverythingToHub(
+            turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
     driverController.yButton.whileTrue(
         ShooterCommands.AimEverything(turret, hood, () -> drive.getTurretPose()));
     // Operator Shooter Binds
     operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
     operatorController.xButton.onTrue(new InstantCommand(() -> ShooterCommands.offset -= 0.01));
     operatorController.yButton.onTrue(
-        new InstantCommand(() -> ShooterCommands.efficiencyFactor = efficiencyFactorEntry.getAsDouble()));
+        new InstantCommand(
+            () -> ShooterCommands.efficiencyFactor = efficiencyFactorEntry.getAsDouble()));
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povDown.whileTrue(hood.moveCommand(false));
@@ -380,7 +384,8 @@ public class RobotContainer {
     operatorController.lt.whileTrue(
         CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     operatorController.rt.whileTrue(
-        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
+        ShooterCommands.AimEverythingToHub(
+            turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
     operatorController.aButton.toggleOnTrue(
         DriveCommands.joystickDriveAtAngle(
             drive,
