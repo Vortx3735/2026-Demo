@@ -24,6 +24,17 @@ public class Hopper extends SubsystemBase {
     NetworkTable hopperTable = inst.getTable("Subsystems/Hopper");
     hopperSpeedEntry = hopperTable.getDoubleTopic("hopperSpeed").getEntry(0);
     hopperSpeedEntry.set(0.3);
+
+    // var talonFXConfigs = new TalonFXConfiguration();
+
+    // var currentLimits = talonFXConfigs.CurrentLimits;
+
+    // currentLimits.SupplyCurrentLimitEnable = true;
+    // currentLimits.SupplyCurrentLimit = 300;
+    // currentLimits.StatorCurrentLimitEnable = true;
+    // currentLimits.StatorCurrentLimit = 300;
+
+    // hopperMotor.getConfigurator().apply(talonFXConfigs);
   }
 
   public double getHopperSpeed() {
@@ -62,7 +73,12 @@ public class Hopper extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    // Logger.recordOutput("Hopper/statorCurrent",
+    // hopperMotor.getStatorCurrent().getValueAsDouble());
+    // Logger.recordOutput("Hopper/supplyCurrent",
+    // hopperMotor.getStatorCurrent().getValueAsDouble());
+  }
 
   @Override
   public void simulationPeriodic() {

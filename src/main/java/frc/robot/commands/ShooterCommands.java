@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.intake.Hopper;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Tunnel;
 import frc.robot.subsystems.shooter.Flywheel;
 import frc.robot.subsystems.shooter.Hood;
@@ -16,6 +17,10 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterCommands {
+  // if only running right camera
+  public static double offset = 0.07;
+  public static double efficiencyFactor = 1.03;
+  // public double offset=0.0;
   // Cache Pose2d instances for hubs (avoid allocating in tight loops)
   private static final Pose2d RED_HUB_POSE2D =
       new Pose2d(
@@ -84,9 +89,12 @@ public class ShooterCommands {
 
     // 4. Recovery/Efficiency Factor (Adjust based on testing)
     // Most FRC shooters lose ~10-15% to slip/compression
-    double efficiencyFactor = 1;
-    Logger.recordOutput("Shooter/calculatedShooterRPS", rps * efficiencyFactor);
-    return rps * efficiencyFactor;
+    double ef = efficiencyFactor;
+    if (xs > 10) {
+      ef += 0.08;
+    }
+    Logger.recordOutput("Shooter/calculatedShooterRPS", rps * ef);
+    return rps * ef;
   }
 
   /** Conversion factor from meters to feet. */
@@ -109,7 +117,7 @@ public class ShooterCommands {
         Math.atan2(hubPose.getY() - robotPose.getY(), hubPose.getX() - robotPose.getX());
     double robotYaw = robotPose.getRotation().getRadians();
     double angleRelative = angleToHub - robotYaw;
-    return -Math.atan2(Math.sin(angleRelative), Math.cos(angleRelative));
+    return -Math.atan2(Math.sin(angleRelative), Math.cos(angleRelative)) + offset;
   }
 
   /** Return the hub pose for the current alliance (red or blue). */
@@ -150,6 +158,29 @@ public class ShooterCommands {
         .withName("turret aim");
   }
 
+  public static Command AimEverything(Turret turret, Hood hood, Supplier<Pose2d> poseSupplier) {
+    // create a supplier that computes target RPS from the live robot pose
+
+    Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
+
+    // While shooting, continuously aim the turret and hold the hood at the desired angle.
+    // The flywheel shoot command acts as the deadline: when it finishes, aiming/hood are
+    // interrupted.
+    return Commands.run(
+            () -> {
+              Pose2d rp = poseSupplier.get();
+              Pose2d hp = hubPoseSupplier.get();
+              double angleRelative = getAngleRelativeToHub(rp, hp);
+              double rotations = angleRelative / (2 * Math.PI);
+              turret.setPositionPID(rotations);
+            },
+            turret)
+        // .until(turret.isFinished())
+
+        // hood.setPositionPIDCommand(theta))
+        .withName("AimEverythingNoHood");
+  }
+
   public static Command AimEverythingToHub(
       Turret turret, Hood hood, Supplier<Pose2d> poseSupplier, double theta) {
     // create a supplier that computes target RPS from the live robot pose
@@ -179,8 +210,9 @@ public class ShooterCommands {
   // Shoots while adjusting flywheel speed based on distance
   public static Command ShootFromDistance(
       Flywheel flywheel,
-      Hopper hopper,
       Tunnel tunnel,
+      Hopper hopper,
+      Intake intake,
       Supplier<Pose2d> poseSupplier,
       double theta) {
     // create a supplier that computes target RPS from the live robot pose
@@ -194,7 +226,30 @@ public class ShooterCommands {
         };
 
     return Commands.deadline(
-            CommandFactory.shootCommand(flywheel, tunnel, hopper, targetRpsSupplier))
+            CommandFactory.shootCommand(flywheel, tunnel, hopper, intake, targetRpsSupplier))
+        .withName("ShootFromDistance");
+  }
+
+  public static Command ShootFromDistanceBackwardsHopper(
+      Flywheel flywheel,
+      Tunnel tunnel,
+      Hopper hopper,
+      Intake intake,
+      Supplier<Pose2d> poseSupplier,
+      double theta) {
+    // create a supplier that computes target RPS from the live robot pose
+    Supplier<Double> targetRpsSupplier =
+        () -> {
+          Pose2d rp = poseSupplier.get();
+          Pose2d hp = getAllianceHubPose();
+          double liveXs = getDistanceToHub(rp, hp);
+          Logger.recordOutput("Shooter/Distance", liveXs);
+          return calculateShooterRPS(liveXs, theta);
+        };
+
+    return Commands.deadline(
+            CommandFactory.shootCommandBackwardsHopper(
+                flywheel, tunnel, hopper, intake, targetRpsSupplier))
         .withName("ShootFromDistance");
   }
 

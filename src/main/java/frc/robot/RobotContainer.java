@@ -25,6 +25,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -58,7 +61,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
+  final DoubleEntry targetHoodAngleEntry;
+  final DoubleEntry softwareHoodAngleEntry;
+  final DoubleEntry efficiencyFactorEntry;
   // Subsystems
   public final Vision vision;
   public final Drive drive;
@@ -98,6 +103,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // SignalLogger.start();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -178,40 +185,69 @@ public class RobotContainer {
     autoRoutines = new AutoRoutines(autoFactory, this);
 
     // Set up auto routines
-    autonChooser.addRoutine(
-        "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
-    autonChooser.addRoutine(
-        "Left ShortLong Center Contest", autoRoutines::leftShortLongCenterContest);
-    autonChooser.addRoutine(
-        "Left ShortDepot Center Contest", autoRoutines::leftShortDepotCenterContest);
-    autonChooser.addRoutine("Left DblLong Center Contest", autoRoutines::leftDblLongCenterContest);
-    autonChooser.addRoutine(
-        "Left LongDepot Center Contest", autoRoutines::leftLongDepotCenterContest);
+    autonChooser.addRoutine("Standstill Shoot Unjam", autoRoutines::standstillunjam);
 
-    autonChooser.addRoutine(
-        "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
-    autonChooser.addRoutine(
-        "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
-    autonChooser.addRoutine(
-        "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
-    autonChooser.addRoutine(
-        "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
-    autonChooser.addRoutine("Right LongHP Center Contest", autoRoutines::rightLongHPCenterContest);
+    // autonChooser.addRoutine(
+    //     "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
+    // autonChooser.addRoutine(
+    //     "Left ShortLong Center Contest", autoRoutines::leftShortLongCenterContest);
+    // autonChooser.addRoutine(
+    //     "Left ShortDepot Center Contest", autoRoutines::leftShortDepotCenterContest);
+    // autonChooser.addRoutine("Left DblLong Center Contest",
+    // autoRoutines::leftDblLongCenterContest);
+    // autonChooser.addRoutine(
+    //     "Left LongDepot Center Contest", autoRoutines::leftLongDepotCenterContest);
 
-    autonChooser.addRoutine(
-        "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
-    autonChooser.addRoutine(
-        "Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
-    autonChooser.addRoutine(
-        "Right Short Climb Center Contest", autoRoutines::rightShortClimbCenterContest);
-    autonChooser.addRoutine(
-        "Right Long Climb Center Contest", autoRoutines::rightLongClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
+    // autonChooser.addRoutine("Right LongHP Center Contest",
+    // autoRoutines::rightLongHPCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
+    // autonChooser.addRoutine("Right LongHP Center Contest",
+    // autoRoutines::rightLongHPCenterContest);
 
-    autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
-    autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
+    // autonChooser.addRoutine(
+    //     "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right Short Climb Center Contest", autoRoutines::rightShortClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right Long Climb Center Contest", autoRoutines::rightLongClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right Short Climb Center Contest", autoRoutines::rightShortClimbCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right Long Climb Center Contest", autoRoutines::rightLongClimbCenterContest);
 
-    autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
-    autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
+    // autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
+    // autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
+    // autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
+    // autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
+
+    // autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
+    // autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
+    // autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
+    // autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
+
+    // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
+    // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
 
     SmartDashboard.putData("Auton Chooser", autonChooser);
 
@@ -256,6 +292,16 @@ public class RobotContainer {
         "turret SysId (Dynamic Forward)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
     sysIdChooser.addOption(
         "turret SysId (Dynamic Reverse)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable shooterTable = inst.getTable("Subystems/Shooter");
+    targetHoodAngleEntry = shooterTable.getDoubleTopic("targetHoodAngleEntry").getEntry(65);
+    targetHoodAngleEntry.set(65);
+    softwareHoodAngleEntry = shooterTable.getDoubleTopic("softwareHoodAngleEntry").getEntry(65);
+    softwareHoodAngleEntry.set(65);
+    efficiencyFactorEntry = shooterTable.getDoubleTopic("efficiencyFactorEntry").getEntry(1.03);
+    efficiencyFactorEntry.set(1.03);
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -284,7 +330,7 @@ public class RobotContainer {
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDriveWithBumpAutoalign(
+        DriveCommands.joystickDrive(
                 drive,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
@@ -305,30 +351,54 @@ public class RobotContainer {
     driverController.lb.whileTrue(turret.moveCommand(true));
     driverController.rb.whileTrue(turret.moveCommand(false));
     driverController.rt.whileTrue(
-        ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 60));
+        ShooterCommands.ShootFromDistance(
+            flywheel,
+            tunnel,
+            hopper,
+            intake,
+            () -> drive.getTurretPose(),
+            softwareHoodAngleEntry.getAsDouble()));
+    // driverController.lt.whileTrue(
+    // ShooterCommands.ShootFromDistanceBackwardsHopper(
+    //     flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), 65));
     // controller.rt.whileTrue(
     //     CommandFactory.shootCommand(
     //         flywheel, tunnel, hopper, () -> flywheel.flywheelSpeedEntry.getAsDouble() * 90));
     driverController.povLeft.whileTrue(hood.moveCommand(true));
     driverController.povRight.whileTrue(hood.moveCommand(false));
+    driverController.lt.whileTrue(
+        ShooterCommands.AimEverythingToHub(
+            turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
     driverController.yButton.whileTrue(
-        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getPose(), 60));
-
+        ShooterCommands.AimEverything(turret, hood, () -> drive.getTurretPose()));
     // Operator Shooter Binds
+    operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
+    operatorController.xButton.onTrue(new InstantCommand(() -> ShooterCommands.offset -= 0.01));
+    operatorController.yButton.onTrue(
+        new InstantCommand(
+            () -> ShooterCommands.efficiencyFactor = efficiencyFactorEntry.getAsDouble()));
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
-    operatorController.povLeft.whileTrue(hood.moveCommand(true));
-    operatorController.povRight.whileTrue(hood.moveCommand(false));
-    
-    operatorController.aButton.toggleOnTrue(DriveCommands.joystickDriveAtAngle(drive, () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),()->new Rotation2d(0)));
+    operatorController.povDown.whileTrue(hood.moveCommand(false));
+    operatorController.povUp.whileTrue(hood.moveCommand(true));
+    operatorController.lt.whileTrue(
+        CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
+    operatorController.rt.whileTrue(
+        ShooterCommands.AimEverythingToHub(
+            turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
+    operatorController.aButton.toggleOnTrue(
+        DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> new Rotation2d(0)));
     // Climber Binds
     driverController.povUp.whileTrue(climber.upCommand());
     driverController.povDown.whileTrue(climber.downCommand());
 
     // Intake Binds
     driverController.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
-    driverController.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
+    driverController.bButton.whileTrue(intake.outtakeCommand());
     driverController.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
 
     // Test/Misc Binds
