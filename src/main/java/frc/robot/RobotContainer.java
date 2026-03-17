@@ -187,67 +187,44 @@ public class RobotContainer {
     // Set up auto routines
     autonChooser.addRoutine("Standstill Shoot Unjam", autoRoutines::standstillunjam);
 
-    // autonChooser.addRoutine(
-    //     "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
-    // autonChooser.addRoutine(
-    //     "Left ShortLong Center Contest", autoRoutines::leftShortLongCenterContest);
-    // autonChooser.addRoutine(
-    //     "Left ShortDepot Center Contest", autoRoutines::leftShortDepotCenterContest);
-    // autonChooser.addRoutine("Left DblLong Center Contest",
-    // autoRoutines::leftDblLongCenterContest);
-    // autonChooser.addRoutine(
-    //     "Left LongDepot Center Contest", autoRoutines::leftLongDepotCenterContest);
+    autonChooser.addRoutine(
+        "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
+    autonChooser.addRoutine(
+        "Left ShortLong Center Contest", autoRoutines::leftShortLongCenterContest);
+    autonChooser.addRoutine(
+        "Left ShortDepot Center Contest", autoRoutines::leftShortDepotCenterContest);
+    autonChooser.addRoutine("Left DblLong Center Contest",
+    autoRoutines::leftDblLongCenterContest);
+    autonChooser.addRoutine(
+        "Left LongDepot Center Contest", autoRoutines::leftLongDepotCenterContest);
 
-    // autonChooser.addRoutine(
-    //     "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
-    // autonChooser.addRoutine("Right LongHP Center Contest",
-    // autoRoutines::rightLongHPCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
-    // autonChooser.addRoutine("Right LongHP Center Contest",
-    // autoRoutines::rightLongHPCenterContest);
+    autonChooser.addRoutine(
+        "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+    autonChooser.addRoutine(
+        "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
+    autonChooser.addRoutine(
+        "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
+    autonChooser.addRoutine(
+        "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
+    autonChooser.addRoutine("Right LongHP Center Contest",
+    autoRoutines::rightLongHPCenterContest);
 
-    // autonChooser.addRoutine(
-    //     "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
-    // autonChooser.addRoutine(
-    //     "Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right Short Climb Center Contest", autoRoutines::rightShortClimbCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right Long Climb Center Contest", autoRoutines::rightLongClimbCenterContest);
-    // autonChooser.addRoutine(
-    //     "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
-    // autonChooser.addRoutine(
-    //     "Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right Short Climb Center Contest", autoRoutines::rightShortClimbCenterContest);
-    // autonChooser.addRoutine(
-    //     "Right Long Climb Center Contest", autoRoutines::rightLongClimbCenterContest);
+    autonChooser.addRoutine(
+        "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
+    autonChooser.addRoutine(
+        "Left Long Climb Center Contest", autoRoutines::leftLongClimbCenterContest);
+    autonChooser.addRoutine(
+        "Right Short Climb Center Contest", autoRoutines::rightShortClimbCenterContest);
+    autonChooser.addRoutine(
+        "Right Long Climb Center Contest", autoRoutines::rightLongClimbCenterContest);
 
-    // autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
-    // autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
-    // autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
-    // autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
+    autonChooser.addRoutine("Depot (Left)", autoRoutines::depot);
+    autonChooser.addRoutine("Human Player Intake (Right)", autoRoutines::hp);
 
-    // autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
-    // autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
-    // autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
-    // autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
+    autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
+    autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
 
-    // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
-    // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
+    autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
 
     SmartDashboard.putData("Auton Chooser", autonChooser);
 

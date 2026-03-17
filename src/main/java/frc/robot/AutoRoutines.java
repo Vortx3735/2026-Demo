@@ -754,7 +754,7 @@ public class AutoRoutines {
                 zero(), shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
 
     // move to shooting position 2s after it gets there. gives human player some time
-    moveToHP.done().onTrue(Commands.parallel(aim(), shoot()));
+    moveToHP.done().onTrue(shoot());
 
     return routine;
   }
