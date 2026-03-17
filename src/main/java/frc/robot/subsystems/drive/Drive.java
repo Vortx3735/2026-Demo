@@ -37,6 +37,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -381,7 +382,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   @AutoLogOutput(key = "Shooter/turretPose")
-  public Pose3d getHoodPose() {
+  public Pose2d getTurretPose() {
     Pose2d drivePose = poseEstimator.getEstimatedPosition();
     // robot to hood transform  x:-10.135-0.51 y:13.866-2.885 z:18.126 (inches)
     return drivePose.plus(
