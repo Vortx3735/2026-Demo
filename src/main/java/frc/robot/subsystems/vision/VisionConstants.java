@@ -25,9 +25,6 @@ public class VisionConstants {
   public static String rightCameraName = "right";
   public static String leftCameraName = "left";
 
-  // note: zero z component might be 0.5 meters above the ground
-
-  // note: zero z component might be 0.5 meters above the ground
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d frontCameraTransform =
@@ -72,12 +69,13 @@ public class VisionConstants {
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)
+  // higher value = trust it less
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // Camera 0
-        1.0, // Camera 1
-        1.0, // Camera 2
-        1.0 // Camera 3
+        1.0, // Camera front
+        1.0, // Camera back
+        1.0, // Camera left
+        1.0 // Camera right
       };
 
   // Multipliers to apply for MegaTag 2 observations

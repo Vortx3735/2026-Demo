@@ -2,6 +2,7 @@ package frc.robot;
 
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -753,7 +754,7 @@ public class AutoRoutines {
                 zero(), shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
 
     // move to shooting position 2s after it gets there. gives human player some time
-    moveToHP.done().onTrue(Commands.parallel(aim(), shoot()));
+    moveToHP.done().onTrue(shoot());
 
     return routine;
   }

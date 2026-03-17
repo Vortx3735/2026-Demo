@@ -186,6 +186,7 @@ public class RobotContainer {
 
     // Set up auto routines
     autonChooser.addRoutine("Standstill Shoot Unjam", autoRoutines::standstillunjam);
+    autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
 
     // autonChooser.addRoutine(
     //     "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
@@ -246,7 +247,6 @@ public class RobotContainer {
     // autonChooser.addRoutine("Climb Depot (Left)", autoRoutines::climbDepot);
     // autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
 
-    // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
     // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
 
     SmartDashboard.putData("Auton Chooser", autonChooser);
@@ -317,16 +317,10 @@ public class RobotContainer {
     intake.setDefaultCommand(intake.stopCommand().withName("stop intake"));
     climber.setDefaultCommand(climber.stopCommand().withName("stop climber"));
     hopper.setDefaultCommand(hopper.stopCommand().withName("stop hopper"));
-    // hood.setDefaultCommand(hood.hold().withName("hold hood"));
-    // flywheel.setDefaultCommand(flywheel.stopCommand().withName("hold flywheel
-    // velocity"));
-    // turret.setDefaultCommand(
-    // TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to
-    // hub"));
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
-    turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
+    turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -369,8 +363,13 @@ public class RobotContainer {
     driverController.lt.whileTrue(
         ShooterCommands.AimEverythingToHub(
             turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
-    driverController.yButton.whileTrue(
-        ShooterCommands.AimEverything(turret, hood, () -> drive.getTurretPose()));
+    driverController
+        .yButton
+        .toggleOnTrue(
+            Commands.parallel(
+                ShooterCommands.AimToSide(turret, () -> drive.getPose()),
+                hood.setPositionPIDCommand(targetHoodAngleEntry.getAsDouble() - 5)))
+        .onFalse(hood.setPositionPIDCommand(targetHoodAngleEntry.getAsDouble()));
     // Operator Shooter Binds
     operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
     operatorController.xButton.onTrue(new InstantCommand(() -> ShooterCommands.offset -= 0.01));

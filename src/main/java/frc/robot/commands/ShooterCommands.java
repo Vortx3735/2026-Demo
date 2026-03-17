@@ -129,12 +129,20 @@ public class ShooterCommands {
   }
 
   /** Choose the left/right hub based on robot Y (used by AimToSide). */
-  public static Pose2d chooseSideHubPose(Pose2d robotPose) {
+  public static Pose2d getSidePose(Pose2d robotPose) {
     if (DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().get() == Alliance.Red) {
-      return RED_HUB_POSE2D;
+      if (robotPose.getY() < 4) {
+        return RED_LEFT_POSE2D;
+      } else {
+        return RED_RIGHT_POSE2D;
+      }
     } else {
-      return BLUE_HUB_POSE2D;
+      if (robotPose.getY() < 4) {
+        return BLUE_LEFT_POSE2D;
+      } else {
+        return BLUE_RIGHT_POSE2D;
+      }
     }
   }
 
@@ -254,7 +262,7 @@ public class ShooterCommands {
   }
 
   public static Command AimToSide(Turret turret, Supplier<Pose2d> poseSupplier) {
-    Supplier<Pose2d> hubPoseSupplier = () -> chooseSideHubPose(poseSupplier.get());
+    Supplier<Pose2d> hubPoseSupplier = () -> getSidePose(poseSupplier.get());
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier);
   }
 
