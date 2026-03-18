@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
@@ -106,6 +105,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight),
+                turret,
                 (robotPose) -> {});
 
         vision =
@@ -133,6 +133,7 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[1]),
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]),
+                turret,
                 driveSimulation::setSimulationWorldPose);
 
         vision =
@@ -165,6 +166,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
+                turret,
                 (robotPose) -> {});
 
         vision = new Vision(drive, new VisionIO() {});
@@ -277,7 +279,7 @@ public class RobotContainer {
     controller.yButton.whileTrue(
         ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getPose(), 60));
     // controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
-    controller.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
+    controller.rs.onTrue(new InstantCommand(hood::zeroHood, hood));
     // Climber Binds
     controller.povUp.whileTrue(climber.upCommand());
     controller.povDown.whileTrue(climber.downCommand());

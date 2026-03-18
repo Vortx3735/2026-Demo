@@ -60,6 +60,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.shooter.Turret;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -126,6 +127,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
+  private Turret turret;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
@@ -156,8 +158,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
+      Turret turret,
       Consumer<Pose2d> resetSimulationPoseCallBack) {
     this.gyroIO = gyroIO;
+    this.turret = turret;
     this.resetSimulationPoseCallBack = resetSimulationPoseCallBack;
     modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
     modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
@@ -266,6 +270,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+    Logger.recordOutput("Shooter/flywheelPose", getFlywheelPose());
+    Logger.recordOutput("Shooter/turretPose", getTurretPose());
   }
 
   /**
@@ -382,7 +388,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     return poseEstimator.getEstimatedPosition();
   }
 
-  @AutoLogOutput(key = "Shooter/turretPose")
+  @AutoLogOutput(key = "Shooter/hoodPose")
   public Pose3d getHoodPose() {
     Pose2d drivePose = poseEstimator.getEstimatedPosition();
     // robot to hood transform  x:-10.135-0.51 y:13.866-2.885 z:18.126 (inches)
@@ -393,6 +399,30 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 Inches.of(13.866 - 4.385),
                 Inches.of(14.126),
                 new Rotation3d()));
+  }
+
+  @AutoLogOutput(key = "Shooter/turretPose")
+  public Pose3d getTurretPose() {
+    Pose2d drivePose = poseEstimator.getEstimatedPosition();
+    // robot to turret transform  x:-10.135-0.51 y:13.866-2.885 z:18.126 (inches)
+    return new Pose3d(drivePose)
+        .plus(new Transform3d(Inches.of(5), Inches.of(-8), Inches.of(18), new Rotation3d()));
+  }
+
+  @AutoLogOutput(key = "Shooter/flywheelPose")
+  public Pose3d getFlywheelPose() {
+    double turretAngleRads = turret.getTurretCurrentPosition() * 2 * Math.PI;
+    // robot to flywheel transform  x:-10.135-0.51 y:13.866-2.885 z:18.126 (inches)
+    return getTurretPose()
+        .plus(
+            new Transform3d(
+                Inches.of((0)),
+                Inches.of(0),
+                Inches.of(0),
+                new Rotation3d(0, 0, turretAngleRads)))
+                .plus(
+                  new Transform3d(Inches.of(-9),Inches.of(0),Inches.of(0), new Rotation3d())
+                  );
   }
 
   /** Returns the current odometry rotation. */
