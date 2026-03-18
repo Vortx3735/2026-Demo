@@ -101,6 +101,10 @@ public class Turret extends SubsystemBase {
     turretSpeedEntry.set(0.1);
     turretPositionEntry = table.getDoubleTopic("turretPosition(rotations)").getEntry(0);
     turretPositionEntry.set(0);
+
+    // zero turret
+    turretMotor.setPosition(0.26 / kGearRatio);
+
     // configure talonfx sim state if the mode is sim
     if (state == Mode.SIM) {
       var talonFXSim = turretMotor.getSimState();

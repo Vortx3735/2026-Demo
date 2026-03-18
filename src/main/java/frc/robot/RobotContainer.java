@@ -18,6 +18,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -92,6 +93,7 @@ public class RobotContainer {
   // Controller
   private final VorTXControllerXbox driverController = new VorTXControllerXbox(0);
   private final VorTXControllerXbox operatorController = new VorTXControllerXbox(1);
+  private final VorTXControllerXbox sysIdController = new VorTXControllerXbox(2);
 
   // Auton
   private final AutoFactory autoFactory;
@@ -193,8 +195,7 @@ public class RobotContainer {
         "Left ShortLong Center Contest", autoRoutines::leftShortLongCenterContest);
     autonChooser.addRoutine(
         "Left ShortDepot Center Contest", autoRoutines::leftShortDepotCenterContest);
-    autonChooser.addRoutine("Left DblLong Center Contest",
-    autoRoutines::leftDblLongCenterContest);
+    autonChooser.addRoutine("Left DblLong Center Contest", autoRoutines::leftDblLongCenterContest);
     autonChooser.addRoutine(
         "Left LongDepot Center Contest", autoRoutines::leftLongDepotCenterContest);
 
@@ -206,8 +207,7 @@ public class RobotContainer {
         "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
     autonChooser.addRoutine(
         "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
-    autonChooser.addRoutine("Right LongHP Center Contest",
-    autoRoutines::rightLongHPCenterContest);
+    autonChooser.addRoutine("Right LongHP Center Contest", autoRoutines::rightLongHPCenterContest);
 
     autonChooser.addRoutine(
         "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
@@ -381,6 +381,13 @@ public class RobotContainer {
     driverController.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
     driverController.view.onTrue(new InstantCommand(() -> turret.zero()));
     driverController.menu.onTrue(new InstantCommand(() -> drive.zeroDriveTrain()));
+
+    sysIdController.lb.onTrue(Commands.runOnce(SignalLogger::start));
+    sysIdController.rb.onTrue(Commands.runOnce(SignalLogger::stop));
+    sysIdController.yButton.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    sysIdController.aButton.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    sysIdController.xButton.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    sysIdController.bButton.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
