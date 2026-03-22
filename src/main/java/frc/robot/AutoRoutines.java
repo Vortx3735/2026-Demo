@@ -133,6 +133,15 @@ public class AutoRoutines {
     return routine;
   }
 
+  public AutoRoutine test() {
+    final AutoRoutine routine = m_factory.newRoutine("test");
+    final AutoTrajectory test = routine.trajectory("test");
+
+    routine.active().onTrue(Commands.sequence(test.resetOdometry(), test.cmd()));
+
+    return routine;
+  }
+
   // Contests half of neutral zone then shoots, then does it again but passes through full neutral
   // zone
   public AutoRoutine leftShortLongCenterContest() {

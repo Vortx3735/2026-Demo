@@ -395,8 +395,12 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
   /** Resets the current odometry pose. */
   public void resetOdometry(Pose2d pose) {
+    odometryLock.lock();
+    gyroIO.setYaw(pose.getRotation());
+    rawGyroRotation = pose.getRotation(); // so we don't have to wait for periodic update
     resetSimulationPoseCallBack.accept(pose);
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    odometryLock.unlock();
   }
 
   public void zeroDriveTrain() {

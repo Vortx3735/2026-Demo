@@ -186,6 +186,7 @@ public class RobotContainer {
 
     // Set up auto routines
     autonChooser.addRoutine("Standstill Shoot Unjam", autoRoutines::standstillunjam);
+    autonChooser.addRoutine("test", autoRoutines::test);
 
     autonChooser.addRoutine(
         "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
@@ -193,8 +194,7 @@ public class RobotContainer {
         "Left ShortLong Center Contest", autoRoutines::leftShortLongCenterContest);
     autonChooser.addRoutine(
         "Left ShortDepot Center Contest", autoRoutines::leftShortDepotCenterContest);
-    autonChooser.addRoutine("Left DblLong Center Contest",
-    autoRoutines::leftDblLongCenterContest);
+    autonChooser.addRoutine("Left DblLong Center Contest", autoRoutines::leftDblLongCenterContest);
     autonChooser.addRoutine(
         "Left LongDepot Center Contest", autoRoutines::leftLongDepotCenterContest);
 
@@ -206,8 +206,7 @@ public class RobotContainer {
         "Right ShortHP Center Contest", autoRoutines::rightShortHPCenterContest);
     autonChooser.addRoutine(
         "Right DblLong Center Contest", autoRoutines::rightDblLongCenterContest);
-    autonChooser.addRoutine("Right LongHP Center Contest",
-    autoRoutines::rightLongHPCenterContest);
+    autonChooser.addRoutine("Right LongHP Center Contest", autoRoutines::rightLongHPCenterContest);
 
     autonChooser.addRoutine(
         "Left Short Climb Center Contest", autoRoutines::leftShortClimbCenterContest);
