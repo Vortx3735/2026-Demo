@@ -22,7 +22,7 @@ public class AutoRoutines {
   // returns the command group for aiming in auton
   private Command aim() {
     return ShooterCommands.AimEverythingToHub(
-            m_container.turret, m_container.hood, () -> m_container.drive.getPose(), 65)
+            m_container.turret, m_container.hood, () -> m_container.drive.getTurretPose(), 65)
         .withTimeout(0.5);
   }
 
@@ -56,45 +56,45 @@ public class AutoRoutines {
         Commands.race(new InstantCommand(() -> m_container.hood.zeroHood()), new WaitCommand(0.1)));
   }
 
-  public AutoRoutine exampleRoutine() {
-    // Creates a routine called "example" and loads a trajectory. The trajectory is essentially the
-    // path the robot will take during auton. Look at
-    // https://choreo.autos/usage/editing-paths/#generating for an example.
-    final AutoRoutine routine = m_factory.newRoutine("example");
-    final AutoTrajectory exampleTraj = routine.trajectory("ExampleTraj");
+//   public AutoRoutine exampleRoutine() {
+//     // Creates a routine called "example" and loads a trajectory. The trajectory is essentially the
+//     // path the robot will take during auton. Look at
+//     // https://choreo.autos/usage/editing-paths/#generating for an example.
+//     final AutoRoutine routine = m_factory.newRoutine("example");
+//     final AutoTrajectory exampleTraj = routine.trajectory("ExampleTraj");
 
-    // If a routine was a method, you could think of this as its body.
-    // The "routine.active())" trigger is essentially the "entrance" to a routine.
-    // Here, you can sequence commands for the routine.
-    routine
-        .active()
-        .onTrue(
-            // Since onTrue only has one parameter, you need to use Commands.sequence to schedule
-            // more than one command.
-            Commands.sequence(
-                // No semicolons! Since you are passing arguments, it is only one statement. A
-                // semicolon only comes at the end of a statement. Also, since you are passing
-                // multiple arguments, you need commas.
-                exampleTraj.resetOdometry(),
-                exampleTraj
-                    .cmd(), // Schedule the trajectory (make the robot move on the trajectory)
-                // Run commands in parallel (at the same time)
-                m_container.drive.stopCommand(),
-                CommandFactory.intakeCommand(m_container.intake, m_container.hopper),
-                // Run flywheel then stop
-                ShooterCommands.ShootFromDistance(
-                    m_container.flywheel,
-                    m_container.tunnel,
-                    m_container.hopper,
-                    m_container.intake,
-                    () -> m_container.drive.getTurretPose(),
-                    65)));
-    // Stop intake and indexer
-    // m_container.intake.stopCommand(),
-    // m_container.hopper.stopCommand();
+//     // If a routine was a method, you could think of this as its body.
+//     // The "routine.active())" trigger is essentially the "entrance" to a routine.
+//     // Here, you can sequence commands for the routine.
+//     routine
+//         .active()
+//         .onTrue(
+//             // Since onTrue only has one parameter, you need to use Commands.sequence to schedule
+//             // more than one command.
+//             Commands.sequence(
+//                 // No semicolons! Since you are passing arguments, it is only one statement. A
+//                 // semicolon only comes at the end of a statement. Also, since you are passing
+//                 // multiple arguments, you need commas.
+//                 exampleTraj.resetOdometry(),
+//                 exampleTraj
+//                     .cmd(), // Schedule the trajectory (make the robot move on the trajectory)
+//                 // Run commands in parallel (at the same time)
+//                 m_container.drive.stopCommand(),
+//                 CommandFactory.intakeCommand(m_container.intake, m_container.hopper),
+//                 // Run flywheel then stop
+//                 ShooterCommands.ShootFromDistance(
+//                     m_container.flywheel,
+//                     m_container.tunnel,
+//                     m_container.hopper,
+//                     m_container.intake,
+//                     () -> m_container.drive.getTurretPose(),
+//                     65)));
+//     // Stop intake and indexer
+//     // m_container.intake.stopCommand(),
+//     // m_container.hopper.stopCommand();
 
-    return routine;
-  }
+//     return routine;
+//   }
 
   // Contests half of neutral zone then shoots, then does it again
   public AutoRoutine leftDblShortCenterContest() {

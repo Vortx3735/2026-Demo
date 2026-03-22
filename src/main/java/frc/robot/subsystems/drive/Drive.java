@@ -378,12 +378,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     return poseEstimator.getEstimatedPosition();
   }
 
-  @AutoLogOutput(key = "Shooter/hoodPose")
-  public Pose3d getHoodPose() {
-    Pose2d drivePose = poseEstimator.getEstimatedPosition();
-    // robot to hood transform  x:-10.135-0.51 y:13.866-2.885 z:18.126 (inches)
-    return drivePose.plus(
-        new Transform2d(Inches.of(-(10.135 - 0.51)), Inches.of(13.866 - 4.385), new Rotation2d()));
+  @AutoLogOutput(key = "Shooter/TurretPose")
+  public Pose2d getTurretPose() {
+    return poseEstimator.getEstimatedPosition().plus(new Transform2d(Inches.of(-8.708), Inches.of(8.299016),new Rotation2d()));
   }
 
   /** Returns the current odometry rotation. */
