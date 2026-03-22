@@ -18,6 +18,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -92,6 +93,7 @@ public class RobotContainer {
   // Controller
   private final VorTXControllerXbox driverController = new VorTXControllerXbox(0);
   private final VorTXControllerXbox operatorController = new VorTXControllerXbox(1);
+  private final VorTXControllerXbox sysIdController = new VorTXControllerXbox(2);
 
   // Auton
   private final AutoFactory autoFactory;
@@ -293,16 +295,10 @@ public class RobotContainer {
     intake.setDefaultCommand(intake.stopCommand().withName("stop intake"));
     climber.setDefaultCommand(climber.stopCommand().withName("stop climber"));
     hopper.setDefaultCommand(hopper.stopCommand().withName("stop hopper"));
-    // hood.setDefaultCommand(hood.hold().withName("hold hood"));
-    // flywheel.setDefaultCommand(flywheel.stopCommand().withName("hold flywheel
-    // velocity"));
-    // turret.setDefaultCommand(
-    // TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to
-    // hub"));
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
-    turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
+    turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -345,8 +341,13 @@ public class RobotContainer {
     driverController.lt.whileTrue(
         ShooterCommands.AimEverythingToHub(
             turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
-    driverController.yButton.whileTrue(
-        ShooterCommands.AimEverything(turret, hood, () -> drive.getTurretPose()));
+    driverController
+        .yButton
+        .toggleOnTrue(
+            Commands.parallel(
+                ShooterCommands.AimToSide(turret, () -> drive.getPose()),
+                hood.setPositionPIDCommand(targetHoodAngleEntry.getAsDouble() - 5)))
+        .onFalse(hood.setPositionPIDCommand(targetHoodAngleEntry.getAsDouble()));
     // Operator Shooter Binds
     operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
     operatorController.xButton.onTrue(new InstantCommand(() -> ShooterCommands.offset -= 0.01));
@@ -361,7 +362,7 @@ public class RobotContainer {
         CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     operatorController.rt.whileTrue(
         ShooterCommands.AimEverythingToHub(
-            turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
+            turret, hood, () -> ShooterCommands.getTurretPose(()->drive.getPose()).toPose2d(), targetHoodAngleEntry.getAsDouble()));
     operatorController.aButton.toggleOnTrue(
         DriveCommands.joystickDriveAtAngle(
             drive,
@@ -381,6 +382,13 @@ public class RobotContainer {
     driverController.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
     driverController.view.onTrue(new InstantCommand(() -> turret.zero()));
     driverController.menu.onTrue(new InstantCommand(() -> drive.zeroDriveTrain()));
+
+    sysIdController.lb.onTrue(Commands.runOnce(SignalLogger::start));
+    sysIdController.rb.onTrue(Commands.runOnce(SignalLogger::stop));
+    sysIdController.yButton.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    sysIdController.aButton.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    sysIdController.xButton.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    sysIdController.bButton.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
@@ -445,5 +453,11 @@ public class RobotContainer {
                             -0.2,
                             new Rotation2d(turret.getTurretTargetPosition() * 2 * Math.PI))))
             .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
+    Logger.recordOutput("Shooter/turretPose", ShooterCommands.getTurretPose(() -> drive.getPose()));
+
+    Logger.recordOutput(
+        "Shooter/flywheelPose",
+        ShooterCommands.getFlywheelPose(
+            () -> drive.getPose(), () -> turret.getTurretCurrentPosition()));
   }
 }

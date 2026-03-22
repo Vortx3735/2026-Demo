@@ -23,6 +23,7 @@ import choreo.Choreo.TrajectoryLogger;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -172,10 +173,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     sysId =
         new SysIdRoutine(
             new SysIdRoutine.Config(
-                null,
-                null,
-                null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                null, null, null, (state) -> SignalLogger.writeString("state", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
@@ -380,12 +378,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     return poseEstimator.getEstimatedPosition();
   }
 
-  @AutoLogOutput(key = "Shooter/turretPose")
+  @AutoLogOutput(key = "Shooter/TurretPose")
   public Pose2d getTurretPose() {
-    Pose2d drivePose = poseEstimator.getEstimatedPosition();
-    // robot to hood transform  x:-10.135-0.51 y:13.866-2.885 z:18.126 (inches)
-    return drivePose.plus(
-        new Transform2d(Inches.of(-(10.135 - 0.51)), Inches.of(13.866 - 4.385), new Rotation2d()));
+    return poseEstimator.getEstimatedPosition().plus(new Transform2d(Inches.of(-8.708), Inches.of(8.299016),new Rotation2d()));
   }
 
   /** Returns the current odometry rotation. */

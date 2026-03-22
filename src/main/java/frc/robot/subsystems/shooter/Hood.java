@@ -90,6 +90,8 @@ public class Hood extends SubsystemBase {
 
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     hoodMotor.setPosition(0);
+
+    // zero hood
     hoodAngleOffset =
         startingHoodAngle - hoodMotor.getRotorPosition().getValue().in(Units.Degrees) * kGearRatio;
 

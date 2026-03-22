@@ -1,7 +1,12 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -66,7 +71,7 @@ public class ShooterCommands {
     // 1. Physical Constants
     double g = 32.2; // Gravity (ft/s^2)
     double thetaRad = Math.toRadians(thetaDegrees);
-    double h = 4.0; // Target Height (6) - Launch Height (2)
+    double h = 4.11776908; // Target Height (6) - Launch Height (1.88223092)
     double wheelDiameter = 4.0 / 12.0; // 4 inch wheel converted to feet
 
     // 2. Calculate Required Ball Exit Velocity (v)
@@ -129,12 +134,20 @@ public class ShooterCommands {
   }
 
   /** Choose the left/right hub based on robot Y (used by AimToSide). */
-  public static Pose2d chooseSideHubPose(Pose2d robotPose) {
+  public static Pose2d getSidePose(Pose2d robotPose) {
     if (DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().get() == Alliance.Red) {
-      return RED_HUB_POSE2D;
+      if (robotPose.getY() < 4) {
+        return RED_LEFT_POSE2D;
+      } else {
+        return RED_RIGHT_POSE2D;
+      }
     } else {
-      return BLUE_HUB_POSE2D;
+      if (robotPose.getY() < 4) {
+        return BLUE_LEFT_POSE2D;
+      } else {
+        return BLUE_RIGHT_POSE2D;
+      }
     }
   }
 
@@ -230,31 +243,8 @@ public class ShooterCommands {
         .withName("ShootFromDistance");
   }
 
-  public static Command ShootFromDistanceBackwardsHopper(
-      Flywheel flywheel,
-      Tunnel tunnel,
-      Hopper hopper,
-      Intake intake,
-      Supplier<Pose2d> poseSupplier,
-      double theta) {
-    // create a supplier that computes target RPS from the live robot pose
-    Supplier<Double> targetRpsSupplier =
-        () -> {
-          Pose2d rp = poseSupplier.get();
-          Pose2d hp = getAllianceHubPose();
-          double liveXs = getDistanceToHub(rp, hp);
-          Logger.recordOutput("Shooter/Distance", liveXs);
-          return calculateShooterRPS(liveXs, theta);
-        };
-
-    return Commands.deadline(
-            CommandFactory.shootCommandBackwardsHopper(
-                flywheel, tunnel, hopper, intake, targetRpsSupplier))
-        .withName("ShootFromDistance");
-  }
-
   public static Command AimToSide(Turret turret, Supplier<Pose2d> poseSupplier) {
-    Supplier<Pose2d> hubPoseSupplier = () -> chooseSideHubPose(poseSupplier.get());
+    Supplier<Pose2d> hubPoseSupplier = () -> getSidePose(poseSupplier.get());
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier);
   }
 
@@ -265,5 +255,19 @@ public class ShooterCommands {
   public static Command AimToHub(Turret turret, Supplier<Pose2d> poseSupplier) {
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier).withName("turretAimToHub");
+  }
+
+  public static Pose3d getTurretPose(Supplier<Pose2d> poseSupplier) {
+    Pose2d drivePose = poseSupplier.get();
+    return new Pose3d(drivePose)
+        .plus(new Transform3d(Inches.of(-8.708), Inches.of(8.299016), Inches.of(18.091), new Rotation3d()));
+  }
+
+  public static Pose3d getFlywheelPose(
+      Supplier<Pose2d> poseSupplier, Supplier<Double> turretPosSupplier) {
+    double turretAngleRads = turretPosSupplier.get() * 2 * Math.PI;
+    return getTurretPose(poseSupplier)
+        .plus(new Transform3d(0, 0, 0, new Rotation3d(0, 0, turretAngleRads)))
+        .plus(new Transform3d(Inches.of(3.623), Inches.of(0), Inches.of(4.495771), new Rotation3d()));
   }
 }
