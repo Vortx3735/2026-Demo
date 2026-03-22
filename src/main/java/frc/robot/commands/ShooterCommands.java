@@ -1,7 +1,12 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -273,5 +278,19 @@ public class ShooterCommands {
   public static Command AimToHub(Turret turret, Supplier<Pose2d> poseSupplier) {
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier).withName("turretAimToHub");
+  }
+
+  public static Pose3d getTurretPose(Supplier<Pose2d> poseSupplier) {
+    Pose2d drivePose = poseSupplier.get();
+    return new Pose3d(drivePose)
+        .plus(new Transform3d(Inches.of(5), Inches.of(-8), Inches.of(18), new Rotation3d()));
+  }
+
+  public static Pose3d getFlywheelPose(
+      Supplier<Pose2d> poseSupplier, Supplier<Double> turretPosSupplier) {
+    double turretAngleRads = turretPosSupplier.get() * 2 * Math.PI;
+    return getTurretPose(poseSupplier)
+        .plus(new Transform3d(0, 0, 0, new Rotation3d(0, 0, turretAngleRads)))
+        .plus(new Transform3d(Inches.of(-9), Inches.of(0), Inches.of(0), new Rotation3d()));
   }
 }

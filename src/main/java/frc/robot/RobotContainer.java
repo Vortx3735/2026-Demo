@@ -452,5 +452,11 @@ public class RobotContainer {
                             -0.2,
                             new Rotation2d(turret.getTurretTargetPosition() * 2 * Math.PI))))
             .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
+    Logger.recordOutput("Shooter/turretPose", ShooterCommands.getTurretPose(() -> drive.getPose()));
+
+    Logger.recordOutput(
+        "Shooter/flywheelPose",
+        ShooterCommands.getFlywheelPose(
+            () -> drive.getPose(), () -> turret.getTurretCurrentPosition()));
   }
 }
