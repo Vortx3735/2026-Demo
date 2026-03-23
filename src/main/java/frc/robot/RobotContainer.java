@@ -21,11 +21,7 @@ import choreo.auto.AutoFactory;
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -362,7 +358,10 @@ public class RobotContainer {
         CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     operatorController.rt.whileTrue(
         ShooterCommands.AimEverythingToHub(
-            turret, hood, () -> ShooterCommands.getTurretPose(()->drive.getPose()).toPose2d(), targetHoodAngleEntry.getAsDouble()));
+            turret,
+            hood,
+            () -> ShooterCommands.getTurretPose(() -> drive.getPose()).toPose2d(),
+            targetHoodAngleEntry.getAsDouble()));
     operatorController.aButton.toggleOnTrue(
         DriveCommands.joystickDriveAtAngle(
             drive,
@@ -419,41 +418,7 @@ public class RobotContainer {
             ? Constants.FieldConstants.RED_HUB_POSE3D
             : Constants.FieldConstants.BLUE_HUB_POSE3D);
     Logger.recordOutput(
-        "Turret/simulatedPose",
-        new Pose3d(
-                driveSimulation
-                    .getSimulatedDriveTrainPose()
-                    .plus(
-                        new Transform2d(
-                            0.13,
-                            -0.2,
-                            new Rotation2d(turret.getTurretCurrentPosition() * 2 * Math.PI))))
-            .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
-    Logger.recordOutput(
-        "Hood/simulatedPose",
-        new Pose3d(
-                driveSimulation
-                    .getSimulatedDriveTrainPose()
-                    .plus(
-                        new Transform2d(
-                            0.13,
-                            -0.2,
-                            new Rotation2d(turret.getTurretCurrentPosition() * 2 * Math.PI))))
-            .plus(
-                new Transform3d(
-                    0, 0, 0.3, new Rotation3d(0, hood.getHoodAngle() * Math.PI / 180, 0))));
-    Logger.recordOutput(
-        "Turret/targetPose",
-        new Pose3d(
-                driveSimulation
-                    .getSimulatedDriveTrainPose()
-                    .plus(
-                        new Transform2d(
-                            0.13,
-                            -0.2,
-                            new Rotation2d(turret.getTurretTargetPosition() * 2 * Math.PI))))
-            .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
-    Logger.recordOutput("Shooter/turretPose", ShooterCommands.getTurretPose(() -> drive.getPose()));
+        "Turret/simulatedPose", ShooterCommands.getTurretPose(() -> drive.getPose()));
 
     Logger.recordOutput(
         "Shooter/flywheelPose",

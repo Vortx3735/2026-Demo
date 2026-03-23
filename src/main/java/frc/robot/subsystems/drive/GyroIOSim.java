@@ -25,7 +25,7 @@ public class GyroIOSim implements GyroIO {
     inputs.odometryYawPositions = gyroSimulation.getCachedGyroReadings();
   }
 
-  @Override 
+  @Override
   public void setYaw(Rotation2d rotation) {
     gyroSimulation.setRotation(rotation);
   }

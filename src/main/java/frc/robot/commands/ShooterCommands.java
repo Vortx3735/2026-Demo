@@ -260,7 +260,9 @@ public class ShooterCommands {
   public static Pose3d getTurretPose(Supplier<Pose2d> poseSupplier) {
     Pose2d drivePose = poseSupplier.get();
     return new Pose3d(drivePose)
-        .plus(new Transform3d(Inches.of(-8.708), Inches.of(8.299016), Inches.of(18.091), new Rotation3d()));
+        .plus(
+            new Transform3d(
+                Inches.of(-8.708), Inches.of(8.299016), Inches.of(18.091), new Rotation3d()));
   }
 
   public static Pose3d getFlywheelPose(
@@ -268,6 +270,7 @@ public class ShooterCommands {
     double turretAngleRads = turretPosSupplier.get() * 2 * Math.PI;
     return getTurretPose(poseSupplier)
         .plus(new Transform3d(0, 0, 0, new Rotation3d(0, 0, turretAngleRads)))
-        .plus(new Transform3d(Inches.of(3.623), Inches.of(0), Inches.of(4.495771), new Rotation3d()));
+        .plus(
+            new Transform3d(Inches.of(3.623), Inches.of(0), Inches.of(4.495771), new Rotation3d()));
   }
 }

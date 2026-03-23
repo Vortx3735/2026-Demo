@@ -258,6 +258,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
       Logger.recordOutput("pose", getPose());
+      Logger.recordOutput("gyroRotation", rawGyroRotation.getDegrees());
     }
 
     // Update gyro alert
@@ -380,7 +381,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
   @AutoLogOutput(key = "Shooter/TurretPose")
   public Pose2d getTurretPose() {
-    return poseEstimator.getEstimatedPosition().plus(new Transform2d(Inches.of(-8.708), Inches.of(8.299016),new Rotation2d()));
+    return poseEstimator
+        .getEstimatedPosition()
+        .plus(new Transform2d(Inches.of(-8.708), Inches.of(8.299016), new Rotation2d()));
   }
 
   /** Returns the current odometry rotation. */
@@ -390,12 +393,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
   /** Resets the current odometry pose. */
   public void resetOdometry(Pose2d pose) {
-    odometryLock.lock();
     gyroIO.setYaw(pose.getRotation());
-    rawGyroRotation = pose.getRotation(); // so we don't have to wait for periodic update
     resetSimulationPoseCallBack.accept(pose);
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
-    odometryLock.unlock();
   }
 
   public void zeroDriveTrain() {
