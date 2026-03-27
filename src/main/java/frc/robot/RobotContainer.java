@@ -324,6 +324,7 @@ public class RobotContainer {
     driverController.rt.whileTrue(
         ShooterCommands.ShootFromDistance(
             flywheel,
+            hood,
             tunnel,
             hopper,
             intake,
@@ -361,7 +362,10 @@ public class RobotContainer {
         CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     operatorController.rt.whileTrue(
         ShooterCommands.AimEverythingToHub(
-            turret, hood, () -> ShooterCommands.getTurretPose(()->drive.getPose()).toPose2d(), targetHoodAngleEntry.getAsDouble()));
+            turret,
+            hood,
+            () -> ShooterCommands.getTurretPose(() -> drive.getPose()).toPose2d(),
+            targetHoodAngleEntry.getAsDouble()));
     operatorController.aButton.toggleOnTrue(
         DriveCommands.joystickDriveAtAngle(
             drive,

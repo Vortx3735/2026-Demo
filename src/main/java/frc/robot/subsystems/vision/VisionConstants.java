@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -35,28 +36,26 @@ public class VisionConstants {
           new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0));
   public static Transform3d backCameraTransform =
       new Transform3d(
-          //   Inches.of(-((11.3 + 12.77) / 2)),
-          //   Inches.of(-((6.21 + 4.9) / 2)),
-          //   Inches.of(16.052 + 3.57),
-          //   new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0)
-          //       .rotateBy(new Rotation3d(0.0, 0.0, Math.PI))
-          );
-  public static Transform3d rightCameraTransform =
+          Inches.of(-((11.3 + 12.77) / 2)),
+          Inches.of(-((6.21 + 4.9) / 2)),
+          Inches.of(16.052 + 3.57),
+          new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0)
+              .rotateBy(new Rotation3d(0.0, 0.0, Math.PI)));
+  public static Transform3d rightCameraTransform = // tuned
       new Transform3d(
-          //   Inches.of(-3.5),
-          //   Inches.of(14.5),
-          //   Inches.of(21),
-          //   new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
-          //       .rotateBy(new Rotation3d(0.0, 0.0, -Math.PI / 2.0))
-          );
-  public static Transform3d leftCameraTransform =
+          //   Inches.of(16.5 - 47),
+          Meters.of(0.04), // y
+          Meters.of(0.419 - 0.77), // x
+          Inches.of(21),
+          new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
+              .rotateBy(new Rotation3d(0.0, 0.0, -Math.PI / 2.0)));
+  public static Transform3d leftCameraTransform = // tuned
       new Transform3d(
-          //   Inches.of((1.881 + 3.269) / 2),
-          //   Inches.of((13.662 + 15.152) / 2),
-          //   Inches.of(10.332 + 3.57),
-          //   new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
-          //       .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0))
-          );
+          Inches.of((1.881 + 3.269) / 2),
+          Inches.of((13.662 + 15.152) / 2),
+          Inches.of(10.332 + 3.57),
+          new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
+              .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0)));
 
   // Basic filtering threshold
   public static double maxAmbiguity = 0.1;

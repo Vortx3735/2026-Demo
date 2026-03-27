@@ -380,7 +380,9 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
   @AutoLogOutput(key = "Shooter/TurretPose")
   public Pose2d getTurretPose() {
-    return poseEstimator.getEstimatedPosition().plus(new Transform2d(Inches.of(-8.708), Inches.of(8.299016),new Rotation2d()));
+    return poseEstimator
+        .getEstimatedPosition()
+        .plus(new Transform2d(Inches.of(-8.708), Inches.of(8.299016), new Rotation2d()));
   }
 
   /** Returns the current odometry rotation. */
