@@ -169,11 +169,16 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     // Start odometry thread
     PhoenixOdometryThread.getInstance().start();
 
+    // VelocityUnit<VoltageUnit> v = new VelocityUnit<VoltageUnit>(Units.Volts.of(0.8)
+    // Seconds.of(1));
     // Configure SysId
     sysId =
         new SysIdRoutine(
             new SysIdRoutine.Config(
-                null, null, null, (state) -> SignalLogger.writeString("state", state.toString())),
+                null,
+                Volts.of(2),
+                null,
+                (state) -> SignalLogger.writeString("state", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 

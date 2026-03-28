@@ -297,7 +297,7 @@ public class RobotContainer {
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
-    turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
+    turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
