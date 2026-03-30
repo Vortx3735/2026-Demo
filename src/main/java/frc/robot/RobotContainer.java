@@ -185,6 +185,7 @@ public class RobotContainer {
     // Set up auto routines
     autonChooser.addRoutine("Standstill Shoot Unjam", autoRoutines::standstillunjam);
     autonChooser.addRoutine("test", autoRoutines::test);
+    autonChooser.addRoutine("test2", autoRoutines::test2);
 
     autonChooser.addRoutine(
         "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
@@ -294,7 +295,8 @@ public class RobotContainer {
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
-    turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
+    // turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
+    turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(

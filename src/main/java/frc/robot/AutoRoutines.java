@@ -5,7 +5,6 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.ShooterCommands;
@@ -137,9 +136,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -238,9 +235,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -279,13 +274,7 @@ public class AutoRoutines {
     final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
     final AutoTrajectory reset = routine.trajectory("ResetLeft");
 
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -308,7 +297,7 @@ public class AutoRoutines {
 
   // Contests all of neutral zone then shoots, then then intakes from depot, then shoots
   public AutoRoutine leftLongDepotCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftShortDepotCenterContest");
+    final AutoRoutine routine = m_factory.newRoutine("leftLonbDepotCenterContest");
     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
     final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
@@ -322,9 +311,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                /*shoot().withTimeout(3),*/ driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -367,9 +354,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -399,9 +384,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -431,9 +414,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -522,9 +503,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -562,9 +541,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                /*shoot().withTimeout(3), */ driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -600,9 +577,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -640,9 +615,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -672,9 +645,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -701,7 +672,8 @@ public class AutoRoutines {
     routine
         .active()
         .onTrue(
-            Commands.sequence( shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
+            Commands.sequence(
+                shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
 
     // hi if ur reading this
     moveToDepot.done().onTrue(moveThroughDepot.cmd());
@@ -726,7 +698,8 @@ public class AutoRoutines {
     routine
         .active()
         .onTrue(
-            Commands.sequence( shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
+            Commands.sequence(
+                shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
 
     // hi if ur reading this
     moveToDepot.done().onTrue(moveThroughDepot.cmd());
@@ -753,7 +726,7 @@ public class AutoRoutines {
     routine
         .active()
         .onTrue(
-            Commands.sequence( shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
+            Commands.sequence(shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
 
     // move to shooting position 2s after it gets there. gives human player some time
     moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
@@ -768,10 +741,7 @@ public class AutoRoutines {
     final AutoRoutine routine = m_factory.newRoutine("hpRight");
     final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
 
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence( shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
+    routine.active().onTrue(Commands.sequence(moveToHP.resetOdometry(), moveToHP.cmd()));
 
     // move to shooting position 2s after it gets there. gives human player some time
     moveToHP.done().onTrue(shoot());
@@ -788,7 +758,7 @@ public class AutoRoutines {
     routine
         .active()
         .onTrue(
-            Commands.sequence( shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
+            Commands.sequence(shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
 
     // move to shooting position 2s after it gets there. gives human player some time
     moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
@@ -876,6 +846,16 @@ public class AutoRoutines {
                             .withTimeout(4),
                         CommandFactory.clearJamsCommand(m_container.tunnel, m_container.hopper)
                             .withTimeout(1)))));
+
+    return routine;
+  }
+
+  public AutoRoutine test2() {
+    AutoRoutine routine = m_factory.newRoutine("test2");
+
+    AutoTrajectory traj = routine.trajectory("test2");
+
+    routine.active().onTrue(Commands.sequence(traj.resetOdometry(), traj.cmd()));
 
     return routine;
   }

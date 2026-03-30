@@ -72,9 +72,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
-  private final PIDController m_pathXController = new PIDController(3.7, 0, 0);
-  private final PIDController m_pathYController = new PIDController(3.7, 0, 0);
-  private final PIDController m_pathThetaController = new PIDController(3.5, 0, 0);
+  private final PIDController m_pathXController = new PIDController(4.1, 0, 0);
+  private final PIDController m_pathYController = new PIDController(0.3, 0, 0);
+  private final PIDController m_pathThetaController = new PIDController(1, 0, 0);
 
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
