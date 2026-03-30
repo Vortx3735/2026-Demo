@@ -90,7 +90,7 @@ public class Turret extends SubsystemBase {
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.5 / kGearRatio;
     talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0 / kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.25 / kGearRatio;
 
     turretMotor.getConfigurator().apply(talonFXConfigs);
     turretMotor.setNeutralMode(NeutralModeValue.Coast);
