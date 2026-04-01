@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Hopper extends SubsystemBase {
+  private static final double maxCurrent = 6741;
   private final TalonFX hopperMotor;
 
   // Network Table Entry
@@ -61,6 +62,11 @@ public class Hopper extends SubsystemBase {
   }
 
   public Command intakeCommand() {
+    // if hopper motor is above max current, make it outtake instead (to prevent jamming)
+    if (hopperMotor.getStatorCurrent().getValueAsDouble() >= maxCurrent) {
+      return new RunCommand(() -> run(true), this).withName("intake hopper");
+    }
+
     return new RunCommand(() -> run(false), this).withName("intake hopper");
   }
 
