@@ -354,6 +354,7 @@ public class RobotContainer {
     operatorController.yButton.onTrue(
         new InstantCommand(
             () -> ShooterCommands.efficiencyFactor = efficiencyFactorEntry.getAsDouble()));
+    operatorController.aButton.toggleOnTrue(turret.stopCommand()).onTrue(turret.setPositionPIDCommand(0.25));
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povDown.whileTrue(hood.moveCommand(false));
