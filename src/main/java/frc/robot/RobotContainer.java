@@ -296,6 +296,7 @@ public class RobotContainer {
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
+    // turret.setDefaultCommand(ShooterCommands.AimToHubOrSide(turret, () -> drive.getTurretPose()));
     turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
     // turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
 
@@ -367,12 +368,6 @@ public class RobotContainer {
             hood,
             () -> ShooterCommands.getTurretPose(() -> drive.getPose()).toPose2d(),
             targetHoodAngleEntry.getAsDouble()));
-    operatorController.aButton.toggleOnTrue(
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -driverController.getLeftY(),
-            () -> -driverController.getLeftX(),
-            () -> new Rotation2d(0)));
     // Climber Binds
     driverController.povUp.whileTrue(climber.upCommand());
     driverController.povDown.whileTrue(climber.downCommand());
