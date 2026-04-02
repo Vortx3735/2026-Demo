@@ -171,6 +171,22 @@ public class ShooterCommands {
         .withName("turret aim");
   }
 
+  private static Command turretLogicalAimCommand(
+      Turret turret, Supplier<Pose2d> robotPoseSupplier, Supplier<Pose2d> hubPoseSupplier) {
+
+    return Commands.run(
+            () -> {
+              Pose2d rp = robotPoseSupplier.get();
+              Pose2d hp =(rp.getY()<5)? hubPoseSupplier.get():getSidePose(rp);
+              double angleRelative = getAngleRelativeToHub(rp, hp);
+              double rotations = angleRelative / (2 * Math.PI);
+              turret.setPositionPID(rotations);
+              Logger.recordOutput("test/targetTurretRotations", rotations);
+            },
+            turret)
+        .withName("turret logical aim");
+  }
+
   public static Command AimEverything(Turret turret, Hood hood, Supplier<Pose2d> poseSupplier) {
     // create a supplier that computes target RPS from the live robot pose
 
@@ -261,6 +277,10 @@ public class ShooterCommands {
    * does not control the flywheel or hood.
    */
   public static Command AimToHub(Turret turret, Supplier<Pose2d> poseSupplier) {
+    Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
+    return turretAimCommand(turret, poseSupplier, hubPoseSupplier).withName("turretAimToHub");
+  }
+  public static Command AimToHubOrSide(Turret turret, Supplier<Pose2d> poseSupplier) {
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier).withName("turretAimToHub");
   }
