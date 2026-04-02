@@ -176,7 +176,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
-                Volts.of(2),
+                Volts.of(2.5),
                 null,
                 (state) -> SignalLogger.writeString("state", state.toString())),
             new SysIdRoutine.Mechanism(
@@ -292,6 +292,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+  }
+
+  public void driveFieldRelative(ChassisSpeeds speeds) {
+    runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, rawGyroRotation));
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -427,7 +431,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     speeds.omegaRadiansPerSecond +=
         m_pathThetaController.calculate(pose.getRotation().getRadians(), sample.heading);
 
-    runVelocity(speeds);
+    driveFieldRelative(speeds);
   }
 
   /** Adds a new timestamped vision measurement. */

@@ -859,4 +859,14 @@ public class AutoRoutines {
 
     return routine;
   }
+
+  public AutoRoutine moveTwoMeters() {
+    AutoRoutine routine = m_factory.newRoutine("moveTwoMeters");
+
+    AutoTrajectory traj = routine.trajectory("straight1meter");
+
+    routine.active().onTrue(Commands.sequence(traj.resetOdometry(), traj.cmd()));
+
+    return routine;
+  }
 }

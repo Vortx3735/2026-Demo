@@ -223,6 +223,7 @@ public class RobotContainer {
     autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
 
     autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
+    autonChooser.addRoutine("Move two meters", autoRoutines::moveTwoMeters);
 
     SmartDashboard.putData("Auton Chooser", autonChooser);
 
@@ -295,8 +296,8 @@ public class RobotContainer {
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
-    // turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
-    turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
+    turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
+    // turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -387,6 +388,7 @@ public class RobotContainer {
 
     sysIdController.lb.onTrue(Commands.runOnce(SignalLogger::start));
     sysIdController.rb.onTrue(Commands.runOnce(SignalLogger::stop));
+    // sysIdController.povUp.whileTrue();
     sysIdController.yButton.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     sysIdController.aButton.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     sysIdController.xButton.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
