@@ -296,7 +296,8 @@ public class RobotContainer {
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
-    // turret.setDefaultCommand(ShooterCommands.AimToHubOrSide(turret, () -> drive.getTurretPose()));
+    // turret.setDefaultCommand(ShooterCommands.AimToHubOrSide(turret, () ->
+    // drive.getTurretPose()));
     turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
     // turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
 
@@ -355,7 +356,10 @@ public class RobotContainer {
     operatorController.yButton.onTrue(
         new InstantCommand(
             () -> ShooterCommands.efficiencyFactor = efficiencyFactorEntry.getAsDouble()));
-    operatorController.aButton.toggleOnTrue(turret.stopCommand()).onTrue(turret.setPositionPIDCommand(0.25));
+    operatorController
+        .aButton
+        .toggleOnTrue(turret.stopCommand())
+        .onTrue(turret.setPositionPIDCommand(0.25));
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povDown.whileTrue(hood.moveCommand(false));

@@ -23,8 +23,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class ShooterCommands {
   // if only running right camera
-  public static double offset = 0.07;
-  public static double efficiencyFactor = 1.01;
+  public static double offset = 0.09;
+  public static double efficiencyFactor = 1.005;
   // public double offset=0.0;
   // Cache Pose2d instances for hubs (avoid allocating in tight loops)
   private static final Pose2d RED_HUB_POSE2D =
@@ -177,7 +177,7 @@ public class ShooterCommands {
     return Commands.run(
             () -> {
               Pose2d rp = robotPoseSupplier.get();
-              Pose2d hp =(rp.getY()<5)? hubPoseSupplier.get():getSidePose(rp);
+              Pose2d hp = (rp.getY() < 5) ? hubPoseSupplier.get() : getSidePose(rp);
               double angleRelative = getAngleRelativeToHub(rp, hp);
               double rotations = angleRelative / (2 * Math.PI);
               turret.setPositionPID(rotations);
@@ -280,6 +280,7 @@ public class ShooterCommands {
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier).withName("turretAimToHub");
   }
+
   public static Command AimToHubOrSide(Turret turret, Supplier<Pose2d> poseSupplier) {
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier).withName("turretAimToHub");

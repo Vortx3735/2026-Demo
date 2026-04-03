@@ -98,7 +98,7 @@ public class Turret extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable table = inst.getTable("Subsystems/Turret");
     turretSpeedEntry = table.getDoubleTopic("turretSpeed").getEntry(0);
-    turretSpeedEntry.set(0.1);
+    turretSpeedEntry.set(0.2);
     turretPositionEntry = table.getDoubleTopic("turretPosition(rotations)").getEntry(0);
     turretPositionEntry.set(0);
 
