@@ -773,27 +773,32 @@ public class AutoRoutines {
 
   public AutoRoutine standstill() {
     final AutoRoutine routine = m_factory.newRoutine("standstill");
-
+    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.parallel(
-                    ShooterCommands.AimEverythingToHub(
-                        m_container.turret,
-                        m_container.hood,
-                        () -> m_container.drive.getPose(),
-                        65),
+                Commands.deadline(
+                    new WaitCommand(15),
                     Commands.sequence(
-                        new WaitCommand(1),
-                        ShooterCommands.ShootFromDistance(
-                            m_container.flywheel,
-                            m_container.hood,
-                            m_container.tunnel,
-                            m_container.hopper,
-                            m_container.intake,
-                            () -> m_container.drive.getTurretPose(),
-                            65)))));
+                        Commands.parallel(
+                            ShooterCommands.AimEverythingToHub(
+                                m_container.turret,
+                                m_container.hood,
+                                () -> m_container.drive.getPose(),
+                                65),
+                            Commands.sequence(
+                                new WaitCommand(1),
+                                ShooterCommands.ShootFromDistance(
+                                    m_container.flywheel,
+                                    m_container.hood,
+                                    m_container.tunnel,
+                                    m_container.hopper,
+                                    m_container.intake,
+                                    () -> m_container.drive.getTurretPose(),
+                                    65))))),
+                moveToHP.resetOdometry(),
+                moveToHP.cmd()));
 
     return routine;
   }

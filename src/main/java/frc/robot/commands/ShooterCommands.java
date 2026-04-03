@@ -137,7 +137,7 @@ public class ShooterCommands {
   public static Pose2d getSidePose(Pose2d robotPose) {
     if (DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().get() == Alliance.Red) {
-      if (robotPose.getY() < 4) {
+      if (robotPose.getY() > 4) {
         return RED_LEFT_POSE2D;
       } else {
         return RED_RIGHT_POSE2D;
@@ -177,7 +177,8 @@ public class ShooterCommands {
     return Commands.run(
             () -> {
               Pose2d rp = robotPoseSupplier.get();
-              Pose2d hp = (rp.getY() < 5) ? hubPoseSupplier.get() : getSidePose(rp);
+              Pose2d hp =
+                  (rp.getY() < 5.2 || rp.getY() > 10.8) ? hubPoseSupplier.get() : getSidePose(rp);
               double angleRelative = getAngleRelativeToHub(rp, hp);
               double rotations = angleRelative / (2 * Math.PI);
               turret.setPositionPID(rotations);
@@ -283,7 +284,8 @@ public class ShooterCommands {
 
   public static Command AimToHubOrSide(Turret turret, Supplier<Pose2d> poseSupplier) {
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
-    return turretAimCommand(turret, poseSupplier, hubPoseSupplier).withName("turretAimToHub");
+    return turretLogicalAimCommand(turret, poseSupplier, hubPoseSupplier)
+        .withName("turretAimToHub");
   }
 
   public static Pose3d getTurretPose(Supplier<Pose2d> poseSupplier) {

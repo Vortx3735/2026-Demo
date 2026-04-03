@@ -295,7 +295,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   public void driveFieldRelative(ChassisSpeeds speeds) {
-    runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, rawGyroRotation));
+    runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation()));
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
