@@ -307,7 +307,7 @@ public class RobotContainer {
                 drive,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX())
+                () -> driverController.getRightX())
             .withName("joystick drive"));
 
     // Reset gyro / odometry
