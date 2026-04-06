@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
@@ -19,6 +20,8 @@ public class Tunnel extends SubsystemBase {
   // Network Table Entry
   final DoubleEntry topTunnelSpeedEntry;
   final DoubleEntry bottomTunnelSpeedEntry;
+
+  private static final double maxCurrent = 1000;
 
   public Tunnel(int bottomTunnelId, int topTunnelId) {
     bottomTunnelMotor = new TalonFX(bottomTunnelId);
@@ -88,7 +91,12 @@ public class Tunnel extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return new RunCommand(() -> run(false), this).withName("intake tunnel");
+    return Commands.either(
+        Commands.sequence(
+            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(true))),
+            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(false)))),
+        Commands.run(() -> run(false)),
+        () -> bottomTunnelMotor.getStatorCurrent().getValueAsDouble() >= maxCurrent);
   }
 
   public Command outtakeCommand() {

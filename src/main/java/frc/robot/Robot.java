@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -92,8 +93,22 @@ public class Robot extends LoggedRobot {
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
+    double matchTime = DriverStation.getMatchTime();
+    if (matchTime > 131) {
+      matchTime -= 130;
+    } else if (matchTime > 106) {
+      matchTime -= 105;
+    } else if (matchTime > 81) {
+      matchTime -= 80;
+    } else if (matchTime > 56) {
+      matchTime -= 55;
+    } else if (matchTime > 31) {
+      matchTime -= 30;
+    }
+
     CommandScheduler.getInstance().run();
     SmartDashboard.putData("scheduler", CommandScheduler.getInstance());
+    SmartDashboard.putNumber("Shift Countdown", (int) matchTime);
 
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);

@@ -5,7 +5,6 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.ShooterCommands;
@@ -51,13 +50,6 @@ public class AutoRoutines {
             .withTimeout(4));
   }
 
-  // returns the command group for zeroing shooter in auton
-  private Command zero() {
-    return Commands.sequence(
-        Commands.race(new InstantCommand(() -> m_container.turret.zero()), new WaitCommand(0.1)),
-        Commands.race(new InstantCommand(() -> m_container.hood.zeroHood()), new WaitCommand(0.1)));
-  }
-
   //   public AutoRoutine exampleRoutine() {
   //     // Creates a routine called "example" and loads a trajectory. The trajectory is essentially
   // the
@@ -96,7 +88,39 @@ public class AutoRoutines {
   //     // Stop intake and indexer
   //     // m_container.intake.stopCommand(),
   //     // m_container.hopper.stopCommand();
+  //     // If a routine was a method, you could think of this as its body.
+  //     // The "routine.active())" trigger is essentially the "entrance" to a routine.
+  //     // Here, you can sequence commands for the routine.
+  //     routine
+  //         .active()
+  //         .onTrue(
+  //             // Since onTrue only has one parameter, you need to use Commands.sequence to
+  // schedule
+  //             // more than one command.
+  //             Commands.sequence(
+  //                 // No semicolons! Since you are passing arguments, it is only one statement. A
+  //                 // semicolon only comes at the end of a statement. Also, since you are passing
+  //                 // multiple arguments, you need commas.
+  //                 exampleTraj.resetOdometry(),
+  //                 exampleTraj
+  //                     .cmd(), // Schedule the trajectory (make the robot move on the trajectory)
+  //                 // Run commands in parallel (at the same time)
+  //                 m_container.drive.stopCommand(),
+  //                 CommandFactory.intakeCommand(m_container.intake, m_container.hopper),
+  //                 // Run flywheel then stop
+  //                 ShooterCommands.ShootFromDistance(
+  //                     m_container.flywheel,
+  //                     m_container.tunnel,
+  //                     m_container.hopper,
+  //                     m_container.intake,
+  //                     () -> m_container.drive.getTurretPose(),
+  //                     65)));
+  //     // Stop intake and indexer
+  //     // m_container.intake.stopCommand(),
+  //     // m_container.hopper.stopCommand();
 
+  //     return routine;
+  //   }
   //     return routine;
   //   }
 
@@ -112,10 +136,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -133,6 +154,15 @@ public class AutoRoutines {
     reset.done().onTrue(driveToMiddle.cmd());
 
     // short bindings will call again
+
+    return routine;
+  }
+
+  public AutoRoutine test() {
+    final AutoRoutine routine = m_factory.newRoutine("test");
+    final AutoTrajectory test = routine.trajectory("test");
+
+    routine.active().onTrue(Commands.sequence(test.resetOdometry(), test.cmd()));
 
     return routine;
   }
@@ -156,7 +186,6 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
                 shoot().withTimeout(3),
                 driveToMiddleShort.resetOdometry(),
                 driveToMiddleShort.cmd()));
@@ -206,10 +235,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -248,14 +274,7 @@ public class AutoRoutines {
     final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
     final AutoTrajectory reset = routine.trajectory("ResetLeft");
 
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -278,7 +297,7 @@ public class AutoRoutines {
 
   // Contests all of neutral zone then shoots, then then intakes from depot, then shoots
   public AutoRoutine leftLongDepotCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftShortDepotCenterContest");
+    final AutoRoutine routine = m_factory.newRoutine("leftLonbDepotCenterContest");
     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
     final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
@@ -292,10 +311,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                /*shoot().withTimeout(3),*/ driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -338,10 +354,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -371,10 +384,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -404,10 +414,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -448,7 +455,6 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
                 shoot().withTimeout(3),
                 driveToMiddleShort.resetOdometry(),
                 driveToMiddleShort.cmd()));
@@ -497,10 +503,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -538,10 +541,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                /*shoot().withTimeout(3), */ driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -577,10 +577,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -618,10 +615,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -651,10 +645,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(),
-                shoot().withTimeout(3),
-                driveToMiddle.resetOdometry(),
-                driveToMiddle.cmd()));
+                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
     ;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
@@ -682,7 +673,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(), shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
+                shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
 
     // hi if ur reading this
     moveToDepot.done().onTrue(moveThroughDepot.cmd());
@@ -708,7 +699,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                zero(), shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
+                shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
 
     // hi if ur reading this
     moveToDepot.done().onTrue(moveThroughDepot.cmd());
@@ -735,8 +726,7 @@ public class AutoRoutines {
     routine
         .active()
         .onTrue(
-            Commands.sequence(
-                zero(), shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
+            Commands.sequence(shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
 
     // move to shooting position 2s after it gets there. gives human player some time
     moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
@@ -751,11 +741,7 @@ public class AutoRoutines {
     final AutoRoutine routine = m_factory.newRoutine("hpRight");
     final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
 
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                zero(), shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
+    routine.active().onTrue(Commands.sequence(moveToHP.resetOdometry(), moveToHP.cmd()));
 
     // move to shooting position 2s after it gets there. gives human player some time
     moveToHP.done().onTrue(shoot());
@@ -772,8 +758,7 @@ public class AutoRoutines {
     routine
         .active()
         .onTrue(
-            Commands.sequence(
-                zero(), shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
+            Commands.sequence(shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
 
     // move to shooting position 2s after it gets there. gives human player some time
     moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
@@ -788,31 +773,32 @@ public class AutoRoutines {
 
   public AutoRoutine standstill() {
     final AutoRoutine routine = m_factory.newRoutine("standstill");
-
+    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.race(
-                    new InstantCommand(() -> m_container.turret.zero()), new WaitCommand(0.1)),
-                Commands.race(
-                    new InstantCommand(() -> m_container.hood.zeroHood()), new WaitCommand(0.1)),
-                Commands.parallel(
-                    ShooterCommands.AimEverythingToHub(
-                        m_container.turret,
-                        m_container.hood,
-                        () -> m_container.drive.getPose(),
-                        65),
+                Commands.deadline(
+                    new WaitCommand(15),
                     Commands.sequence(
-                        new WaitCommand(1),
-                        ShooterCommands.ShootFromDistance(
-                            m_container.flywheel,
-                            m_container.hood,
-                            m_container.tunnel,
-                            m_container.hopper,
-                            m_container.intake,
-                            () -> m_container.drive.getTurretPose(),
-                            65)))));
+                        Commands.parallel(
+                            ShooterCommands.AimEverythingToHub(
+                                m_container.turret,
+                                m_container.hood,
+                                () -> m_container.drive.getPose(),
+                                65),
+                            Commands.sequence(
+                                new WaitCommand(1),
+                                ShooterCommands.ShootFromDistance(
+                                    m_container.flywheel,
+                                    m_container.hood,
+                                    m_container.tunnel,
+                                    m_container.hopper,
+                                    m_container.intake,
+                                    () -> m_container.drive.getTurretPose(),
+                                    65))))),
+                moveToHP.resetOdometry(),
+                moveToHP.cmd()));
 
     return routine;
   }
@@ -824,10 +810,6 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.race(
-                    new InstantCommand(() -> m_container.turret.zero()), new WaitCommand(0.1)),
-                Commands.race(
-                    new InstantCommand(() -> m_container.hood.zeroHood()), new WaitCommand(0.1)),
                 Commands.parallel(
                     ShooterCommands.AimEverythingToHub(
                         m_container.turret,
@@ -869,6 +851,26 @@ public class AutoRoutines {
                             .withTimeout(4),
                         CommandFactory.clearJamsCommand(m_container.tunnel, m_container.hopper)
                             .withTimeout(1)))));
+
+    return routine;
+  }
+
+  public AutoRoutine test2() {
+    AutoRoutine routine = m_factory.newRoutine("test2");
+
+    AutoTrajectory traj = routine.trajectory("test2");
+
+    routine.active().onTrue(Commands.sequence(traj.resetOdometry(), traj.cmd()));
+
+    return routine;
+  }
+
+  public AutoRoutine moveTwoMeters() {
+    AutoRoutine routine = m_factory.newRoutine("moveTwoMeters");
+
+    AutoTrajectory traj = routine.trajectory("straight1meter");
+
+    routine.active().onTrue(Commands.sequence(traj.resetOdometry(), traj.cmd()));
 
     return routine;
   }

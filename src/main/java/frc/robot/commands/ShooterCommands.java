@@ -23,8 +23,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class ShooterCommands {
   // if only running right camera
-  public static double offset = 0.07;
-  public static double efficiencyFactor = 1.01;
+  public static double offset = 0.09;
+  public static double efficiencyFactor = 1.005;
   // public double offset=0.0;
   // Cache Pose2d instances for hubs (avoid allocating in tight loops)
   private static final Pose2d RED_HUB_POSE2D =
@@ -95,7 +95,7 @@ public class ShooterCommands {
     // 4. Recovery/Efficiency Factor (Adjust based on testing)
     // Most FRC shooters lose ~10-15% to slip/compression
     double ef = efficiencyFactor;
-    if (xs > 15) {
+    if (xs > 13) {
       ef += 0.04;
     }
     Logger.recordOutput("Shooter/calculatedShooterRPS", rps * ef);
@@ -137,7 +137,7 @@ public class ShooterCommands {
   public static Pose2d getSidePose(Pose2d robotPose) {
     if (DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().get() == Alliance.Red) {
-      if (robotPose.getY() < 4) {
+      if (robotPose.getY() > 4) {
         return RED_LEFT_POSE2D;
       } else {
         return RED_RIGHT_POSE2D;
@@ -169,6 +169,23 @@ public class ShooterCommands {
             },
             turret)
         .withName("turret aim");
+  }
+
+  private static Command turretLogicalAimCommand(
+      Turret turret, Supplier<Pose2d> robotPoseSupplier, Supplier<Pose2d> hubPoseSupplier) {
+
+    return Commands.run(
+            () -> {
+              Pose2d rp = robotPoseSupplier.get();
+              Pose2d hp =
+                  (rp.getY() < 5.2 || rp.getY() > 10.8) ? hubPoseSupplier.get() : getSidePose(rp);
+              double angleRelative = getAngleRelativeToHub(rp, hp);
+              double rotations = angleRelative / (2 * Math.PI);
+              turret.setPositionPID(rotations);
+              Logger.recordOutput("test/targetTurretRotations", rotations);
+            },
+            turret)
+        .withName("turret logical aim");
   }
 
   public static Command AimEverything(Turret turret, Hood hood, Supplier<Pose2d> poseSupplier) {
@@ -263,6 +280,12 @@ public class ShooterCommands {
   public static Command AimToHub(Turret turret, Supplier<Pose2d> poseSupplier) {
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
     return turretAimCommand(turret, poseSupplier, hubPoseSupplier).withName("turretAimToHub");
+  }
+
+  public static Command AimToHubOrSide(Turret turret, Supplier<Pose2d> poseSupplier) {
+    Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
+    return turretLogicalAimCommand(turret, poseSupplier, hubPoseSupplier)
+        .withName("turretAimToHub");
   }
 
   public static Pose3d getTurretPose(Supplier<Pose2d> poseSupplier) {

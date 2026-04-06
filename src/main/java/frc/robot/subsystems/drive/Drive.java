@@ -72,9 +72,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
-  private final PIDController m_pathXController = new PIDController(3.7, 0, 0);
-  private final PIDController m_pathYController = new PIDController(3.7, 0, 0);
-  private final PIDController m_pathThetaController = new PIDController(3.5, 0, 0);
+  private final PIDController m_pathXController = new PIDController(4.1, 0, 0);
+  private final PIDController m_pathYController = new PIDController(0.3, 0, 0);
+  private final PIDController m_pathThetaController = new PIDController(1, 0, 0);
 
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
@@ -176,7 +176,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
-                Volts.of(2),
+                Volts.of(2.5),
                 null,
                 (state) -> SignalLogger.writeString("state", state.toString())),
             new SysIdRoutine.Mechanism(
@@ -263,6 +263,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
       Logger.recordOutput("pose", getPose());
+      Logger.recordOutput("gyroRotation", rawGyroRotation.getDegrees());
     }
 
     // Update gyro alert
@@ -291,6 +292,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+  }
+
+  public void driveFieldRelative(ChassisSpeeds speeds) {
+    runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation()));
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -397,8 +402,13 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
   /** Resets the current odometry pose. */
   public void resetOdometry(Pose2d pose) {
-    resetSimulationPoseCallBack.accept(pose);
+    odometryLock.lock();
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    resetSimulationPoseCallBack.accept(pose);
+    odometryLock.unlock();
+    ChassisSpeeds robotRelativeSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(new ChassisSpeeds(0, 0, 0), rawGyroRotation);
+    kinematics.toSwerveModuleStates(robotRelativeSpeeds);
   }
 
   public void zeroDriveTrain() {
@@ -421,7 +431,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     speeds.omegaRadiansPerSecond +=
         m_pathThetaController.calculate(pose.getRotation().getRadians(), sample.heading);
 
-    runVelocity(speeds);
+    driveFieldRelative(speeds);
   }
 
   /** Adds a new timestamped vision measurement. */
