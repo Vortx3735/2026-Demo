@@ -82,6 +82,7 @@ public class RobotContainer {
           Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
           Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
   public final Telemetry telemetry;
+  public final LEDSubsystem led;
 
   private SwerveDriveSimulation driveSimulation = null;
 
@@ -177,6 +178,7 @@ public class RobotContainer {
     }
     telemetry =
         new Telemetry(drive, vision, flywheel, hood, turret, hopper, intake, tunnel, climber);
+    led = new LEDSubsystem(vision);
     // Init auton objects
     autoFactory = drive.createAutoFactory();
     autoRoutines = new AutoRoutines(autoFactory, this);
