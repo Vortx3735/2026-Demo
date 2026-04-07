@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.WLEDController;
-import frc.robot.util.WLEDController.State;
 
 public class LEDSubsystem extends SubsystemBase {
   Vision vision;
@@ -14,27 +13,45 @@ public class LEDSubsystem extends SubsystemBase {
     this.vision = vision;
   }
 
-  private final WLEDController wled = new WLEDController(Constants.WLED_IP);
-  private State lastSentState = null;
+  public enum LEDState {
+    OFF(-1),
+    IDLE(1),
+    HAS_TAG(2),
+    NO_TAG(3);
 
-  public void setRobotState(State newState) {
-    // Optimization: Only send the network packet if the state actually changed
-    if (newState != lastSentState) {
-      wled.set(newState);
-      lastSentState = newState;
+    private final int presetId;
+
+    LEDState(int id) {
+      this.presetId = id;
     }
+  }
+
+  private final WLEDController wled = new WLEDController(Constants.WLED_IP);
+  private LEDState currentState = LEDState.OFF;
+
+  public void setState(LEDState newState) {
+    if (newState == currentState) return; // Optimization
+
+    if (newState == LEDState.OFF) {
+      wled.setPower(false);
+    } else {
+      wled.setPower(true);
+      wled.setPreset(newState.presetId);
+    }
+
+    currentState = newState;
   }
 
   @Override
   public void periodic() {
     if (DriverStation.isDisabled()) {
-      setRobotState(State.IDLE);
+      setState(LEDState.IDLE);
       return;
     }
     if (vision.hasTag()) {
-      this.setRobotState(WLEDController.State.HAS_TAG);
+      this.setState(LEDState.HAS_TAG);
     } else {
-      this.setRobotState(WLEDController.State.NO_TAG);
+      this.setState(LEDState.NO_TAG);
     }
   }
 }
