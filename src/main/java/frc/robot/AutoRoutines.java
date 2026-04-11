@@ -155,6 +155,7 @@ public class AutoRoutines {
   // Contests half of neutral zone then shoots, then does it again
   public AutoRoutine leftDblShortCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("leftDblShortCenterContest");
+    final AutoTrajectory initialDriveBack = routine.trajectory("LeftInitialDriveBack");
     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftShortDriveThroughMiddle");
     final AutoTrajectory driveBack = routine.trajectory("LeftShortDriveBack");
@@ -162,12 +163,11 @@ public class AutoRoutines {
 
     routine
         .active()
-        .onTrue(
-            Commands.sequence(
-                /*shoot().withTimeout(3),*/ driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), driveToMiddle.cmd()));
 
     // short
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+    initialDriveBack.doneFor(3).whileTrue(shoot());
+    driveToMiddle.doneDelayed(3).onTrue(driveThroughMiddle.cmd());
 
     driveThroughMiddle
         .active()
@@ -370,69 +370,10 @@ public class AutoRoutines {
     return routine;
   }
 
-  // Contests half of neutral zone, shoots, then climbs
-  public AutoRoutine leftShortClimbCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftShortClimbCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftShortDriveBack");
-    final AutoTrajectory climb = routine.trajectory("LeftsideClimb");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-    ;
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
-    driveBack.doneFor(4).whileTrue(shoot());
-    driveBack.doneDelayed(4).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).onTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
-  // Contests all of neutral zone, shoots, then climbs
-  public AutoRoutine leftLongClimbCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftLongClimbCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
-    final AutoTrajectory climb = routine.trajectory("LeftsideClimb");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-    ;
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
-    driveBack.doneFor(4).whileTrue(shoot());
-    driveBack.doneDelayed(4).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
   // Contests half of neutral zone then shoots, then does it again
   public AutoRoutine rightDblShortCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("rightDblShortCenterContest");
+    final AutoTrajectory initialDriveBack = routine.trajectory("RightInitialDriveBack");
     final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightShortDriveThroughMiddle");
     final AutoTrajectory driveBack = routine.trajectory("RightShortDriveBack");
@@ -440,12 +381,11 @@ public class AutoRoutines {
 
     routine
         .active()
-        .onTrue(
-            Commands.sequence(
-                driveToMiddle.resetOdometry(), shoot().withTimeout(3), driveToMiddle.cmd()));
+        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), driveToMiddle.cmd()));
 
-    // short;
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+    // short
+    initialDriveBack.doneFor(3).whileTrue(shoot());
+    driveToMiddle.doneDelayed(3).onTrue(driveThroughMiddle.cmd());
 
     driveThroughMiddle
         .active()
@@ -590,107 +530,6 @@ public class AutoRoutines {
     return routine;
   }
 
-  // Contests all of neutral zone then shoots, then intakes from HP, then shoots
-  public AutoRoutine rightLongHPCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightShortHPCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightLongDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetRight");
-
-    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
-    final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short;
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 4 seconds after robot drives back
-    driveBack.doneFor(4).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(4).onTrue(reset.cmd());
-    reset.done().onTrue(moveToHP.cmd());
-
-    // hp
-
-    moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
-
-    shootAfterHP.done().whileTrue(shoot());
-
-    return routine;
-  }
-
-  // Contests half of neutral zone, shoots, then climbs
-  public AutoRoutine rightShortClimbCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightShortClimbCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightShortDriveBack");
-    final AutoTrajectory climb = routine.trajectory("RightsideClimb");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-    ;
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
-    driveBack.doneFor(5).whileTrue(shoot());
-    driveBack.doneDelayed(5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
-  // Contests all of neutral zone, shoots, then climbs
-  public AutoRoutine rightLongClimbCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightLongClimbCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightLongDriveBack");
-    final AutoTrajectory climb = routine.trajectory("RightsideClimb");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-    ;
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! upposed to shoot 5 seconds after robot drives back then go to climb pos
-    driveBack.doneFor(5).whileTrue(shoot());
-    driveBack.doneDelayed(5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
   public AutoRoutine depot() {
     final AutoRoutine routine = m_factory.newRoutine("depotLeft");
     final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
@@ -716,55 +555,6 @@ public class AutoRoutines {
     return routine;
   }
 
-  public AutoRoutine climbDepot() {
-    final AutoRoutine routine = m_factory.newRoutine("climbDepotLeft");
-    final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
-    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
-    final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
-    final AutoTrajectory climb = routine.trajectory("LeftsideClimb");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
-
-    // hi if ur reading this
-    moveToDepot.done().onTrue(moveThroughDepot.cmd());
-
-    moveThroughDepot
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
-
-    shootAfterDepot.done().onTrue(aim());
-    shootAfterDepot.doneFor(3.5).whileTrue(shoot());
-    shootAfterDepot.doneDelayed(3.5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
-    return routine;
-  }
-
-  public AutoRoutine hp() {
-    final AutoRoutine routine = m_factory.newRoutine("hpRight");
-    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
-    final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
-
-    // move to shooting position 2s after it gets there. gives human player some time
-    moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
-
-    shootAfterHP.done().onTrue(aim());
-    shootAfterHP.doneFor(3.5).whileTrue(shoot());
-
-    return routine;
-  }
-
   public AutoRoutine hpSimple() {
     final AutoRoutine routine = m_factory.newRoutine("hpRight");
     final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
@@ -774,28 +564,6 @@ public class AutoRoutines {
     // move to shooting position 2s after it gets there. gives human player some time
     moveToHP.done().onTrue(shoot());
 
-    return routine;
-  }
-
-  public AutoRoutine climbhp() {
-    final AutoRoutine routine = m_factory.newRoutine("climbhpRight");
-    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
-    final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
-    final AutoTrajectory climb = routine.trajectory("RightsideClimb");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(shoot().withTimeout(3), moveToHP.resetOdometry(), moveToHP.cmd()));
-
-    // move to shooting position 2s after it gets there. gives human player some time
-    moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
-
-    shootAfterHP.doneFor(5).whileTrue(shoot());
-    shootAfterHP.doneDelayed(5).onTrue(climb.cmd());
-
-    // 7s delay bc im not tryna climb too early yk
-    climb.doneDelayed(7).whileTrue(m_container.climber.downCommand());
     return routine;
   }
 
