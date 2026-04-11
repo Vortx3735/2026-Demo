@@ -188,8 +188,8 @@ public class RobotContainer {
     autonChooser.addRoutine("Standstill shoot then move", autoRoutines::standstill);
     // autonChooser.addRoutine("test2", autoRoutines::test2);
 
-    // autonChooser.addRoutine(
-    //     "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
+    autonChooser.addRoutine(
+        "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
     // autonChooser.addRoutine(
     //     "Left ShortLong Center Contest", autoRoutines::leftShortLongCenterContest);
     // autonChooser.addRoutine(

@@ -36,9 +36,9 @@ public class VisionConstants {
           new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0));
   public static Transform3d backCameraTransform =
       new Transform3d(
-          Inches.of(-((11.3 + 12.77) / 2)),
-          Inches.of(-((6.21 + 4.9) / 2)),
-          Inches.of(16.052 + 3.57),
+          Inches.of(-((9.75))),
+          Inches.of(-(7.25)),
+          Inches.of(18.9),
           new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI)));
   public static Transform3d rightCameraTransform = // tuned
@@ -51,9 +51,9 @@ public class VisionConstants {
               .rotateBy(new Rotation3d(0.0, 0.0, -Math.PI / 2.0)));
   public static Transform3d leftCameraTransform = // tuned
       new Transform3d(
-          Inches.of((1.881 + 3.269) / 2),
+          Inches.of(((1.881 + 3.269) / 2) - 4.75),
           Inches.of((13.662 + 15.152) / 2),
-          Inches.of(10.332 + 3.57),
+          Inches.of(10.332 + 3.57 + 4.5),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0)));
 

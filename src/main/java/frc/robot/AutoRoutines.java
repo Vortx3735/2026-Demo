@@ -124,9 +124,9 @@ public class AutoRoutines {
   //     return routine;
   //   }
 
-  public AutoRoutine behindHub() {
+  public AutoRoutine behindHubDepot() {
     final AutoRoutine routine = m_factory.newRoutine("behindHub");
-    final AutoTrajectory behindHubMid = routine.trajectory("BehindHubMid");
+    final AutoTrajectory behindHubMid = routine.trajectory("BehindHubDepot");
     final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepotMid");
     final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepotMid");
 
@@ -152,6 +152,17 @@ public class AutoRoutines {
     return routine;
   }
 
+  public AutoRoutine behindHub() {
+    final AutoRoutine routine = m_factory.newRoutine("behindHub");
+    final AutoTrajectory behindHubTraj = routine.trajectory("BehindHub");
+
+    routine.active().onTrue(Commands.sequence(behindHubTraj.resetOdometry(), behindHubTraj.cmd()));
+
+    behindHubTraj.done().whileTrue(shoot());
+
+    return routine;
+  }
+
   // Contests half of neutral zone then shoots, then does it again
   public AutoRoutine leftDblShortCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("leftDblShortCenterContest");
@@ -163,11 +174,12 @@ public class AutoRoutines {
 
     routine
         .active()
-        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), driveToMiddle.cmd()));
+        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), initialDriveBack.cmd()));
 
     // short
     initialDriveBack.doneFor(3).whileTrue(shoot());
-    driveToMiddle.doneDelayed(3).onTrue(driveThroughMiddle.cmd());
+    initialDriveBack.doneDelayed(3).onTrue(driveToMiddle.cmd());
+    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
     driveThroughMiddle
         .active()
@@ -199,6 +211,7 @@ public class AutoRoutines {
   // zone
   public AutoRoutine leftShortLongCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("leftShortLongCenterContest");
+    final AutoTrajectory initialDriveBack = routine.trajectory("LeftInitialDriveBack");
     final AutoTrajectory driveToMiddleShort = routine.trajectory("LeftDriveToMiddle");
     final AutoTrajectory driveThroughMiddleShort =
         routine.trajectory("LeftShortDriveThroughMiddle");
@@ -212,13 +225,11 @@ public class AutoRoutines {
 
     routine
         .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddleShort.resetOdometry(),
-                driveToMiddleShort.cmd()));
+        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), initialDriveBack.cmd()));
 
     // short
+    initialDriveBack.doneFor(3).whileTrue(shoot());
+    initialDriveBack.doneDelayed(3).onTrue(driveToMiddleShort.cmd());
     driveToMiddleShort.done().onTrue(driveThroughMiddleShort.cmd());
 
     driveThroughMiddleShort
@@ -247,63 +258,22 @@ public class AutoRoutines {
     return routine;
   }
 
-  // Contests half of neutral zone then shoots, then intakes from HP, then shoots
-  public AutoRoutine leftShortDepotCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftShortDepotCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftShortDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetLeft");
-
-    final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
-    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
-    final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short;
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.doneFor(4).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(4).onTrue(reset.cmd());
-    reset.done().onTrue(moveToDepot.cmd());
-
-    // depot
-
-    moveToDepot.done().onTrue(moveThroughDepot.cmd());
-
-    moveThroughDepot
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
-
-    shootAfterDepot.done().whileTrue(shoot());
-
-    return routine;
-  }
-
   // Contests all of neutral zone then shoots
   public AutoRoutine leftDblLongCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("leftDblLongCenterContest");
+    final AutoTrajectory initialDriveBack = routine.trajectory("LeftInitialDriveBack");
     final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
     final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
     final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
     final AutoTrajectory reset = routine.trajectory("ResetLeft");
 
-    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-    ;
+    routine
+        .active()
+        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), initialDriveBack.cmd()));
+
+    // short
+    initialDriveBack.doneFor(3).whileTrue(shoot());
+    initialDriveBack.doneDelayed(3).onTrue(driveToMiddle.cmd());
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
     driveThroughMiddle
@@ -323,53 +293,6 @@ public class AutoRoutines {
     return routine;
   }
 
-  // Contests all of neutral zone then shoots, then then intakes from depot, then shoots
-  public AutoRoutine leftLongDepotCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("leftLonbDepotCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftLongDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("LeftLongDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetLeft");
-
-    final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
-    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
-    final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                /*shoot().withTimeout(3),*/ driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short;
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.doneFor(4).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(4).onTrue(reset.cmd());
-    reset.done().onTrue(moveToDepot.cmd());
-
-    // depot
-
-    moveToDepot.done().onTrue(moveThroughDepot.cmd());
-
-    moveThroughDepot
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
-
-    shootAfterDepot.doneFor(4).whileTrue(shoot());
-
-    return routine;
-  }
-
   // Contests half of neutral zone then shoots, then does it again
   public AutoRoutine rightDblShortCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("rightDblShortCenterContest");
@@ -381,11 +304,11 @@ public class AutoRoutines {
 
     routine
         .active()
-        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), driveToMiddle.cmd()));
+        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), initialDriveBack.cmd()));
 
-    // short
     initialDriveBack.doneFor(3).whileTrue(shoot());
-    driveToMiddle.doneDelayed(3).onTrue(driveThroughMiddle.cmd());
+    initialDriveBack.doneDelayed(3).onTrue(driveToMiddle.cmd());
+    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
     driveThroughMiddle
         .active()
@@ -408,6 +331,7 @@ public class AutoRoutines {
   // zone
   public AutoRoutine rightShortLongCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("rightShortLongCenterContest");
+    final AutoTrajectory initialDriveBack = routine.trajectory("RightInitialDriveBack");
     final AutoTrajectory driveToMiddleShort = routine.trajectory("RightDriveToMiddle");
     final AutoTrajectory driveThroughMiddleShort =
         routine.trajectory("RightShortDriveThroughMiddle");
@@ -421,13 +345,10 @@ public class AutoRoutines {
 
     routine
         .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3),
-                driveToMiddleShort.resetOdometry(),
-                driveToMiddleShort.cmd()));
+        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), initialDriveBack.cmd()));
 
-    // short
+    initialDriveBack.doneFor(3).whileTrue(shoot());
+    initialDriveBack.doneDelayed(3).onTrue(driveToMiddleShort.cmd());
     driveToMiddleShort.done().onTrue(driveThroughMiddleShort.cmd());
 
     driveThroughMiddleShort
@@ -456,50 +377,10 @@ public class AutoRoutines {
     return routine;
   }
 
-  // Contests half of neutral zone then shoots, then then intakes from HP, then shoots
-  public AutoRoutine rightShortHPCenterContest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightShortHPCenterContest");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightShortDriveThroughMiddle");
-    final AutoTrajectory driveBack = routine.trajectory("RightShortDriveBack");
-    final AutoTrajectory reset = routine.trajectory("ResetRight");
-
-    final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
-    final AutoTrajectory shootAfterHP = routine.trajectory("ShootAfterHP");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-
-    // short;
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.doneFor(4).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(4).onTrue(reset.cmd());
-    reset.done().onTrue(moveToHP.cmd());
-
-    // hp
-
-    moveToHP.doneDelayed(2).onTrue(shootAfterHP.cmd());
-
-    shootAfterHP.doneFor(4).whileTrue(shoot());
-
-    return routine;
-  }
-
   // Contests all of neutral zone then shoots, then does it again
   public AutoRoutine rightDblLongCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("rightDblLongCenterContest");
+    final AutoTrajectory initialDriveBack = routine.trajectory("RightInitialDriveBack");
     final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightLongDriveThroughMiddle");
     final AutoTrajectory driveBack = routine.trajectory("RightLongDriveBack");
@@ -507,10 +388,10 @@ public class AutoRoutines {
 
     routine
         .active()
-        .onTrue(
-            Commands.sequence(
-                /*shoot().withTimeout(3), */ driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
-    ;
+        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), initialDriveBack.cmd()));
+
+    initialDriveBack.doneFor(3).whileTrue(shoot());
+    initialDriveBack.doneDelayed(3).onTrue(driveToMiddle.cmd());
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
 
     driveThroughMiddle
@@ -526,31 +407,6 @@ public class AutoRoutines {
     reset.done().onTrue(driveToMiddle.cmd());
 
     // long bindings will call again
-
-    return routine;
-  }
-
-  public AutoRoutine depot() {
-    final AutoRoutine routine = m_factory.newRoutine("depotLeft");
-    final AutoTrajectory moveToDepot = routine.trajectory("MoveToDepot");
-    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepot");
-    final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepot");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                shoot().withTimeout(3), moveToDepot.resetOdometry(), moveToDepot.cmd()));
-
-    // hi if ur reading this
-    moveToDepot.done().onTrue(moveThroughDepot.cmd());
-
-    moveThroughDepot
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
-
-    shootAfterDepot.doneFor(4).whileTrue(shoot());
 
     return routine;
   }
