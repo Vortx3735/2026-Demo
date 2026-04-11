@@ -402,13 +402,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
   /** Resets the current odometry pose. */
   public void resetOdometry(Pose2d pose) {
-    odometryLock.lock();
-    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
     resetSimulationPoseCallBack.accept(pose);
-    odometryLock.unlock();
-    ChassisSpeeds robotRelativeSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(new ChassisSpeeds(0, 0, 0), rawGyroRotation);
-    kinematics.toSwerveModuleStates(robotRelativeSpeeds);
+    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
   public void zeroDriveTrain() {

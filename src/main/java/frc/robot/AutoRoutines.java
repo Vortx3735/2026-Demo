@@ -124,6 +124,34 @@ public class AutoRoutines {
   //     return routine;
   //   }
 
+  public AutoRoutine behindHub() {
+    final AutoRoutine routine = m_factory.newRoutine("behindHub");
+    final AutoTrajectory behindHubMid = routine.trajectory("BehindHubMid");
+    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepotMid");
+    final AutoTrajectory shootAfterDepot = routine.trajectory("ShootAfterDepotMid");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                shoot().withTimeout(3), behindHubMid.resetOdometry(), behindHubMid.cmd()));
+
+    behindHubMid.done().onTrue(moveThroughDepot.cmd());
+
+    // moveThroughDepot.active().onTrue(deployIntake());
+    // moveThroughDepot.active().whileTrue(intake());
+    // moveThroughDepot.done().onTrue(storeIntake());
+    moveThroughDepot
+        .active()
+        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+    moveThroughDepot.done().onTrue(shootAfterDepot.cmd());
+
+    // change movement to ust rotate if possible
+    shootAfterDepot.done().whileTrue(shoot());
+
+    return routine;
+  }
+
   // Contests half of neutral zone then shoots, then does it again
   public AutoRoutine leftDblShortCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("leftDblShortCenterContest");
@@ -136,7 +164,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+                /*shoot().withTimeout(3),*/ driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     // short
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
@@ -414,7 +442,7 @@ public class AutoRoutines {
         .active()
         .onTrue(
             Commands.sequence(
-                shoot().withTimeout(3), driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+                driveToMiddle.resetOdometry(), shoot().withTimeout(3), driveToMiddle.cmd()));
 
     // short;
     driveToMiddle.done().onTrue(driveThroughMiddle.cmd());

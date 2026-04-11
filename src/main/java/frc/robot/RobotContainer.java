@@ -199,8 +199,8 @@ public class RobotContainer {
     // autonChooser.addRoutine(
     //     "Left LongDepot Center Contest", autoRoutines::leftLongDepotCenterContest);
 
-    // autonChooser.addRoutine(
-    //     "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+    autonChooser.addRoutine(
+        "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
     // autonChooser.addRoutine(
     //     "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
     // autonChooser.addRoutine(
@@ -226,7 +226,7 @@ public class RobotContainer {
     // autonChooser.addRoutine("Climb Human Player Intake (Right)", autoRoutines::climbhp);
 
     autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
-    // autonChooser.addRoutine("Move two meters", autoRoutines::moveTwoMeters);
+    autonChooser.addRoutine("Move two meters", autoRoutines::moveTwoMeters);
 
     SmartDashboard.putData("Auton Chooser", autonChooser);
 
@@ -308,9 +308,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
                 drive,
-                () -> driverController.getLeftY(),
-                () -> driverController.getLeftX(),
-                () -> driverController.getRightX())
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX())
             .withName("joystick drive"));
 
     // Reset gyro / odometry
