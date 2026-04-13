@@ -36,9 +36,14 @@ public class CommandFactory {
       Flywheel flywheel, Tunnel tunnel, Hopper hopper, Intake intake, Supplier<Double> targetRPS) {
     return Commands.parallel(
             flywheel.shootCommand(targetRPS),
-            hopper.intakeCommand(),
-            new RunCommand(() -> intake.setSpeed(1), intake),
-            Commands.sequence(new WaitUntilCommand(flywheel.isAtSpeed()), tunnel.intakeCommand()))
+            Commands.sequence(
+                Commands.deadline(
+                    new WaitUntilCommand(flywheel.isAtSpeed()), hopper.intakeSlowCommand()),
+                Commands.parallel(hopper.intakeCommand(), tunnel.intakeCommand())),
+            new RunCommand(() -> intake.setSpeed(1), intake)
+            // ,Commands.sequence(new WaitUntilCommand(flywheel.isAtSpeed()),
+            // tunnel.intakeCommand())
+            )
         .withName("shoot command group");
   }
 

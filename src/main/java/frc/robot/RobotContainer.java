@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
@@ -178,7 +179,7 @@ public class RobotContainer {
     }
     telemetry =
         new Telemetry(drive, vision, flywheel, hood, turret, hopper, intake, tunnel, climber);
-    led = new LEDSubsystem(vision);
+    led = new LEDSubsystem();
     // Init auton objects
     autoFactory = drive.createAutoFactory();
     autoRoutines = new AutoRoutines(autoFactory, this);
@@ -321,6 +322,9 @@ public class RobotContainer {
                 drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
     driverController.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
+    Trigger hasTag = new Trigger(() -> vision.hasTag());
+    hasTag.onTrue(led.setStateCommand(LEDSubsystem.LEDState.HAS_TAG));
+    hasTag.onFalse(led.setStateCommand(LEDSubsystem.LEDState.NO_TAG));
     // Set bindings
 
     // Shooter Binds
@@ -354,8 +358,8 @@ public class RobotContainer {
     //             hood.setPositionPIDCommand(targetHoodAngleEntry.getAsDouble() - 5)))
     //     .onFalse(hood.setPositionPIDCommand(targetHoodAngleEntry.getAsDouble()));
     // Operator Shooter Binds
-    operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
-    operatorController.xButton.onTrue(new InstantCommand(() -> ShooterCommands.offset -= 0.01));
+    // operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
+    operatorController.xButton.toggleOnTrue(flywheel.idleCommand());
     operatorController.aButton.toggleOnTrue(
         ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()).withName("aim hub"));
     operatorController.yButton.toggleOnTrue(

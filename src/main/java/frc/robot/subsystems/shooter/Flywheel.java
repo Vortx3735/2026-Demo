@@ -75,7 +75,7 @@ public class Flywheel extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable flywheelTable = inst.getTable("Subsystems/Flywheel");
     flywheelSpeedEntry = flywheelTable.getDoubleTopic("flywheelSpeed").getEntry(1);
-    flywheelSpeedEntry.set(0.5);
+    flywheelSpeedEntry.set(20);
     if (state == Mode.SIM) {
       var talonFXSim = flywheelMotor.getSimState();
       talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -125,6 +125,10 @@ public class Flywheel extends SubsystemBase {
 
   // For testing purposes, allows setting flywheel speed directly from Network
   // Tables
+  public Command idleCommand() {
+    return Commands.run(() -> shoot(flywheelSpeedEntry.getAsDouble()));
+  }
+
   public Command shootCommand() {
 
     return Commands.run(

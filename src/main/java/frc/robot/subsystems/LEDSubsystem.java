@@ -1,17 +1,13 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.WLEDController;
 
 public class LEDSubsystem extends SubsystemBase {
-  Vision vision;
 
-  public LEDSubsystem(Vision vision) {
-    this.vision = vision;
-  }
+  public LEDSubsystem() {}
 
   public enum LEDState {
     OFF(-1),
@@ -42,16 +38,20 @@ public class LEDSubsystem extends SubsystemBase {
     currentState = newState;
   }
 
-  @Override
-  public void periodic() {
-    if (DriverStation.isDisabled()) {
-      setState(LEDState.IDLE);
-      return;
-    }
-    if (vision.hasTag()) {
-      this.setState(LEDState.HAS_TAG);
-    } else {
-      this.setState(LEDState.NO_TAG);
-    }
+  public Command setStateCommand(LEDState state) {
+    return run(() -> setState(state));
   }
+
+  // @Override
+  // public void periodic() {
+  // if (DriverStation.isDisabled()) {
+  //   setState(LEDState.IDLE);
+  //   return;
+  // }
+  // if (hasTag.getAsBoolean()) {
+  //   this.setState(LEDState.HAS_TAG);
+  // } else {
+  //   this.setState(LEDState.NO_TAG);
+  // }
+  // }
 }

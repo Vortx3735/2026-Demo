@@ -58,6 +58,16 @@ public class Hopper extends SubsystemBase {
     }
   }
 
+  public void runSlow(Boolean inverted) {
+    if (inverted) {
+      // outtake
+      hopperMotor.set(-getHopperSpeed() + 0.08);
+    } else {
+      // intake
+      hopperMotor.set(getHopperSpeed() - 0.08);
+    }
+  }
+
   public void stop() {
     hopperMotor.set(0);
   }
@@ -70,6 +80,16 @@ public class Hopper extends SubsystemBase {
             Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(false)))),
         Commands.run(() -> run(false)),
         () -> hopperMotor.getStatorCurrent().getValueAsDouble() >= maxCurrent);
+  }
+
+  public Command intakeSlowCommand() {
+    // if hopper motor is above max current, make it outtake instead (to prevent jamming)
+    return Commands.either(
+        Commands.sequence(
+            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(true))),
+            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(false)))),
+        Commands.run(() -> runSlow(false)),
+        () -> hopperMotor.getStatorCurrent().getValueAsDouble() >= maxCurrent - 5);
   }
 
   public Command outtakeCommand() {
