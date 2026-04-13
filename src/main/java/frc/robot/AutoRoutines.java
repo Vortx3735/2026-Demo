@@ -242,6 +242,51 @@ public class AutoRoutines {
     return routine;
   }
 
+//    Contests half of neutral zone then shoots, then does it again
+  public AutoRoutine rightLucas() {
+    final AutoRoutine routine = m_factory.newRoutine("rightDblShortCenterContest");
+    final AutoTrajectory initialDriveBack = routine.trajectory("RightInitialDriveBack");
+    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
+    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightDriveVeryCenter");
+    final AutoTrajectory driveBack = routine.trajectory("RightDriveBackLucas");
+    final AutoTrajectory reset = routine.trajectory("ResetRight");
+
+    final AutoTrajectory driveToHub = routine.trajectory("RightDriveToHub");
+    final AutoTrajectory driveBehindHub = routine.trajectory("RightDriveBehindHub");
+    final AutoTrajectory driveBackLucas = routine.trajectory("RightDriveBackLucas");
+
+    routine
+        .active()
+        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), initialDriveBack.cmd()));
+
+    initialDriveBack.doneFor(3).whileTrue(shoot());
+    initialDriveBack.doneDelayed(3).onTrue(driveToMiddle.cmd());
+    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+    driveThroughMiddle
+        .active()
+        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+    driveThroughMiddle.done().onTrue(driveBack.cmd());
+
+    // i hope this works! supposed to shoot 5 seconds after robot drives back
+    driveBack.doneFor(4).whileTrue(shoot());
+
+    // reset
+    driveBack.doneDelayed(4).onTrue(reset.cmd());
+    reset.done().onTrue(driveToHub.cmd());
+    driveToHub.done().onTrue(driveBehindHub.cmd());
+
+    // short bindings will call again
+    driveBehindHub
+        .active()
+        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+    driveBehindHub.done().onTrue(driveBackLucas.cmd());
+
+    // i hope this works! supposed to shoot 5 seconds after robot drives back
+    driveBackLucas.doneFor(4).whileTrue(shoot());
+    return routine;
+  }
+
   public AutoRoutine hpSimple() {
     final AutoRoutine routine = m_factory.newRoutine("hpRight");
     final AutoTrajectory moveToHP = routine.trajectory("MoveToHP");
