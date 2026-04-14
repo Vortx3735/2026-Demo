@@ -73,7 +73,7 @@ public class Turret extends SubsystemBase {
     //                 * DCMotor.getKrakenX44(1).rOhms
     //                 * kMOI))
     //         * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kP = 3; // A position error of 2.5 rotations results in 12 V output
+    slot0Configs.kP = 5; // A position error of 2.5 rotations results in 12 V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0; // A velocity error of 1 rps results in 0.1 V output
 
@@ -82,8 +82,8 @@ public class Turret extends SubsystemBase {
 
     // max mechanism rps: 2.651 rps
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity = 1 / kGearRatio;
-    motionMagicConfigs.MotionMagicAcceleration = 2 / kGearRatio;
+    motionMagicConfigs.MotionMagicCruiseVelocity = 2 / kGearRatio;
+    motionMagicConfigs.MotionMagicAcceleration = 4 / kGearRatio;
     // motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 

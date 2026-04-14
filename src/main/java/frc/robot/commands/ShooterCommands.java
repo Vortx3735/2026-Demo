@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 public class ShooterCommands {
   // if only running right camera
   public static double offset = 0.06;
-  public static double efficiencyFactor = 1.0075;
+  public static double efficiencyFactor = 1.02;
   // public double offset=0.0;
   // Cache Pose2d instances for hubs (avoid allocating in tight loops)
   private static final Pose2d RED_HUB_POSE2D =
@@ -96,7 +96,7 @@ public class ShooterCommands {
     // Most FRC shooters lose ~10-15% to slip/compression
     double ef = efficiencyFactor;
     if (xs > 13) {
-      ef += 0.04;
+      ef += 0.08;
     }
     Logger.recordOutput("Shooter/calculatedShooterRPS", rps * ef);
     return rps * ef;

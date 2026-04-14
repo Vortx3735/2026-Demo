@@ -34,11 +34,11 @@ public class VisionConstants {
           Meters.of(1.897 - 1.7526),
           Meters.of(0.261),
           new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0));
-  public static Transform3d backCameraTransform =
+  public static Transform3d backCameraTransform = // tuned using cad
       new Transform3d(
-          Inches.of(-((9.75))),
-          Inches.of(-(7.25)),
-          Inches.of(18.9),
+          Inches.of(-((9.699 + 11.128) / 2)),
+          Inches.of(-((6.818 + 8.191) / 2)),
+          Inches.of(19),
           new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI)));
   public static Transform3d rightCameraTransform = // tuned
@@ -49,11 +49,11 @@ public class VisionConstants {
           Inches.of(21),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, -Math.PI / 2.0)));
-  public static Transform3d leftCameraTransform = // tuned
+  public static Transform3d leftCameraTransform = // tuned using cad
       new Transform3d(
-          Inches.of(((1.881 + 3.269) / 2) - 4.75),
-          Inches.of((13.662 + 15.152) / 2),
-          Inches.of(10.332 + 3.57 + 4.5),
+          Inches.of(-((1.685 + 2.361) / 2)),
+          Inches.of((13.114 + 14.611) / 2),
+          Inches.of(18.8),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0)));
 

@@ -88,9 +88,9 @@ public class Constants {
         new Pose3d(DISTANCE_X_TO_HUB, 4.03479, 1.8, new Rotation3d());
     public static final Pose3d RED_HUB_POSE3D =
         new Pose3d(16.5736 - DISTANCE_X_TO_HUB, 4.03479, 1.8, new Rotation3d());
-    public static final Pose2d BLUE_RIGHT = new Pose2d(3.09, 7.10, new Rotation2d());
-    public static final Pose2d BLUE_LEFT = new Pose2d(3.09, 1.39, new Rotation2d());
-    public static final Pose2d RED_RIGHT = new Pose2d(13.78, 1.39, new Rotation2d());
-    public static final Pose2d RED_LEFT = new Pose2d(13.78, 7.10, new Rotation2d());
+    public static final Pose2d BLUE_RIGHT = new Pose2d(3.09, 6.3, new Rotation2d());
+    public static final Pose2d BLUE_LEFT = new Pose2d(3.09, 2.2, new Rotation2d());
+    public static final Pose2d RED_RIGHT = new Pose2d(13.78, 2.2, new Rotation2d());
+    public static final Pose2d RED_LEFT = new Pose2d(13.78, 6.3, new Rotation2d());
   }
 }

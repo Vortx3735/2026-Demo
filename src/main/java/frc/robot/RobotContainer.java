@@ -202,6 +202,8 @@ public class RobotContainer {
 
     autonChooser.addRoutine(
         "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+    autonChooser.addRoutine("Right Lucas", autoRoutines::rightLucas);
+    autonChooser.addRoutine("Right Lucas TEST", autoRoutines::rightLucasTest);
     // autonChooser.addRoutine(
     //     "Right ShortLong Center Contest", autoRoutines::rightShortLongCenterContest);
     // autonChooser.addRoutine(
