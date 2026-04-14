@@ -373,7 +373,11 @@ public class RobotContainer {
     operatorController.povDown.whileTrue(hood.moveCommand(false));
     operatorController.povUp.whileTrue(hood.moveCommand(true));
     operatorController.rt.whileTrue(
-        CommandFactory.shootCommandNoHood(flywheel, tunnel, hopper, intake, 60.0));
+        ShooterCommands.PassFromDistance(
+            flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 55));
+    driverController.yButton.whileTrue(
+        ShooterCommands.PassFromDistance(
+            flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 55));
     // operatorController.lt.whileTrue(
     //     CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     // operatorController.rt.whileTrue(
