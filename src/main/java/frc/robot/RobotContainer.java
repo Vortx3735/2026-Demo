@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -300,7 +301,8 @@ public class RobotContainer {
     climber.setDefaultCommand(climber.stopCommand().withName("stop climber"));
     hopper.setDefaultCommand(hopper.stopCommand().withName("stop hopper"));
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
-    flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
+    flywheel.setDefaultCommand(
+        new RunCommand(() -> flywheel.setSpeed(0.5), flywheel).withName("idle flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
     // turret.setDefaultCommand(ShooterCommands.AimToHubOrSide(turret, () ->
     // drive.getTurretPose()));
@@ -361,7 +363,7 @@ public class RobotContainer {
     //     .onFalse(hood.setPositionPIDCommand(targetHoodAngleEntry.getAsDouble()));
     // Operator Shooter Binds
     // operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
-    operatorController.xButton.toggleOnTrue(flywheel.idleCommand());
+    operatorController.xButton.toggleOnTrue(flywheel.stopCommand());
     operatorController.aButton.toggleOnTrue(
         ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()).withName("aim hub"));
     operatorController.yButton.toggleOnTrue(
@@ -370,6 +372,8 @@ public class RobotContainer {
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povDown.whileTrue(hood.moveCommand(false));
     operatorController.povUp.whileTrue(hood.moveCommand(true));
+    operatorController.rt.whileTrue(
+        CommandFactory.shootCommandNoHood(flywheel, tunnel, hopper, intake, 60.0));
     // operatorController.lt.whileTrue(
     //     CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     // operatorController.rt.whileTrue(
@@ -399,6 +403,10 @@ public class RobotContainer {
     sysIdController.aButton.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     sysIdController.xButton.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     sysIdController.bButton.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    sysIdController.povUp.whileTrue(flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    sysIdController.povDown.whileTrue(flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    sysIdController.povRight.whileTrue(flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    sysIdController.povLeft.whileTrue(flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
