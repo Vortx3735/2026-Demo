@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.subsystems.intake.Hopper;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Tunnel;
@@ -106,7 +108,11 @@ public class ShooterCommands {
     Logger.recordOutput("Shooter/effiencyFactor", ef);
 
     Logger.recordOutput("Shooter/calculatedShooterRPS", rps * ef);
-    return rps * ef;
+    if (rps * ef > 85) {
+      return 85;
+    } else {
+      return rps * ef;
+    }
   }
 
   /** Conversion factor from meters to feet. */
@@ -167,7 +173,10 @@ public class ShooterCommands {
    * suppliers.
    */
   private static Command turretAimCommand(
-      Turret turret, Supplier<Pose2d> robotPoseSupplier, Supplier<Pose2d> hubPoseSupplier) {
+      Turret turret,
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<Pose2d> hubPoseSupplier,
+      LEDSubsystem led) {
 
     return Commands.run(
             () -> {
@@ -177,8 +186,16 @@ public class ShooterCommands {
               double rotations = angleRelative / (2 * Math.PI);
               turret.setPositionPID(rotations);
               Logger.recordOutput("test/targetTurretRotations", rotations);
+              if (hp == RED_HUB_POSE2D) {
+                led.setState(LEDState.RED);
+              } else if (hp == BLUE_HUB_POSE2D) {
+                led.setState(LEDState.BLUE);
+              } else {
+                led.setState(LEDState.GREEN);
+              }
             },
-            turret)
+            turret,
+            led)
         .withName("turret aim");
   }
 
@@ -250,6 +267,7 @@ public class ShooterCommands {
 
   // Shoots while adjusting flywheel speed based on distance
   public static Command ShootFromDistance(
+      LEDSubsystem led,
       Flywheel flywheel,
       Hood hood,
       Tunnel tunnel,
@@ -279,11 +297,12 @@ public class ShooterCommands {
         };
 
     return Commands.deadline(
-            CommandFactory.shootCommand(flywheel, tunnel, hopper, intake, targetRpsSupplier))
+            CommandFactory.shootCommand(led, flywheel, tunnel, hopper, intake, targetRpsSupplier))
         .withName("ShootFromDistance");
   }
 
   public static Command PassFromDistance(
+      LEDSubsystem led,
       Flywheel flywheel,
       Hood hood,
       Tunnel tunnel,
@@ -300,31 +319,31 @@ public class ShooterCommands {
           Logger.recordOutput("Shooter/Distance", liveXs);
 
           if (liveXs > 15) {
-            hood.setPositionPID(50);
-            return calculateShooterRPS(liveXs, 60);
+            hood.setPositionPID(theta);
+            return calculateShooterRPS(liveXs, theta);
           } else {
-            hood.setPositionPID(50);
-            return calculateShooterRPS(liveXs, 60);
+            hood.setPositionPID(theta);
+            return calculateShooterRPS(liveXs, theta);
           }
         };
 
     return Commands.deadline(
-            CommandFactory.shootCommand(flywheel, tunnel, hopper, intake, targetRpsSupplier))
+            CommandFactory.shootCommand(led, flywheel, tunnel, hopper, intake, targetRpsSupplier))
         .withName("ShootFromDistance");
   }
 
-  public static Command AimToSide(Turret turret, Supplier<Pose2d> poseSupplier) {
+  public static Command AimToSide(Turret turret, Supplier<Pose2d> poseSupplier, LEDSubsystem led) {
     Supplier<Pose2d> hubPoseSupplier = () -> getSidePose(poseSupplier.get());
-    return turretAimCommand(turret, poseSupplier, hubPoseSupplier);
+    return turretAimCommand(turret, poseSupplier, hubPoseSupplier, led);
   }
 
   /**
    * Backwards-compatible overload: aim turret to hub using only turret and a pose supplier. This
    * does not control the flywheel or hood.
    */
-  public static Command AimToHub(Turret turret, Supplier<Pose2d> poseSupplier) {
+  public static Command AimToHub(Turret turret, Supplier<Pose2d> poseSupplier, LEDSubsystem led) {
     Supplier<Pose2d> hubPoseSupplier = ShooterCommands::getAllianceHubPose;
-    return turretAimCommand(turret, poseSupplier, hubPoseSupplier).withName("turretAimToHub");
+    return turretAimCommand(turret, poseSupplier, hubPoseSupplier, led).withName("turretAimToHub");
   }
 
   public static Command AimToHubOrSide(Turret turret, Supplier<Pose2d> poseSupplier) {

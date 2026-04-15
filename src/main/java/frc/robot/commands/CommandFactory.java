@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.intake.*;
 import frc.robot.subsystems.shooter.*;
 import java.util.function.Supplier;
@@ -33,7 +34,12 @@ public class CommandFactory {
   }
 
   public static Command shootCommand(
-      Flywheel flywheel, Tunnel tunnel, Hopper hopper, Intake intake, Supplier<Double> targetRPS) {
+      LEDSubsystem led,
+      Flywheel flywheel,
+      Tunnel tunnel,
+      Hopper hopper,
+      Intake intake,
+      Supplier<Double> targetRPS) {
     return Commands.parallel(
             flywheel.shootCommand(targetRPS),
             Commands.sequence(

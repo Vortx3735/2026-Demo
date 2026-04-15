@@ -42,6 +42,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.intake.*;
 import frc.robot.subsystems.shooter.*;
@@ -280,6 +281,7 @@ public class RobotContainer {
     // drive.getTurretPose()));
     // turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
     turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
+    led.setDefaultCommand(led.setStateCommand(LEDState.CHASE));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -299,8 +301,6 @@ public class RobotContainer {
     driverController.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
     Trigger hasTag = new Trigger(() -> vision.hasTag());
-    hasTag.onTrue(led.setStateCommand(LEDSubsystem.LEDState.HAS_TAG));
-    hasTag.onFalse(led.setStateCommand(LEDSubsystem.LEDState.NO_TAG));
     // Set bindings
 
     // Shooter Binds
@@ -308,6 +308,7 @@ public class RobotContainer {
     // driverController.rb.whileTrue(turret.moveCommand(false));
     driverController.rt.whileTrue(
         ShooterCommands.ShootFromDistance(
+            led,
             flywheel,
             hood,
             tunnel,
@@ -337,19 +338,19 @@ public class RobotContainer {
     // operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
     operatorController.xButton.toggleOnTrue(flywheel.stopCommand());
     operatorController.aButton.toggleOnTrue(
-        ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()).withName("aim hub"));
+        ShooterCommands.AimToHub(turret, () -> drive.getTurretPose(), led).withName("aim hub"));
     operatorController.yButton.toggleOnTrue(
-        ShooterCommands.AimToSide(turret, () -> drive.getPose()).withName("aim side"));
+        ShooterCommands.AimToSide(turret, () -> drive.getPose(), led).withName("aim side"));
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povDown.whileTrue(hood.moveCommand(false));
     operatorController.povUp.whileTrue(hood.moveCommand(true));
     operatorController.rt.whileTrue(
         ShooterCommands.PassFromDistance(
-            flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 55));
+            led, flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 75));
     driverController.yButton.whileTrue(
         ShooterCommands.PassFromDistance(
-            flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 55));
+            led, flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 75));
     // operatorController.lt.whileTrue(
     //     CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     // operatorController.rt.whileTrue(
