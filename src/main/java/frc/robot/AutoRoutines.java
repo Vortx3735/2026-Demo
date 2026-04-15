@@ -153,6 +153,15 @@ public class AutoRoutines {
     return routine;
   }
 
+  //   public AutoRoutine whydidntidothisearlier() {
+  //     final AutoRoutine routine = m_factory.newRoutine("ok");
+  //     final AutoTrajectory behindHubTraj = routine.trajectory("test");
+
+  //     routine.active().onTrue(Commands.sequence(behindHubTraj.resetOdometry(),
+  // behindHubTraj.cmd()));
+
+  //   }
+
   // Contests half of neutral zone then shoots, then does it again
   public AutoRoutine leftDblShortCenterContest() {
     final AutoRoutine routine = m_factory.newRoutine("leftDblShortCenterContest");
@@ -231,54 +240,8 @@ public class AutoRoutines {
     return routine;
   }
 
-  //    Contests half of neutral zone then shoots, then does it again
   public AutoRoutine rightLucas() {
-    final AutoRoutine routine = m_factory.newRoutine("rightDblShortCenterContest");
-    final AutoTrajectory initialDriveBack = routine.trajectory("RightInitialDriveBack");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
-    final AutoTrajectory driveThroughMiddle = routine.trajectory("RightDriveVeryCenter");
-    final AutoTrajectory driveBack = routine.trajectory("RightDriveBackLucas");
-    final AutoTrajectory reset = routine.trajectory("ResetRight");
-
-    final AutoTrajectory driveToHub = routine.trajectory("RightDriveToHub");
-    final AutoTrajectory driveBehindHub = routine.trajectory("RightDriveBehindHub");
-    final AutoTrajectory driveBackLucas = routine.trajectory("RightDriveBackLucas");
-
-    routine
-        .active()
-        .onTrue(Commands.sequence(initialDriveBack.resetOdometry(), initialDriveBack.cmd()));
-
-    initialDriveBack.doneFor(3).whileTrue(shoot());
-    initialDriveBack.doneDelayed(3).onTrue(driveToMiddle.cmd());
-    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
-
-    driveThroughMiddle
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveThroughMiddle.done().onTrue(driveBack.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBack.doneFor(4).whileTrue(shoot());
-
-    // reset
-    driveBack.doneDelayed(4).onTrue(reset.cmd());
-    reset.done().onTrue(driveToHub.cmd());
-    driveToHub.done().onTrue(driveBehindHub.cmd());
-
-    // short bindings will call again
-    driveBehindHub
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveBehindHub.done().onTrue(driveBackLucas.cmd());
-
-    // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBackLucas.doneFor(4).whileTrue(shoot());
-    return routine;
-  }
-
-  public AutoRoutine rightLucasTest() {
-    final AutoRoutine routine = m_factory.newRoutine("rightDblShortCenterContest");
-    // final AutoTrajectory initialDriveBack = routine.trajectory("RightInitialDriveBack");
+    final AutoRoutine routine = m_factory.newRoutine("rightLucas");
     final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddleTest");
     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightDriveVeryCenter");
     final AutoTrajectory driveBack = routine.trajectory("RightDriveBackLucas");
@@ -286,7 +249,6 @@ public class AutoRoutines {
 
     final AutoTrajectory driveToHub = routine.trajectory("RightDriveToHub");
     final AutoTrajectory driveBehindHub = routine.trajectory("RightDriveBehindHub");
-    final AutoTrajectory driveBackLucas = routine.trajectory("RightDriveBackLucas");
 
     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
@@ -309,10 +271,48 @@ public class AutoRoutines {
     driveBehindHub
         .active()
         .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveBehindHub.done().onTrue(driveBackLucas.cmd());
+    // driveBehindHub.done().onTrue(driveBack.cmd());
+
+    // // i hope this works! supposed to shoot 5 seconds after robot drives back
+    // driveBack.done().whileTrue(shoot());
+    return routine;
+  }
+
+  public AutoRoutine leftLucas() {
+    final AutoRoutine routine = m_factory.newRoutine("leftLucas");
+    final AutoTrajectory driveToMiddle = routine.trajectory("LeftDriveToMiddle");
+    final AutoTrajectory driveThroughMiddle = routine.trajectory("LeftDriveVeryCenter");
+    final AutoTrajectory driveBack = routine.trajectory("LeftDriveBackLucas");
+    final AutoTrajectory reset = routine.trajectory("ResetLeft");
+
+    final AutoTrajectory driveToHub = routine.trajectory("LeftDriveToHub");
+    final AutoTrajectory driveBehindHub = routine.trajectory("LeftDriveBehindHub");
+
+    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+    driveToMiddle.done().onTrue(driveThroughMiddle.cmd());
+
+    driveThroughMiddle
+        .active()
+        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+    driveThroughMiddle.done().onTrue(driveBack.cmd());
 
     // i hope this works! supposed to shoot 5 seconds after robot drives back
-    driveBackLucas.done().whileTrue(shoot());
+    driveBack.doneFor(6).whileTrue(shoot());
+
+    // reset
+    driveBack.doneDelayed(6).onTrue(reset.cmd());
+    reset.done().onTrue(driveToHub.cmd());
+    driveToHub.done().onTrue(driveBehindHub.cmd());
+
+    // short bindings will call again
+    driveBehindHub
+        .active()
+        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+    // driveBehindHub.done().onTrue(driveBack.cmd());
+
+    // // i hope this works! supposed to shoot 5 seconds after robot drives back
+    // driveBack.done().whileTrue(shoot());
     return routine;
   }
 

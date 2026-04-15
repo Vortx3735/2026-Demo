@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.Logger;
 public class ShooterCommands {
   // if only running right camera
   public static double offset = 0.06;
-  public static double efficiencyFactor = 1.02;
+  public static double efficiencyFactor = 1.06;
   // public double offset=0.0;
   // Cache Pose2d instances for hubs (avoid allocating in tight loops)
   private static final Pose2d RED_HUB_POSE2D =
@@ -95,9 +95,16 @@ public class ShooterCommands {
     // 4. Recovery/Efficiency Factor (Adjust based on testing)
     // Most FRC shooters lose ~10-15% to slip/compression
     double ef = efficiencyFactor;
-    if (xs > 13) {
-      ef += 0.08;
-    }
+    // if (xs > 17) {
+    //   ef += 0.18;
+    // } else if (xs > 13) {
+    //   ef += 0.08;
+    // } else if (xs > 9.9) {
+    //   ef += 0.06;
+    // }
+
+    Logger.recordOutput("Shooter/effiencyFactor", ef);
+
     Logger.recordOutput("Shooter/calculatedShooterRPS", rps * ef);
     return rps * ef;
   }
@@ -258,9 +265,13 @@ public class ShooterCommands {
           double liveXs = getDistanceToHub(rp, hp);
           Logger.recordOutput("Shooter/Distance", liveXs);
 
-          if (liveXs > 15) {
-            hood.setPositionPID(theta - 8);
-            return calculateShooterRPS(liveXs, theta - 8);
+          // theta is 65
+          if (liveXs <= 10) {
+            hood.setPositionPID(theta - 5);
+            return calculateShooterRPS(liveXs, theta - 5);
+          } else if (liveXs > 15) {
+            hood.setPositionPID(theta + 5);
+            return calculateShooterRPS(liveXs, theta + 5);
           } else {
             hood.setPositionPID(theta);
             return calculateShooterRPS(liveXs, theta);

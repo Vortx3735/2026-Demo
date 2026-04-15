@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -124,7 +124,8 @@ public class Flywheel extends SubsystemBase {
   public void shoot(double speed) {
     this.targetRPS = speed;
 
-    final VelocityVoltage m_request = new VelocityVoltage(speed);
+    // final VelocityVoltage m_request = new VelocityVoltage(speed);
+    final VelocityTorqueCurrentFOC m_request = new VelocityTorqueCurrentFOC(speed);
     flywheelMotor.setControl(m_request);
     // flywheelMotor.set(bbcontroller.calculate(currentRPS, targetRPS));
     // In simulation, pre-compute a feedforwar .d voltage so the DCMotorSim receives a

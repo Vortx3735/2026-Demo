@@ -198,8 +198,8 @@ public class RobotContainer {
     autonChooser.addRoutine("Right Lucas", autoRoutines::rightLucas);
     autonChooser.addRoutine("Left Lucas", autoRoutines::leftLucas);
 
-    autonChooser.addRoutine("Right Dbl Center", autoRoutines::rightDblCenter);
-    autonChooser.addRoutine("Left Dbl Center", autoRoutines::leftDblCenter);
+    // autonChooser.addRoutine("Right Dbl Center", autoRoutines::rightDblCenter);
+    // autonChooser.addRoutine("Left Dbl Center", autoRoutines::leftDblCenter);
 
     autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
     autonChooser.addRoutine("Move two meters", autoRoutines::moveTwoMeters);
@@ -274,7 +274,7 @@ public class RobotContainer {
     hopper.setDefaultCommand(hopper.stopCommand().withName("stop hopper"));
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(
-        new RunCommand(() -> flywheel.setSpeed(0.5), flywheel).withName("idle flywheel"));
+        new RunCommand(() -> flywheel.setSpeed(0.25), flywheel).withName("idle flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
     // turret.setDefaultCommand(ShooterCommands.AimToHubOrSide(turret, () ->
     // drive.getTurretPose()));
