@@ -327,13 +327,8 @@ public class RobotContainer {
     driverController.lt.whileTrue(
         ShooterCommands.AimEverythingToHub(
             turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
-    // driverController
-    //     .yButton
-    //     .toggleOnTrue(
-    //         Commands.parallel(
-    //             ShooterCommands.AimToSide(turret, () -> drive.getPose()),
-    //             hood.setPositionPIDCommand(targetHoodAngleEntry.getAsDouble() - 5)))
-    //     .onFalse(hood.setPositionPIDCommand(targetHoodAngleEntry.getAsDouble()));
+    driverController.yButton.toggleOnTrue(
+        ShooterCommands.AimToSide(turret, () -> drive.getPose()).withName("aim side"));
     // Operator Shooter Binds
     // operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
     operatorController.xButton.toggleOnTrue(flywheel.stopCommand());
