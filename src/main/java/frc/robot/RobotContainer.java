@@ -328,7 +328,7 @@ public class RobotContainer {
         ShooterCommands.AimEverythingToHub(
             turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
     driverController.yButton.toggleOnTrue(
-        ShooterCommands.AimToSide(turret, () -> drive.getPose(),led).withName("aim side"));
+        ShooterCommands.AimToSide(turret, () -> drive.getPose(), led).withName("aim side"));
     // Operator Shooter Binds
     // operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
     operatorController.xButton.toggleOnTrue(flywheel.stopCommand());
