@@ -16,6 +16,10 @@ public class AutoRoutines {
   public AutoRoutines(AutoFactory factory, RobotContainer container) {
     m_factory = factory;
     m_container = container;
+
+    m_factory
+      .bind("intake", CommandFactory.intakeCommand(m_container.intake, m_container.hopper))
+      .bind("stop intake", Commands.parallel(m_container.intake.stopCommand(), m_container.hopper.stopCommand()));
   }
 
   // returns the command group for aiming in auton
@@ -113,6 +117,48 @@ public class AutoRoutines {
   //   }
   //     return routine;
   //   }
+
+  public AutoRoutine rightDoubleCenter() {
+    final AutoRoutine routine = m_factory.newRoutine("rightDoubleCenter");
+    final AutoTrajectory center = routine.trajectory("RightCenter");
+    final AutoTrajectory reset = routine.trajectory("ResetRight");
+
+    routine
+      .active()
+      .onTrue(
+        Commands.sequence(
+          center.resetOdometry(), center.cmd()));
+
+    center.doneFor(6).whileTrue(shoot());
+    center.doneDelayed(6).onTrue(reset.cmd());
+
+    reset.done().onTrue(center.cmd());
+
+    // center bindings will call again
+
+    return routine;
+  }
+
+  public AutoRoutine leftDoubleCenter() {
+    final AutoRoutine routine = m_factory.newRoutine("leftDoubleCenter");
+    final AutoTrajectory center = routine.trajectory("LeftCenter");
+    final AutoTrajectory reset = routine.trajectory("ResetLeft");
+
+    routine
+      .active()
+      .onTrue(
+        Commands.sequence(
+          center.resetOdometry(), center.cmd()));
+
+    center.doneFor(6).whileTrue(shoot());
+    center.doneDelayed(6).onTrue(reset.cmd());
+
+    reset.done().onTrue(center.cmd());
+
+    // center bindings will call again
+
+    return routine;
+  }
 
   public AutoRoutine behindHubDepot() {
     final AutoRoutine routine = m_factory.newRoutine("behindHub");
@@ -242,7 +288,7 @@ public class AutoRoutines {
 
   public AutoRoutine rightLucas() {
     final AutoRoutine routine = m_factory.newRoutine("rightLucas");
-    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddleTest");
+    final AutoTrajectory driveToMiddle = routine.trajectory("RightDriveToMiddle");
     final AutoTrajectory driveThroughMiddle = routine.trajectory("RightDriveVeryCenter");
     final AutoTrajectory driveBack = routine.trajectory("RightDriveBackLucas");
     final AutoTrajectory reset = routine.trajectory("ResetRight");
