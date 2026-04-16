@@ -21,7 +21,7 @@ public class Constants {
     REPLAY
   }
 
-  public static final String WLED_IP = "10.37.35.67";
+  public static final String WLED_IP = "10.37.35.15";
 
   public static final class DriveTrainConstants { // Id's are all placeholders
     public static final int FRONTLEFT_DRIVE_ID = 1;

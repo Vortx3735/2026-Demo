@@ -34,6 +34,7 @@ public class AutoRoutines {
     return Commands.sequence(
         aim(),
         ShooterCommands.ShootFromDistance(
+                m_container.led,
                 m_container.flywheel,
                 m_container.hood,
                 m_container.tunnel,
@@ -393,6 +394,7 @@ public class AutoRoutines {
                             Commands.sequence(
                                 new WaitCommand(1),
                                 ShooterCommands.ShootFromDistance(
+                                    m_container.led,
                                     m_container.flywheel,
                                     m_container.hood,
                                     m_container.tunnel,
@@ -422,6 +424,7 @@ public class AutoRoutines {
                     Commands.sequence(
                         new WaitCommand(1),
                         ShooterCommands.ShootFromDistance(
+                                m_container.led,
                                 m_container.flywheel,
                                 m_container.hood,
                                 m_container.tunnel,
@@ -433,6 +436,7 @@ public class AutoRoutines {
                         CommandFactory.clearJamsCommand(m_container.tunnel, m_container.hopper)
                             .withTimeout(1),
                         ShooterCommands.ShootFromDistance(
+                                m_container.led,
                                 m_container.flywheel,
                                 m_container.hood,
                                 m_container.tunnel,
@@ -444,6 +448,7 @@ public class AutoRoutines {
                         CommandFactory.clearJamsCommand(m_container.tunnel, m_container.hopper)
                             .withTimeout(1),
                         ShooterCommands.ShootFromDistance(
+                                m_container.led,
                                 m_container.flywheel,
                                 m_container.hood,
                                 m_container.tunnel,
