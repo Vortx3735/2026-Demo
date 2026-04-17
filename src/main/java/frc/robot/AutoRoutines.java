@@ -357,28 +357,29 @@ public class AutoRoutines {
     return routine;
   }
 
-  public AutoRoutine rightBehindHubOnly() {
-    final AutoRoutine routine = m_factory.newRoutine("rightBehindHub");
-    final AutoTrajectory driveToHub = routine.trajectory("RightDriveOverBump");
-    final AutoTrajectory driveBehindHub = routine.trajectory("RightDriveBehindHub");
-    final AutoTrajectory driveBack = routine.trajectory("RightDriveBackLucas");
+  // public AutoRoutine rightBehindHubOnly() {
+  //   final AutoRoutine routine = m_factory.newRoutine("rightBehindHub");
+  //   final AutoTrajectory driveToHub = routine.trajectory("RightDriveOverBump");
+  //   final AutoTrajectory driveBehindHub = routine.trajectory("RightDriveBehindHub");
+  //   final AutoTrajectory driveBack = routine.trajectory("RightDriveBackLucas");
 
-    routine
-      .active()
-      .onTrue(
-        Commands.sequence(
-          new WaitCommand(hubOnlyDelay), driveToHub.resetOdometry(), driveToHub.cmd())
-        );
+  //   routine
+  //     .active()
+  //     .onTrue(
+  //       Commands.sequence(
+  //         new WaitCommand(hubOnlyDelay), driveToHub.resetOdometry(), driveToHub.cmd())
+  //       );
+    
 
-    driveBehindHub
-        .active()
-        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
-    driveBehindHub.done().onTrue(driveBack.cmd());
+  //   driveBehindHub
+  //       .active()
+  //       .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+  //   driveBehindHub.done().onTrue(driveBack.cmd());
 
-    driveBack.done().whileTrue(shoot());
+  //   driveBack.done().whileTrue(shoot());
 
-    return routine;
-  }
+  //   return routine;
+  // }
 
   public AutoRoutine leftLucas() {
     final AutoRoutine routine = m_factory.newRoutine("leftLucas");
