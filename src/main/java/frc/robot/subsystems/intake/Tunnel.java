@@ -91,12 +91,7 @@ public class Tunnel extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return Commands.either(
-        Commands.sequence(
-            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(true))),
-            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(false)))),
-        Commands.run(() -> run(false)),
-        () -> bottomTunnelMotor.getStatorCurrent().getValueAsDouble() >= maxCurrent);
+    return Commands.run(() -> run(false));
   }
 
   public Command outtakeCommand() {

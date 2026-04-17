@@ -35,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
@@ -181,7 +180,7 @@ public class RobotContainer {
     }
     telemetry =
         new Telemetry(drive, vision, flywheel, hood, turret, hopper, intake, tunnel, climber);
-    led = new LEDSubsystem();
+    led = new LEDSubsystem(() -> flywheel.getidling());
     // Init auton objects
     autoFactory = drive.createAutoFactory();
     autoRoutines = new AutoRoutines(autoFactory, this);
@@ -191,19 +190,26 @@ public class RobotContainer {
     autonChooser.addRoutine("Standstill shoot then move", autoRoutines::standstill);
     // autonChooser.addRoutine("test2", autoRoutines::test2);
 
-    autonChooser.addRoutine(
-        "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
-    autonChooser.addRoutine(
-        "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+    // autonChooser.addRoutine(
+    //     "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
 
     autonChooser.addRoutine("Right Lucas", autoRoutines::rightLucas);
     autonChooser.addRoutine("Left Lucas", autoRoutines::leftLucas);
+    autonChooser.addRoutine("SINGLE Left Lucas", autoRoutines::leftLucasSingle);
+    autonChooser.addRoutine("SINGLE Right Lucas", autoRoutines::rightLucasSingle);
+    autonChooser.addRoutine("Behind Hub", autoRoutines::behindHub);
+    autonChooser.addRoutine("UNTESTED Right Dbl Center", autoRoutines::rightDoubleCenter);
+    autonChooser.addRoutine("UNTESTED Left Dbl Center", autoRoutines::leftDoubleCenter);
+    autonChooser.addRoutine("UNTESTED One Cycle Right Lucas", autoRoutines::rightLucasOneCycle);
+    autonChooser.addRoutine("UNTESTED One Cycle Left Lucas", autoRoutines::leftLucasOneCycle);
 
     // autonChooser.addRoutine("Right Dbl Center", autoRoutines::rightDblCenter);
     // autonChooser.addRoutine("Left Dbl Center", autoRoutines::leftDblCenter);
 
-    autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
-    autonChooser.addRoutine("Move two meters", autoRoutines::moveTwoMeters);
+    // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
+    // autonChooser.addRoutine("Move two meters", autoRoutines::moveTwoMeters);
 
     SmartDashboard.putData("Auton Chooser", autonChooser);
 
@@ -275,13 +281,13 @@ public class RobotContainer {
     hopper.setDefaultCommand(hopper.stopCommand().withName("stop hopper"));
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
     flywheel.setDefaultCommand(
-        new RunCommand(() -> flywheel.setSpeed(0.25), flywheel).withName("idle flywheel"));
+        new RunCommand(() -> flywheel.setSpeedIdle(0.25), flywheel).withName("idle flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
     // turret.setDefaultCommand(ShooterCommands.AimToHubOrSide(turret, () ->
     // drive.getTurretPose()));
     // turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
     turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
-    led.setDefaultCommand(led.setStateCommand(LEDState.CHASE));
+    led.setDefaultCommand(led.setColorCommand(LEDState.RED));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -300,7 +306,7 @@ public class RobotContainer {
                 drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
     driverController.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
-    Trigger hasTag = new Trigger(() -> vision.hasTag());
+    // Trigger hasTag = new Trigger(() -> vision.hasTag());
     // Set bindings
 
     // Shooter Binds
@@ -334,15 +340,32 @@ public class RobotContainer {
     operatorController.xButton.toggleOnTrue(flywheel.stopCommand());
     operatorController.aButton.toggleOnTrue(
         ShooterCommands.AimToHub(turret, () -> drive.getTurretPose(), led).withName("aim hub"));
-    operatorController.yButton.toggleOnTrue(
+    operatorController.yButton.whileTrue(
+        ShooterCommands.AimToSide(turret, () -> drive.getPose(), led).withName("aim side"));
+    driverController.rb.toggleOnTrue(
+        ShooterCommands.AimToHub(turret, () -> drive.getTurretPose(), led).withName("aim hub"));
+    driverController.lb.toggleOnTrue(
         ShooterCommands.AimToSide(turret, () -> drive.getPose(), led).withName("aim side"));
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
     operatorController.povDown.whileTrue(hood.moveCommand(false));
     operatorController.povUp.whileTrue(hood.moveCommand(true));
     operatorController.rt.whileTrue(
+        ShooterCommands.ShootFromDistance(
+            led,
+            flywheel,
+            hood,
+            tunnel,
+            hopper,
+            intake,
+            () -> drive.getTurretPose(),
+            softwareHoodAngleEntry.getAsDouble()));
+    operatorController.lt.whileTrue(
         ShooterCommands.PassFromDistance(
             led, flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 75));
+    operatorController.menu.whileTrue(
+        Commands.parallel(tunnel.intakeCommand(), hopper.intakeCommand()));
+    operatorController.bButton.whileTrue(new RunCommand(() -> drive.stopWithX(), drive));
     driverController.yButton.whileTrue(
         ShooterCommands.PassFromDistance(
             led, flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 75));

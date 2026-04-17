@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Hopper extends SubsystemBase {
-  private static final double maxCurrent = 50;
+  private static final double maxCurrent = 65;
   private final TalonFX hopperMotor;
 
   // Network Table Entry

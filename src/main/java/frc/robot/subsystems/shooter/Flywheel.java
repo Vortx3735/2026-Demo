@@ -19,6 +19,7 @@ import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -60,6 +61,7 @@ public class Flywheel extends SubsystemBase {
   public double simulatedVelocity;
 
   private final boolean isSim;
+  public boolean idling;
   // Sim-only input voltage computed from feedforward when control requests are made
   private double simulatedInputVoltage = 0.0;
 
@@ -82,6 +84,8 @@ public class Flywheel extends SubsystemBase {
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicAcceleration = 100000000; // Target acceleration of 100 rps/s
     motionMagicConfigs.MotionMagicJerk = 10000000; // Target jerk of 6000 rps/s/s (0.1 seconds)
+
+    // talonFXConfigs.TorqueCurrent.PeakReverseTorqueCurrent = 0;
 
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
@@ -110,10 +114,15 @@ public class Flywheel extends SubsystemBase {
     return targetRPS;
   }
 
+  public Boolean getidling() {
+    return idling;
+  }
+
   public void stop() {
     flywheelMotor.set(0);
     targetRPS = 0;
     simulatedInputVoltage = 0.0;
+    idling = false;
   }
 
   public BooleanSupplier isAtSpeed() {
@@ -158,8 +167,21 @@ public class Flywheel extends SubsystemBase {
     flywheelMotor.set(speed);
   }
 
+  public void setSpeedIdle(double speed) {
+    flywheelMotor.set(speed);
+    idling = true;
+  }
+
   public Command shootCommand(double speed) {
-    return this.run(() -> this.shoot(speed)).withName("shoot flywheel");
+    return this.run(
+            () -> {
+              if (speed < 0) {
+                this.setSpeed(1.0);
+              } else {
+                this.shoot(speed);
+              }
+            })
+        .withName("shoot flywheel");
   }
 
   /** Dynamic shoot command which queries the supplied target RPS supplier each loop. */
@@ -198,6 +220,7 @@ public class Flywheel extends SubsystemBase {
     } else {
       currentRPS = flywheelMotor.getRotorVelocity().getValueAsDouble();
     }
+    SmartDashboard.putBoolean("idling", idling);
   }
 
   @Override

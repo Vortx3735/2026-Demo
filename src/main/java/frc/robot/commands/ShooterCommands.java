@@ -108,11 +108,7 @@ public class ShooterCommands {
     Logger.recordOutput("Shooter/effiencyFactor", ef);
 
     Logger.recordOutput("Shooter/calculatedShooterRPS", rps * ef);
-    if (rps * ef > 85) {
-      return 85;
-    } else {
-      return rps * ef;
-    }
+    return rps * ef;
   }
 
   /** Conversion factor from meters to feet. */
@@ -187,11 +183,11 @@ public class ShooterCommands {
               turret.setPositionPID(rotations);
               Logger.recordOutput("test/targetTurretRotations", rotations);
               if (hp == RED_HUB_POSE2D) {
-                led.setState(LEDState.RED);
+                led.setColor(LEDState.GREEN);
               } else if (hp == BLUE_HUB_POSE2D) {
-                led.setState(LEDState.BLUE);
+                led.setColor(LEDState.GREEN);
               } else {
-                led.setState(LEDState.GREEN);
+                led.setColor(LEDState.YELLOW);
               }
             },
             turret,
@@ -317,14 +313,8 @@ public class ShooterCommands {
           Pose2d hp = getAllianceHubPose();
           double liveXs = getDistanceToHub(rp, hp);
           Logger.recordOutput("Shooter/Distance", liveXs);
-
-          if (liveXs > 15) {
-            hood.setPositionPID(theta);
-            return calculateShooterRPS(liveXs, theta);
-          } else {
-            hood.setPositionPID(theta);
-            return calculateShooterRPS(liveXs, theta);
-          }
+          hood.setPositionPID(78);
+          return 55.0;
         };
 
     return Commands.deadline(
