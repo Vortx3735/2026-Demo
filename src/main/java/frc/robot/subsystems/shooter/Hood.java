@@ -38,7 +38,7 @@ public class Hood extends SubsystemBase {
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44(1), kMOI, kGearRatio),
           DCMotor.getKrakenX44(1));
-  public final double startingHoodAngle = 65;
+  public final double startingHoodAngle = 60;
   public double hoodAngle = 0;
   public double hoodAngleOffset = startingHoodAngle;
   public double targetAngle = 0;
@@ -88,15 +88,17 @@ public class Hood extends SubsystemBase {
         200; // Target acceleration of 160 rps/s (0.5 seconds)
     motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
-    talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    talonFXConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    hoodMotor.setPosition(0);
 
+    // zero hood
     hoodAngleOffset =
         startingHoodAngle - hoodMotor.getRotorPosition().getValue().in(Units.Degrees) * kGearRatio;
 
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0;
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 10;
     talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -10;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
     hoodMotor.getConfigurator().apply(talonFXConfigs);
 
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -139,10 +141,10 @@ public class Hood extends SubsystemBase {
     // Convert desired mechanism position (degrees) to motor rotor rotations.
     // mechanism rotations = degrees / 360
     // motor rotations = mechanism rotations / kGearRatio
+    targetAngle = degrees;
     degrees = degrees - startingHoodAngle;
     final PositionVoltage m_request = new PositionVoltage((degrees / 360.0) / kGearRatio);
     hoodMotor.setControl(m_request);
-    targetAngle = degrees;
   }
 
   public boolean isFinished() {
@@ -165,9 +167,27 @@ public class Hood extends SubsystemBase {
         .withName("move hood");
   }
 
+  public Command setTargetAngle(double angle) {
+    return this.run(
+        () -> {
+          this.targetAngle = angle;
+        });
+  }
+
   public Command stopCommand() {
     return new RunCommand(() -> stop(), this).withName("stop hood");
   }
+
+  // public Command hoodDefaultCommand() {
+  //   return run(
+  //       () -> {
+  //         if (Math.abs(hoodAngle - targetAngle) > 1) {
+  //           setPositionPID();
+  //         } else {
+  //           stop();
+  //         }
+  //       });
+  // }
 
   public Command setPositionPIDCommand(double degrees) {
     // Set the setpoint then wait until the hood reports finished, but don't wait forever.
@@ -201,15 +221,8 @@ public class Hood extends SubsystemBase {
     if (!isSim) {
       // Convert motor (rotor) position to hood (mechanism) angle using kGearRatio (mechanism/rotor)
       hoodAngle =
-          hoodAngleOffset + hoodMotor.getRotorPosition().getValue().in(Units.Degrees) * kGearRatio;
-      try {
-        // Convert motor (rotor) velocity (rotations per second) to hood angular velocity in deg/s
-        hoodVelocity = hoodMotor.getRotorVelocity().getValueAsDouble() * 360.0 * kGearRatio;
-      } catch (Exception e) {
-        // ignore if not available
-      }
+          hoodAngleOffset + (360 * hoodMotor.getRotorPosition().getValueAsDouble() * kGearRatio);
     }
-    Logger.recordOutput("Hood/currentAngle", targetAngle);
   }
 
   @Override
@@ -303,7 +316,6 @@ public class Hood extends SubsystemBase {
             * 360.0;
 
     // Record useful debugging outputs for CI logs
-    Logger.recordOutput("Hood/TargetPosition", targetAngle);
     Logger.recordOutput("Hood/SimulatedHoodPosition(degrees)", hoodAngle);
     Logger.recordOutput("Hood/SimulatedHoodVelocity(deg/s)", hoodVelocity);
   }

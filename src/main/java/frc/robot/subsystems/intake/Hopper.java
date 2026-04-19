@@ -6,11 +6,13 @@ import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Hopper extends SubsystemBase {
+  private static final double maxCurrent = 65;
   private final TalonFX hopperMotor;
 
   // Network Table Entry
@@ -24,6 +26,17 @@ public class Hopper extends SubsystemBase {
     NetworkTable hopperTable = inst.getTable("Subsystems/Hopper");
     hopperSpeedEntry = hopperTable.getDoubleTopic("hopperSpeed").getEntry(0);
     hopperSpeedEntry.set(0.3);
+
+    // var talonFXConfigs = new TalonFXConfiguration();
+
+    // var currentLimits = talonFXConfigs.CurrentLimits;
+
+    // currentLimits.SupplyCurrentLimitEnable = true;
+    // currentLimits.SupplyCurrentLimit = 300;
+    // currentLimits.StatorCurrentLimitEnable = true;
+    // currentLimits.StatorCurrentLimit = 300;
+
+    // hopperMotor.getConfigurator().apply(talonFXConfigs);
   }
 
   public double getHopperSpeed() {
@@ -45,12 +58,38 @@ public class Hopper extends SubsystemBase {
     }
   }
 
+  public void runSlow(Boolean inverted) {
+    if (inverted) {
+      // outtake
+      hopperMotor.set(-getHopperSpeed() + 0.08);
+    } else {
+      // intake
+      hopperMotor.set(getHopperSpeed() - 0.08);
+    }
+  }
+
   public void stop() {
     hopperMotor.set(0);
   }
 
   public Command intakeCommand() {
-    return new RunCommand(() -> run(false), this).withName("intake hopper");
+    // if hopper motor is above max current, make it outtake instead (to prevent jamming)
+    return Commands.either(
+        Commands.sequence(
+            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(true))),
+            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(false)))),
+        Commands.run(() -> run(false)),
+        () -> hopperMotor.getStatorCurrent().getValueAsDouble() >= maxCurrent);
+  }
+
+  public Command intakeSlowCommand() {
+    // if hopper motor is above max current, make it outtake instead (to prevent jamming)
+    return Commands.either(
+        Commands.sequence(
+            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(true))),
+            Commands.deadline(Commands.waitSeconds(0.25), Commands.run(() -> run(false)))),
+        Commands.run(() -> runSlow(false)),
+        () -> hopperMotor.getStatorCurrent().getValueAsDouble() >= maxCurrent - 5);
   }
 
   public Command outtakeCommand() {
@@ -62,7 +101,10 @@ public class Hopper extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    Logger.recordOutput("Hopper/statorCurrent", hopperMotor.getStatorCurrent().getValueAsDouble());
+    Logger.recordOutput("Hopper/supplyCurrent", hopperMotor.getStatorCurrent().getValueAsDouble());
+  }
 
   @Override
   public void simulationPeriodic() {

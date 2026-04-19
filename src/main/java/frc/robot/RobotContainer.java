@@ -18,13 +18,13 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.DoubleEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -34,12 +34,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.intake.*;
 import frc.robot.subsystems.shooter.*;
@@ -57,7 +59,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
+  final DoubleEntry targetHoodAngleEntry;
+  final DoubleEntry softwareHoodAngleEntry;
+  final DoubleEntry efficiencyFactorEntry;
   // Subsystems
   public final Vision vision;
   public final Drive drive;
@@ -80,11 +84,14 @@ public class RobotContainer {
           Constants.TunnelConstants.BOTTOM_TUNNEL_MOTOR_ID,
           Constants.TunnelConstants.TOP_TUNNEL_MOTOR_ID);
   public final Telemetry telemetry;
+  public final LEDSubsystem led;
 
   private SwerveDriveSimulation driveSimulation = null;
 
   // Controller
-  private final VorTXControllerXbox controller = new VorTXControllerXbox(0);
+  private final VorTXControllerXbox driverController = new VorTXControllerXbox(0);
+  private final VorTXControllerXbox operatorController = new VorTXControllerXbox(1);
+  private final VorTXControllerXbox sysIdController = new VorTXControllerXbox(2);
 
   // Auton
   private final AutoFactory autoFactory;
@@ -92,10 +99,12 @@ public class RobotContainer {
   final AutoChooser autonChooser = new AutoChooser();
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedDashboardChooser<Command> sysIdChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // SignalLogger.start();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -171,31 +180,58 @@ public class RobotContainer {
     }
     telemetry =
         new Telemetry(drive, vision, flywheel, hood, turret, hopper, intake, tunnel, climber);
+    led = new LEDSubsystem(() -> flywheel.getidling());
     // Init auton objects
     autoFactory = drive.createAutoFactory();
     autoRoutines = new AutoRoutines(autoFactory, this);
+
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    autonChooser.addRoutine(
-        "Example Auton",
-        autoRoutines
-            ::exampleRoutine); // Logged dashboard chooser no support Choreo AutoRoutine objects
+    autonChooser.addRoutine("Standstill Shoot Unjam", autoRoutines::standstillunjam);
+    autonChooser.addRoutine("Standstill shoot then move", autoRoutines::standstill);
+    // autonChooser.addRoutine("test2", autoRoutines::test2);
+
+    // autonChooser.addRoutine(
+    //     "Left DblShort Center Contest", autoRoutines::leftDblShortCenterContest);
+    // autonChooser.addRoutine(
+    //     "Right DblShort Center Contest", autoRoutines::rightDblShortCenterContest);
+
+    autonChooser.addRoutine("Right Lucas", autoRoutines::rightLucas);
+    autonChooser.addRoutine("Left Lucas", autoRoutines::leftLucas);
+    autonChooser.addRoutine("SINGLE Left Lucas", autoRoutines::leftLucasSingle);
+    autonChooser.addRoutine("SINGLE Right Lucas", autoRoutines::rightLucasSingle);
+    autonChooser.addRoutine("Behind Hub", autoRoutines::behindHub);
+    autonChooser.addRoutine("Depot", autoRoutines::depot);
+    // autonChooser.addRoutine("UNTESTED Right Dbl Center", autoRoutines::rightDoubleCenter);
+    // autonChooser.addRoutine("UNTESTED Left Dbl Center", autoRoutines::leftDoubleCenter);
+    autonChooser.addRoutine("UNTESTED One Cycle Right Lucas", autoRoutines::rightLucasOneCycle);
+    autonChooser.addRoutine("UNTESTED One Cycle Left Lucas", autoRoutines::leftLucasOneCycle);
+
+    // autonChooser.addRoutine("Right Dbl Center", autoRoutines::rightDblCenter);
+    // autonChooser.addRoutine("Left Dbl Center", autoRoutines::leftDblCenter);
+
+    // autonChooser.addRoutine("HP Simple", autoRoutines::hpSimple);
+    // autonChooser.addRoutine("Move two meters", autoRoutines::moveTwoMeters);
+
     SmartDashboard.putData("Auton Chooser", autonChooser);
 
+    RobotModeTriggers.autonomous().whileTrue(autonChooser.selectedCommandScheduler());
+    // Init SysId object
+    sysIdChooser = new LoggedDashboardChooser<>("SysId Choices", AutoBuilder.buildAutoChooser());
+
     // Set up SysId routines
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Quasistatic Reverse)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     // Create the SysId routine
     var sysIdRoutine =
@@ -209,16 +245,26 @@ public class RobotContainer {
                 (voltage) -> turret.setVoltage(voltage.in(Volts)),
                 null, // No log consumer, since data is recorded by AdvantageKit
                 turret));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Quasistatic Forward)",
         sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Quasistatic Reverse)",
         sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Dynamic Forward)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    sysIdChooser.addOption(
         "turret SysId (Dynamic Reverse)", sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable shooterTable = inst.getTable("Subystems/Shooter");
+    targetHoodAngleEntry = shooterTable.getDoubleTopic("targetHoodAngleEntry").getEntry(65);
+    targetHoodAngleEntry.set(65);
+    softwareHoodAngleEntry = shooterTable.getDoubleTopic("softwareHoodAngleEntry").getEntry(65);
+    softwareHoodAngleEntry.set(65);
+    efficiencyFactorEntry = shooterTable.getDoubleTopic("efficiencyFactorEntry").getEntry(1.03);
+    efficiencyFactorEntry.set(1.03);
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -234,24 +280,23 @@ public class RobotContainer {
     intake.setDefaultCommand(intake.stopCommand().withName("stop intake"));
     climber.setDefaultCommand(climber.stopCommand().withName("stop climber"));
     hopper.setDefaultCommand(hopper.stopCommand().withName("stop hopper"));
-    // hood.setDefaultCommand(hood.hold().withName("hold hood"));
-    // flywheel.setDefaultCommand(flywheel.stopCommand().withName("hold flywheel
-    // velocity"));
-    // turret.setDefaultCommand(
-    // TurretCommands.AimToHub(turret, () -> drive.getPose()).withName("aim to
-    // hub"));
     hood.setDefaultCommand(hood.stopCommand().withName("stop hood"));
-    flywheel.setDefaultCommand(flywheel.stopCommand().withName("stop flywheel"));
+    flywheel.setDefaultCommand(
+        new RunCommand(() -> flywheel.setSpeedIdle(0.25), flywheel).withName("idle flywheel"));
     tunnel.setDefaultCommand(tunnel.stopCommand().withName("stop tunnel"));
+    // turret.setDefaultCommand(ShooterCommands.AimToHubOrSide(turret, () ->
+    // drive.getTurretPose()));
+    // turret.setDefaultCommand(ShooterCommands.AimToHub(turret, () -> drive.getTurretPose()));
     turret.setDefaultCommand(turret.stopCommand().withName("stop turret"));
+    led.setDefaultCommand(led.setColorCommand(LEDState.RED));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDriveWithBumpAutoalign(
+        DriveCommands.joystickDrive(
                 drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> -controller.getRightX())
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX())
             .withName("joystick drive"));
 
     // Reset gyro / odometry
@@ -260,41 +305,104 @@ public class RobotContainer {
             ? () -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())
             : () ->
                 drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
-    controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
+    driverController.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
 
+    // Trigger hasTag = new Trigger(() -> vision.hasTag());
     // Set bindings
 
     // Shooter Binds
-    controller.lb.whileTrue(turret.moveCommand(true));
-    controller.rb.whileTrue(turret.moveCommand(false));
-    controller.rt.whileTrue(
-        ShooterCommands.ShootFromDistance(flywheel, hopper, tunnel, () -> drive.getPose(), 60));
+    // driverController.lb.whileTrue(turret.moveCommand(true));
+    // driverController.rb.whileTrue(turret.moveCommand(false));
+    driverController.rt.whileTrue(
+        ShooterCommands.ShootFromDistance(
+            led,
+            flywheel,
+            hood,
+            tunnel,
+            hopper,
+            intake,
+            () -> drive.getTurretPose(),
+            softwareHoodAngleEntry.getAsDouble()));
+    // driverController.lt.whileTrue(
+    // ShooterCommands.ShootFromDistanceBackwardsHopper(
+    //     flywheel, tunnel, hopper, intake, () -> drive.getTurretPose(), 65));
     // controller.rt.whileTrue(
     //     CommandFactory.shootCommand(
     //         flywheel, tunnel, hopper, () -> flywheel.flywheelSpeedEntry.getAsDouble() * 90));
-    controller.povLeft.whileTrue(hood.moveCommand(true));
-    controller.povRight.whileTrue(hood.moveCommand(false));
-    controller.yButton.whileTrue(
-        ShooterCommands.AimEverythingToHub(turret, hood, () -> drive.getPose(), 60));
-    // controller.yButton.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
-    controller.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
+    driverController.povLeft.whileTrue(hood.moveCommand(true));
+    driverController.povRight.whileTrue(hood.moveCommand(false));
+    driverController.lt.whileTrue(
+        ShooterCommands.AimEverythingToHub(
+            turret, hood, () -> drive.getTurretPose(), targetHoodAngleEntry.getAsDouble()));
+    driverController.yButton.toggleOnTrue(
+        ShooterCommands.AimToSide(turret, () -> drive.getPose(), led).withName("aim side"));
+    // Operator Shooter Binds
+    // operatorController.bButton.onTrue(new InstantCommand(() -> ShooterCommands.offset += 0.01));
+    operatorController.xButton.toggleOnTrue(flywheel.stopCommand());
+    operatorController.aButton.toggleOnTrue(
+        ShooterCommands.AimToHub(turret, () -> drive.getTurretPose(), led).withName("aim hub"));
+    operatorController.yButton.whileTrue(
+        ShooterCommands.AimToSide(turret, () -> drive.getPose(), led).withName("aim side"));
+    driverController.rb.toggleOnTrue(
+        ShooterCommands.AimToHub(turret, () -> drive.getTurretPose(), led).withName("aim hub"));
+    driverController.lb.toggleOnTrue(
+        ShooterCommands.AimToSide(turret, () -> drive.getPose(), led).withName("aim side"));
+    operatorController.lb.whileTrue(turret.moveCommand(true));
+    operatorController.rb.whileTrue(turret.moveCommand(false));
+    operatorController.povDown.whileTrue(hood.moveCommand(false));
+    operatorController.povUp.whileTrue(hood.moveCommand(true));
+    operatorController.rt.whileTrue(
+        ShooterCommands.ShootFromDistance(
+            led,
+            flywheel,
+            hood,
+            tunnel,
+            hopper,
+            intake,
+            () -> drive.getTurretPose(),
+            softwareHoodAngleEntry.getAsDouble()));
+    operatorController.lt.whileTrue(
+        ShooterCommands.PassFromDistance(
+            led, flywheel, hood, tunnel, hopper, () -> drive.getPose(), 75));
+    operatorController.menu.whileTrue(
+        Commands.parallel(tunnel.intakeCommand(), hopper.intakeCommand()));
+    operatorController.bButton.whileTrue(new RunCommand(() -> drive.stopWithX(), drive));
+    driverController.yButton.whileTrue(
+        ShooterCommands.PassFromDistance(
+            led, flywheel, hood, tunnel, hopper, () -> drive.getPose(), 75));
+    // operatorController.lt.whileTrue(
+    //     CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
+    // operatorController.rt.whileTrue(
+    //     ShooterCommands.AimEverythingToHub(
+    //         turret,
+    //         hood,
+    //         () -> ShooterCommands.getTurretPose(() -> drive.getPose()).toPose2d(),
+    //         targetHoodAngleEntry.getAsDouble()));
     // Climber Binds
-    controller.povUp.whileTrue(climber.upCommand());
-    controller.povDown.whileTrue(climber.downCommand());
+    driverController.povUp.whileTrue(climber.upCommand());
+    driverController.povDown.whileTrue(climber.downCommand());
 
     // Intake Binds
-    controller.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
-    controller.bButton.whileTrue(CommandFactory.outtakeCommand(intake, hopper));
-
-    controller.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
+    driverController.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
+    driverController.bButton.whileTrue(intake.outtakeCommand());
+    driverController.aButton.whileTrue(CommandFactory.clearJamsCommand(tunnel, hopper));
 
     // Test/Misc Binds
-    // controller.povUp.whileTrue(ShooterCommands.AimToHub(turret, () -> drive.getPose()));
-    // controller.povDown.whileTrue(new RunCommand(() -> turret.setVoltageNetworkTable(), turret));
+    // driverController.rs.onTrue(new RunCommand(() -> hood.zeroHood(), hood));
+    operatorController.view.onTrue(new InstantCommand(() -> turret.zero()));
+    driverController.menu.onTrue(new InstantCommand(() -> drive.zeroDriveTrain()));
 
-    controller.view.onTrue(new InstantCommand(() -> turret.zero()));
-    // controller.menu.onTrue(drive.runOnce(() -> drive.))
-    controller.menu.onTrue(new InstantCommand(() -> drive.zeroDriveTrain()));
+    sysIdController.lb.onTrue(Commands.runOnce(SignalLogger::start));
+    sysIdController.rb.onTrue(Commands.runOnce(SignalLogger::stop));
+    // sysIdController.povUp.whileTrue();
+    sysIdController.yButton.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    sysIdController.aButton.whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    sysIdController.xButton.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    sysIdController.bButton.whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    sysIdController.povUp.whileTrue(flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    sysIdController.povDown.whileTrue(flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    sysIdController.povRight.whileTrue(flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    sysIdController.povLeft.whileTrue(flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
@@ -325,34 +433,7 @@ public class RobotContainer {
             ? Constants.FieldConstants.RED_HUB_POSE3D
             : Constants.FieldConstants.BLUE_HUB_POSE3D);
     Logger.recordOutput(
-        "Turret/simulatedPose",
-        new Pose3d(
-                driveSimulation
-                    .getSimulatedDriveTrainPose()
-                    .plus(
-                        new Transform2d(
-                            0.13, -0.2, new Rotation2d(turret.currentPosition * 2 * Math.PI))))
-            .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
-    Logger.recordOutput(
-        "Hood/simulatedPose",
-        new Pose3d(
-                driveSimulation
-                    .getSimulatedDriveTrainPose()
-                    .plus(
-                        new Transform2d(
-                            0.13, -0.2, new Rotation2d(turret.currentPosition * 2 * Math.PI))))
-            .plus(
-                new Transform3d(0, 0, 0.3, new Rotation3d(0, hood.hoodAngle * Math.PI / 180, 0))));
-    Logger.recordOutput(
-        "Turret/targetPose",
-        new Pose3d(
-                driveSimulation
-                    .getSimulatedDriveTrainPose()
-                    .plus(
-                        new Transform2d(
-                            0.13, -0.2, new Rotation2d(turret.targetPosition * 2 * Math.PI))))
-            .plus(new Transform3d(0, 0, 0.3, new Rotation3d())));
-    Logger.recordOutput("Shooter/turretPose", ShooterCommands.getTurretPose(() -> drive.getPose()));
+        "Turret/simulatedPose", ShooterCommands.getTurretPose(() -> drive.getPose()));
 
     Logger.recordOutput(
         "Shooter/flywheelPose",

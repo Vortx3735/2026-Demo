@@ -73,7 +73,7 @@ public class Turret extends SubsystemBase {
     //                 * DCMotor.getKrakenX44(1).rOhms
     //                 * kMOI))
     //         * slot0Configs.kA; // A velocity target of 1 rps results in 0.12 V output
-    slot0Configs.kP = 2; // A position error of 2.5 rotations results in 12 V output
+    slot0Configs.kP = 5; // A position error of 2.5 rotations results in 12 V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0; // A velocity error of 1 rps results in 0.1 V output
 
@@ -82,15 +82,15 @@ public class Turret extends SubsystemBase {
 
     // max mechanism rps: 2.651 rps
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity = 1 / kGearRatio;
-    motionMagicConfigs.MotionMagicAcceleration = 2 / kGearRatio;
+    motionMagicConfigs.MotionMagicCruiseVelocity = 2 / kGearRatio;
+    motionMagicConfigs.MotionMagicAcceleration = 4 / kGearRatio;
     // motionMagicConfigs.MotionMagicJerk = 2000; // Target jerk of 1600 rps/s/s (0.1 seconds)
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.5 / kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.9 / kGearRatio;
     talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0 / kGearRatio;
+    talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.25 / kGearRatio;
 
     turretMotor.getConfigurator().apply(talonFXConfigs);
     turretMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -98,9 +98,13 @@ public class Turret extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable table = inst.getTable("Subsystems/Turret");
     turretSpeedEntry = table.getDoubleTopic("turretSpeed").getEntry(0);
-    turretSpeedEntry.set(0.1);
+    turretSpeedEntry.set(0.2);
     turretPositionEntry = table.getDoubleTopic("turretPosition(rotations)").getEntry(0);
     turretPositionEntry.set(0);
+
+    // zero turret
+    turretMotor.setPosition(0.26 / kGearRatio);
+
     // configure talonfx sim state if the mode is sim
     if (state == Mode.SIM) {
       var talonFXSim = turretMotor.getSimState();
@@ -146,6 +150,13 @@ public class Turret extends SubsystemBase {
     return () -> Math.abs(targetPosition - currentPosition) < kTurretPositionTolerance;
   }
 
+  public BooleanSupplier hitLimit() {
+    return () ->
+        !(targetPosition < 0.5 && targetPosition > 0.0)
+            && (Math.abs(0.5 - currentPosition) < kTurretPositionTolerance
+                || Math.abs(0.0 - currentPosition) < kTurretPositionTolerance);
+  }
+
   public void set(double s) {
     turretMotor.set(s);
   }
@@ -155,7 +166,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void zero() {
-    turretMotor.setPosition(0.26 / kGearRatio);
+    turretMotor.setPosition(0.25 / kGearRatio);
   }
 
   // command factories / command helpers

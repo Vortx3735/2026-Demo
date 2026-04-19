@@ -8,6 +8,7 @@
 package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -17,7 +18,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 public class VisionConstants {
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
   // Camera names, must match names configured on coprocessor
   public static String frontCameraName = "front";
@@ -25,41 +26,39 @@ public class VisionConstants {
   public static String rightCameraName = "right";
   public static String leftCameraName = "left";
 
-  // note: zero z component might be 0.5 meters above the ground
-
-  // note: zero z component might be 0.5 meters above the ground
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   public static Transform3d frontCameraTransform =
       new Transform3d(
-          Inches.of(12.671076),
-          Inches.of(-0.499150),
-          Inches.of(15.651053),
+          Meters.of(0.748 - 0.413),
+          Meters.of(1.897 - 1.7526),
+          Meters.of(0.261),
           new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0));
-  public static Transform3d backCameraTransform =
+  public static Transform3d backCameraTransform = // tuned using cad
       new Transform3d(
-          Inches.of(-9.646),
-          Inches.of(-3.844),
-          Inches.of(18.190),
-          new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
+          Inches.of(-((9.699 + 11.128) / 2)),
+          Inches.of(-((6.818 + 8.191) / 2)),
+          Inches.of(19),
+          new Rotation3d(0.0, -18.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI)));
-  public static Transform3d rightCameraTransform =
+  public static Transform3d rightCameraTransform = // tuned
       new Transform3d(
-          Inches.of(-2.458),
-          Inches.of(-14.702),
-          Inches.of(21.460),
+          //   Inches.of(16.5 - 47),
+          Meters.of(0.04), // y
+          Meters.of(0.419 - 0.77), // x
+          Inches.of(21),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
-              .rotateBy(new Rotation3d(0.0, 0.0, Math.PI * 3.0 / 2.0)));
-  public static Transform3d leftCameraTransform =
+              .rotateBy(new Rotation3d(0.0, 0.0, -Math.PI / 2.0)));
+  public static Transform3d leftCameraTransform = // tuned using cad
       new Transform3d(
-          Inches.of(-2.594),
-          Inches.of(13.962),
-          Inches.of(19.468),
+          Inches.of(-((1.685 + 2.361) / 2)),
+          Inches.of((13.114 + 14.611) / 2),
+          Inches.of(18.8),
           new Rotation3d(0.0, -30.0 * Math.PI / 180, 0.0)
               .rotateBy(new Rotation3d(0.0, 0.0, Math.PI / 2.0)));
 
   // Basic filtering threshold
-  public static double maxAmbiguity = 0.3;
+  public static double maxAmbiguity = 0.1;
   public static double maxZError = 0.75;
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
@@ -69,12 +68,13 @@ public class VisionConstants {
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)
+  // higher value = trust it less
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // Camera 0
-        1.0, // Camera 1
-        1.0, // Camera 2
-        1.0 // Camera 3
+        1.0, // Camera front
+        1.0, // Camera back
+        1.0, // Camera left
+        1.0 // Camera right
       };
 
   // Multipliers to apply for MegaTag 2 observations

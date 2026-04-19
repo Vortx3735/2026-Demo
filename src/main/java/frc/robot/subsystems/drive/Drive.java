@@ -23,6 +23,7 @@ import choreo.Choreo.TrajectoryLogger;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -37,10 +38,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -73,9 +72,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
-  private final PIDController m_pathXController = new PIDController(3.7, 0, 0);
-  private final PIDController m_pathYController = new PIDController(3.7, 0, 0);
-  private final PIDController m_pathThetaController = new PIDController(3.5, 0, 0);
+  private final PIDController m_pathXController = new PIDController(4.1, 0, 0);
+  private final PIDController m_pathYController = new PIDController(4, 1, 0);
+  private final PIDController m_pathThetaController = new PIDController(4.1, 0, 0);
 
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
@@ -170,14 +169,16 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     // Start odometry thread
     PhoenixOdometryThread.getInstance().start();
 
+    // VelocityUnit<VoltageUnit> v = new VelocityUnit<VoltageUnit>(Units.Volts.of(0.8)
+    // Seconds.of(1));
     // Configure SysId
     sysId =
         new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
+                Volts.of(2.5),
                 null,
-                null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                (state) -> SignalLogger.writeString("state", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
@@ -262,6 +263,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
       Logger.recordOutput("pose", getPose());
+      Logger.recordOutput("gyroRotation", rawGyroRotation.getDegrees());
     }
 
     // Update gyro alert
@@ -290,6 +292,10 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+  }
+
+  public void driveFieldRelative(ChassisSpeeds speeds) {
+    runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation()));
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -382,17 +388,11 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     return poseEstimator.getEstimatedPosition();
   }
 
-  @AutoLogOutput(key = "Shooter/hoodPose")
-  public Pose3d getHoodPose() {
-    Pose2d drivePose = poseEstimator.getEstimatedPosition();
-    // robot to hood transform  x:-10.135-0.51 y:13.866-2.885 z:18.126 (inches)
-    return new Pose3d(drivePose)
-        .plus(
-            new Transform3d(
-                Inches.of(-(10.135 - 0.51)),
-                Inches.of(13.866 - 4.385),
-                Inches.of(14.126),
-                new Rotation3d()));
+  @AutoLogOutput(key = "Shooter/TurretPose")
+  public Pose2d getTurretPose() {
+    return poseEstimator
+        .getEstimatedPosition()
+        .plus(new Transform2d(Inches.of(-8.708), Inches.of(8.299016), new Rotation2d()));
   }
 
   /** Returns the current odometry rotation. */
@@ -414,13 +414,19 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   public void followPath(SwerveSample sample) {
     var pose = getPose();
 
-    var targetSpeeds = sample.getChassisSpeeds();
-    targetSpeeds.vxMetersPerSecond += m_pathXController.calculate(pose.getX(), sample.x);
-    targetSpeeds.vyMetersPerSecond += m_pathYController.calculate(pose.getY(), sample.y);
-    targetSpeeds.omegaRadiansPerSecond +=
+    /*ChassisSpeeds speeds = new ChassisSpeeds(
+      sample.vx + m_pathXController.calculate(pose.getX(), sample.x),
+      sample.vy + m_pathYController.calculate(pose.getY(), sample.y),
+      sample.omega + m_pathThetaController.calculate(pose.getRotation().getRadians(), sample.heading)
+    ); */
+
+    var speeds = sample.getChassisSpeeds();
+    speeds.vxMetersPerSecond += m_pathXController.calculate(pose.getX(), sample.x);
+    speeds.vyMetersPerSecond += m_pathYController.calculate(pose.getY(), sample.y);
+    speeds.omegaRadiansPerSecond +=
         m_pathThetaController.calculate(pose.getRotation().getRadians(), sample.heading);
 
-    runVelocity(targetSpeeds);
+    driveFieldRelative(speeds);
   }
 
   /** Adds a new timestamped vision measurement. */

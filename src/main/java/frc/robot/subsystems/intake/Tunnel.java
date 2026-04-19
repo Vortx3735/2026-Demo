@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
@@ -20,6 +21,8 @@ public class Tunnel extends SubsystemBase {
   final DoubleEntry topTunnelSpeedEntry;
   final DoubleEntry bottomTunnelSpeedEntry;
 
+  private static final double maxCurrent = 1000;
+
   public Tunnel(int bottomTunnelId, int topTunnelId) {
     bottomTunnelMotor = new TalonFX(bottomTunnelId);
     topTunnelMotor = new TalonFX(topTunnelId);
@@ -28,6 +31,21 @@ public class Tunnel extends SubsystemBase {
     TalonFXConfiguration topMotorConfig = new TalonFXConfiguration();
     bottomMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     topMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    // var bottomCurrentLimits = bottomMotorConfig.CurrentLimits;
+
+    // bottomCurrentLimits.SupplyCurrentLimitEnable = true;
+    // bottomCurrentLimits.SupplyCurrentLimit = 300;
+    // bottomCurrentLimits.StatorCurrentLimitEnable = true;
+    // bottomCurrentLimits.StatorCurrentLimit = 300;
+
+    // var topCurrentLimit = bottomMotorConfig.CurrentLimits;
+
+    // topCurrentLimits.SupplyCurrentLimitEnable = true;
+    // topCurrentLimits.SupplyCurrentLimit = 300;
+    // topCurrentLimits.StatorCurrentLimitEnable = true;
+    // topCurrentLimits.StatorCurrentLimit = 300;
+
     bottomTunnelMotor.getConfigurator().apply(bottomMotorConfig);
     topTunnelMotor.getConfigurator().apply(topMotorConfig);
 
@@ -37,8 +55,8 @@ public class Tunnel extends SubsystemBase {
     NetworkTable tunnelTable = inst.getTable("Subsystems/Tunnel");
     bottomTunnelSpeedEntry = tunnelTable.getDoubleTopic("bottomTunnelSpeed").getEntry(1);
     topTunnelSpeedEntry = tunnelTable.getDoubleTopic("topTunnelSpeed").getEntry(1);
-    bottomTunnelSpeedEntry.set(0.4);
-    topTunnelSpeedEntry.set(0.4);
+    bottomTunnelSpeedEntry.set(0.35);
+    topTunnelSpeedEntry.set(0.35);
   }
 
   public double getTopTunnelSpeed() {
@@ -73,7 +91,7 @@ public class Tunnel extends SubsystemBase {
   }
 
   public Command intakeCommand() {
-    return new RunCommand(() -> run(false), this).withName("intake tunnel");
+    return Commands.run(() -> run(false));
   }
 
   public Command outtakeCommand() {
@@ -85,7 +103,12 @@ public class Tunnel extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    // Logger.recordOutput("Tunnel/bottomStatorCurrent",
+    // bottomTunnelMotorMotor.getStatorCurrent().getValueAsDouble());
+    // Logger.recordOutput("Tunnel/supplyCurrent",
+    // topTunnelMotor.getStatorCurrent().getValueAsDouble());
+  }
 
   @Override
   public void simulationPeriodic() {
