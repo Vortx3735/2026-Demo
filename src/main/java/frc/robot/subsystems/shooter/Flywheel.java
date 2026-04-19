@@ -85,7 +85,7 @@ public class Flywheel extends SubsystemBase {
     motionMagicConfigs.MotionMagicAcceleration = 100000000; // Target acceleration of 100 rps/s
     motionMagicConfigs.MotionMagicJerk = 10000000; // Target jerk of 6000 rps/s/s (0.1 seconds)
 
-    // talonFXConfigs.TorqueCurrent.PeakReverseTorqueCurrent = 0;
+    talonFXConfigs.TorqueCurrent.PeakReverseTorqueCurrent = 0;
 
     talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
@@ -221,6 +221,8 @@ public class Flywheel extends SubsystemBase {
       currentRPS = flywheelMotor.getRotorVelocity().getValueAsDouble();
     }
     SmartDashboard.putBoolean("idling", idling);
+    Logger.recordOutput(
+        "Shooter/Flywheel/statorCurrent", flywheelMotor.getStatorCurrent().getValueAsDouble());
   }
 
   @Override

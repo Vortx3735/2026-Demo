@@ -303,7 +303,6 @@ public class ShooterCommands {
       Hood hood,
       Tunnel tunnel,
       Hopper hopper,
-      Intake intake,
       Supplier<Pose2d> poseSupplier,
       double theta) {
     // create a supplier that computes target RPS from the live robot pose
@@ -318,7 +317,7 @@ public class ShooterCommands {
         };
 
     return Commands.deadline(
-            CommandFactory.shootCommand(led, flywheel, tunnel, hopper, intake, targetRpsSupplier))
+            CommandFactory.shootCommandNoIntake(led, flywheel, tunnel, hopper, targetRpsSupplier))
         .withName("ShootFromDistance");
   }
 

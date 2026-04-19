@@ -53,6 +53,24 @@ public class CommandFactory {
         .withName("shoot command group");
   }
 
+  public static Command shootCommandNoIntake(
+      LEDSubsystem led,
+      Flywheel flywheel,
+      Tunnel tunnel,
+      Hopper hopper,
+      Supplier<Double> targetRPS) {
+    return Commands.parallel(
+            flywheel.shootCommand(targetRPS),
+            Commands.sequence(
+                Commands.deadline(
+                    new WaitUntilCommand(flywheel.isAtSpeed()), hopper.intakeSlowCommand()),
+                Commands.parallel(hopper.intakeCommand(), tunnel.intakeCommand()))
+            // ,Commands.sequence(new WaitUntilCommand(flywheel.isAtSpeed()),
+            // tunnel.intakeCommand())
+            )
+        .withName("shoot command group");
+  }
+
   public static Command shootCommandNoHood(
       Flywheel flywheel, Tunnel tunnel, Hopper hopper, Intake intake, Double targetRPS) {
     return Commands.parallel(

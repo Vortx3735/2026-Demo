@@ -167,14 +167,22 @@ public class AutoRoutines {
     return routine;
   }
 
-  //   public AutoRoutine whydidntidothisearlier() {
-  //     final AutoRoutine routine = m_factory.newRoutine("ok");
-  //     final AutoTrajectory behindHubTraj = routine.trajectory("test");
+  public AutoRoutine depot() {
+    final AutoRoutine routine = m_factory.newRoutine("behindHub");
+    final AutoTrajectory behindHub = routine.trajectory("BehindHubDepot");
+    final AutoTrajectory moveThroughDepot = routine.trajectory("MoveThroughDepotMid");
 
-  //     routine.active().onTrue(Commands.sequence(behindHubTraj.resetOdometry(),
-  // behindHubTraj.cmd()));
+    routine.active().onTrue(Commands.sequence(behindHub.resetOdometry(), behindHub.cmd()));
 
-  //   }
+    behindHub.done().onTrue(moveThroughDepot.cmd());
+
+    moveThroughDepot
+        .active()
+        .whileTrue(CommandFactory.intakeCommand(m_container.intake, m_container.hopper));
+    moveThroughDepot.doneFor(10).whileTrue(shoot());
+
+    return routine;
+  }
 
   // Contests half of neutral zone then shoots, then does it again
   public AutoRoutine leftDblShortCenterContest() {
@@ -317,7 +325,7 @@ public class AutoRoutines {
     // reset
     driveBack.doneDelayed(shotTime).onTrue(reset.cmd());
     reset.done().onTrue(driveToHub.cmd());
-    driveToHub.doneFor(shotTime).onTrue(driveBehindHub.cmd());
+    driveToHub.done().onTrue(driveBehindHub.cmd());
 
     // short bindings will call again
     driveBehindHub
@@ -369,7 +377,6 @@ public class AutoRoutines {
   //       Commands.sequence(
   //         new WaitCommand(hubOnlyDelay), driveToHub.resetOdometry(), driveToHub.cmd())
   //       );
-    
 
   //   driveBehindHub
   //       .active()
@@ -407,7 +414,7 @@ public class AutoRoutines {
     // reset
     driveBack.doneDelayed(shotTime).onTrue(reset.cmd());
     reset.done().onTrue(driveToHub.cmd());
-    driveToHub.doneFor(shotTime).onTrue(driveBehindHub.cmd());
+    driveToHub.done().onTrue(driveBehindHub.cmd());
 
     // short bindings will call again
     driveBehindHub
@@ -445,7 +452,7 @@ public class AutoRoutines {
     // reset
     driveBack.doneDelayed(shotTime).onTrue(reset.cmd());
     reset.done().onTrue(driveToHub.cmd());
-    driveToHub.doneFor(shotTime).onTrue(driveBehindHub.cmd());
+    driveToHub.done().onTrue(driveBehindHub.cmd());
 
     // short bindings will call again
     driveBehindHub

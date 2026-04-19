@@ -200,8 +200,9 @@ public class RobotContainer {
     autonChooser.addRoutine("SINGLE Left Lucas", autoRoutines::leftLucasSingle);
     autonChooser.addRoutine("SINGLE Right Lucas", autoRoutines::rightLucasSingle);
     autonChooser.addRoutine("Behind Hub", autoRoutines::behindHub);
-    autonChooser.addRoutine("UNTESTED Right Dbl Center", autoRoutines::rightDoubleCenter);
-    autonChooser.addRoutine("UNTESTED Left Dbl Center", autoRoutines::leftDoubleCenter);
+    autonChooser.addRoutine("Depot", autoRoutines::depot);
+    // autonChooser.addRoutine("UNTESTED Right Dbl Center", autoRoutines::rightDoubleCenter);
+    // autonChooser.addRoutine("UNTESTED Left Dbl Center", autoRoutines::leftDoubleCenter);
     autonChooser.addRoutine("UNTESTED One Cycle Right Lucas", autoRoutines::rightLucasOneCycle);
     autonChooser.addRoutine("UNTESTED One Cycle Left Lucas", autoRoutines::leftLucasOneCycle);
 
@@ -362,13 +363,13 @@ public class RobotContainer {
             softwareHoodAngleEntry.getAsDouble()));
     operatorController.lt.whileTrue(
         ShooterCommands.PassFromDistance(
-            led, flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 75));
+            led, flywheel, hood, tunnel, hopper, () -> drive.getPose(), 75));
     operatorController.menu.whileTrue(
         Commands.parallel(tunnel.intakeCommand(), hopper.intakeCommand()));
     operatorController.bButton.whileTrue(new RunCommand(() -> drive.stopWithX(), drive));
     driverController.yButton.whileTrue(
         ShooterCommands.PassFromDistance(
-            led, flywheel, hood, tunnel, hopper, intake, () -> drive.getPose(), 75));
+            led, flywheel, hood, tunnel, hopper, () -> drive.getPose(), 75));
     // operatorController.lt.whileTrue(
     //     CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 0.1));
     // operatorController.rt.whileTrue(
