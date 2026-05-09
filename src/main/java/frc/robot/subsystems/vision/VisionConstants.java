@@ -59,7 +59,7 @@ public class VisionConstants {
 
   // Basic filtering threshold
   public static double maxAmbiguity = 0.1;
-  public static double maxZError = 0.75;
+  public static double maxZError = 99999999;
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)

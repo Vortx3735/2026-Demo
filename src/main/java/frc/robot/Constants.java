@@ -83,9 +83,9 @@ public class Constants {
   }
 
   public static class FieldConstants {
-    public static final double DISTANCE_X_TO_HUB = 4.62534;
+    public static final double DISTANCE_X_TO_HUB = 3.8;
     public static final Pose3d BLUE_HUB_POSE3D =
-        new Pose3d(DISTANCE_X_TO_HUB, 4.03479, 1.8, new Rotation3d());
+        new Pose3d(DISTANCE_X_TO_HUB, 4.03479, -5, new Rotation3d());
     public static final Pose3d RED_HUB_POSE3D =
         new Pose3d(16.54 - DISTANCE_X_TO_HUB, 4.03479, 1.8, new Rotation3d());
     public static final Pose2d BLUE_RIGHT = new Pose2d(3.09, 6.3, new Rotation2d());

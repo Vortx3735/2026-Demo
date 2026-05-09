@@ -25,8 +25,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class ShooterCommands {
   // if only running right camera
-  public static double offset = 0.06;
-  public static double efficiencyFactor = 1.06;
+  public static double offset = 0.1
+  ;
+  public static double efficiencyFactor = 0.85;
   // public double offset=0.0;
   // Cache Pose2d instances for hubs (avoid allocating in tight loops)
   private static final Pose2d RED_HUB_POSE2D =

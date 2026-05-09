@@ -352,15 +352,7 @@ public class RobotContainer {
     operatorController.povDown.whileTrue(hood.moveCommand(false));
     operatorController.povUp.whileTrue(hood.moveCommand(true));
     operatorController.rt.whileTrue(
-        ShooterCommands.ShootFromDistance(
-            led,
-            flywheel,
-            hood,
-            tunnel,
-            hopper,
-            intake,
-            () -> drive.getTurretPose(),
-            softwareHoodAngleEntry.getAsDouble()));
+        CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 50.0));
     operatorController.lt.whileTrue(
         ShooterCommands.PassFromDistance(
             led, flywheel, hood, tunnel, hopper, () -> drive.getPose(), 75));
