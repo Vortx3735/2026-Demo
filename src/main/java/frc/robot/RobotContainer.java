@@ -307,16 +307,17 @@ public class RobotContainer {
     // Shooter Binds
     driverController.lb.whileTrue(turret.moveCommand(true));
     driverController.rb.whileTrue(turret.moveCommand(false));
-    driverController.povDown.whileTrue(hood.moveCommand(false));
-    driverController.povUp.whileTrue(hood.moveCommand(true));
+    driverController.povDown.whileTrue(hood.moveCommand(true));
+    driverController.povUp.whileTrue(hood.moveCommand(false));
+    driverController.view.toggleOnTrue(led.setColorCommand(LEDState.IDLE));
     driverController.rt.whileTrue(
         CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 35.0));
 
     // Operator Shooter Binds
     operatorController.lb.whileTrue(turret.moveCommand(true));
     operatorController.rb.whileTrue(turret.moveCommand(false));
-    operatorController.povDown.whileTrue(hood.moveCommand(false));
-    operatorController.povUp.whileTrue(hood.moveCommand(true));
+    operatorController.povDown.whileTrue(hood.moveCommand(true));
+    operatorController.povUp.whileTrue(hood.moveCommand(false));
     operatorController.rt.whileTrue(
         CommandFactory.manualShootCommandAtSpeed(flywheel, hopper, tunnel, () -> 35.0));
     operatorController.xButton.whileTrue(CommandFactory.intakeCommand(intake, hopper));
